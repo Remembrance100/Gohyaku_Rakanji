@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Memorial Tour Guide</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Barlow:wght@500;700;800&family=Manrope:wght@500;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="app-shell" id="appShell">
+      <section class="tour-sheet" aria-label="Tour stops">
+        <article class="intro-card">
+          <video
+            id="introVideo"
+            class="intro-video hidden"
+            playsinline
+            muted
+            autoplay
+            loop
+            controls
+            preload="metadata"
+            aria-label="Introduction video"
+          ></video>
+        </article>
+
+        <div class="stop-list">
+          <article class="stop-card">
+            <div
+              class="thumb"
+              role="img"
+              aria-label="Entrance gate with memorial arch"
+            >
+              <button class="play-btn" type="button" aria-label="Play audio stop">
+                >
+              </button>
+            </div>
+            <div class="stop-info">
+              <h3>01 | Welcome Gate & Orientation Plaza</h3>
+              <p>3:05</p>
+            </div>
+            <button class="open-link" type="button" data-stop="1">OPEN</button>
+          </article>
+
+          <article class="stop-card">
+            <div
+              class="thumb"
+              role="img"
+              aria-label="Stone wall carved with memorial names"
+            >
+              <button class="play-btn" type="button" aria-label="Play audio stop">
+                >
+              </button>
+            </div>
+            <div class="stop-info">
+              <h3>02 | Wall of Names</h3>
+              <p>2:42</p>
+            </div>
+            <button class="open-link" type="button" data-stop="2">OPEN</button>
+          </article>
+
+          <article class="stop-card">
+            <div
+              class="thumb"
+              role="img"
+              aria-label="Eternal flame in bronze monument"
+            >
+              <button class="play-btn" type="button" aria-label="Play audio stop">
+                >
+              </button>
+            </div>
+            <div class="stop-info">
+              <h3>03 | Eternal Flame Courtyard</h3>
+              <p>2:18</p>
+            </div>
+            <button class="open-link" type="button" data-stop="3">OPEN</button>
+          </article>
+
+          <article class="stop-card">
+            <div
+              class="thumb"
+              role="img"
+              aria-label="Garden path lined with white flowers"
+            >
+              <button class="play-btn" type="button" aria-label="Play audio stop">
+                >
+              </button>
+            </div>
+            <div class="stop-info">
+              <h3>04 | Reflection Garden</h3>
+              <p>2:56</p>
+            </div>
+            <button class="open-link" type="button" data-stop="4">OPEN</button>
+          </article>
+
+          <article class="stop-card">
+            <div
+              class="thumb"
+              role="img"
+              aria-label="Bell tower and quiet seating area"
+            >
+              <button class="play-btn" type="button" aria-label="Play audio stop">
+                >
+              </button>
+            </div>
+            <div class="stop-info">
+              <h3>05 | Peace Bell Pavilion</h3>
+              <p>1:49</p>
+            </div>
+            <button class="open-link" type="button" data-stop="5">OPEN</button>
+          </article>
+        </div>
+      </section>
+
+      <section class="detail-view" aria-label="Stop detail">
+        <div class="detail-hero">
+          <button class="back-btn" id="backButton" type="button" aria-label="Go back">
+            <
+          </button>
+          <div class="detail-hero-track" id="detailHeroTrack"></div>
+          <div
+            class="detail-hero-indicators"
+            id="detailHeroIndicators"
+            aria-label="Image slide indicators"
+          ></div>
+        </div>
+
+        <header class="detail-strip">
+          <p class="detail-number" id="detailNumber">01</p>
+          <h2 class="detail-title" id="detailTitle">
+            Welcome Gate & Orientation Plaza
+          </h2>
+        </header>
+
+        <div class="detail-content" id="detailContent">
+          <article class="detail-question-block">
+            <h3 id="detailQuestion">
+              Why was this site chosen as a place of remembrance?
+            </h3>
+          </article>
+
+          <div class="detail-text" id="detailText"></div>
+
+          <section class="detail-transcript-block" id="detailTranscriptBlock" hidden>
+            <h4>Transcript</h4>
+            <div class="detail-transcript" id="detailTranscript"></div>
+          </section>
+
+          <div class="player-dock">
+            <article class="player-card">
+              <img
+                id="detailThumb"
+                class="player-thumb"
+                src="https://picsum.photos/id/1040/120/80"
+                alt="Stop thumbnail"
+              />
+              <p id="detailAudioTitle">01 | Welcome Gate & Orientation Plaza</p>
+              <button
+                class="detail-play-btn"
+                id="detailPlayBtn"
+                type="button"
+                aria-label="Play stop audio"
+              >
+                ▶
+              </button>
+            </article>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <section
+      class="overlay-modal hidden"
+      id="mapPreviewModal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="mapPreviewTitle"
+    >
+      <div class="overlay-modal-inner">
+        <div class="overlay-modal-head">
+          <h3 id="mapPreviewTitle">Map Preview</h3>
+          <button
+            type="button"
+            class="overlay-modal-close"
+            id="mapPreviewClose"
+            aria-label="Close map preview"
+          >
+            x
+          </button>
+        </div>
+        <img id="mapPreviewImage" class="overlay-image" src="" alt="Stop map preview" />
+      </div>
+    </section>
+
+    <section
+      class="overlay-modal hidden"
+      id="termModal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="termModalTitle"
+    >
+      <div class="overlay-modal-inner term-modal-inner">
+        <div class="overlay-modal-head">
+          <h3 id="termModalTitle">Keyword</h3>
+          <button
+            type="button"
+            class="overlay-modal-close"
+            id="termModalClose"
+            aria-label="Close keyword details"
+          >
+            x
+          </button>
+        </div>
+        <div class="term-modal-scroll" id="termModalScroll">
+          <div id="termGalleryMeta" class="term-gallery-meta hidden">
+            <span id="termGalleryCount" class="term-gallery-count">1 / 1</span>
+            <div id="termGalleryDots" class="term-gallery-dots" aria-label="Image position"></div>
+          </div>
+          <div id="termModalMedia" class="term-modal-media hidden"></div>
+          <div id="termModalBody" class="term-modal-body"></div>
+        </div>
+      </div>
+    </section>
+
+    <script src="./script.js"></script>
+  </body>
+</html>
