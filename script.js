@@ -3,6 +3,7 @@ const DATA_URL =
 const SLIDE_INTERVAL_MS = 3000;
 
 const appShell = document.querySelector("#appShell");
+const appLoadingOverlay = document.querySelector("#appLoadingOverlay");
 const stopList = document.querySelector(".stop-list");
 const introButton = document.querySelector(".intro-cta");
 const introCard = document.querySelector(".intro-card");
@@ -28,8 +29,13 @@ const detailPlayBtn = document.querySelector("#detailPlayBtn");
 const playerDock = document.querySelector(".player-dock");
 
 const mapPreviewModal = document.querySelector("#mapPreviewModal");
+const mapPreviewTitle = document.querySelector("#mapPreviewTitle");
+const mapPreviewStage = document.querySelector("#mapPreviewStage");
 const mapPreviewImage = document.querySelector("#mapPreviewImage");
 const mapPreviewClose = document.querySelector("#mapPreviewClose");
+const mapZoomOutBtn = document.querySelector("#mapZoomOut");
+const mapZoomResetBtn = document.querySelector("#mapZoomReset");
+const mapZoomInBtn = document.querySelector("#mapZoomIn");
 
 const termModal = document.querySelector("#termModal");
 const termModalTitle = document.querySelector("#termModalTitle");
@@ -49,6 +55,25 @@ let activePreviewButton = null;
 let heroSlideIndex = 0;
 let heroSlideTimer = null;
 let activeTermLookup = new Map();
+
+const MAP_MIN_SCALE = 1;
+const MAP_MAX_SCALE = 4;
+const MAP_ZOOM_STEP = 0.25;
+let mapScale = 1;
+let mapOffsetX = 0;
+let mapOffsetY = 0;
+let mapPointers = new Map();
+let mapPinchStart = null;
+let mapDragPointerId = null;
+let mapDragStartX = 0;
+let mapDragStartY = 0;
+
+function playIconHtml(size = 10) {
+  return `<svg width="${size}" height="${size}" viewBox="0 0 10 10" fill="currentColor" aria-hidden="true" focusable="false"><polygon points="2,1 9,5 2,9"/></svg>`;
+}
+function pauseIconHtml(size = 10) {
+  return `<svg width="${size}" height="${size}" viewBox="0 0 10 10" fill="currentColor" aria-hidden="true" focusable="false"><rect x="1" y="1" width="3" height="8" rx="0.5"/><rect x="6" y="1" width="3" height="8" rx="0.5"/></svg>`;
+}
 
 const fallbackStops = [
   {
@@ -597,7 +622,8 @@ function renderIntroCardVideo(stops) {
   introCard
     .querySelectorAll(".intro-label, h2, .intro-cta")
     .forEach((node) => node.remove());
-  introCard.classList.remove("has-video");
+  introCard.classList.remove("has-video", "has-aspect-ratio");
+  introCard.style.aspectRatio = "";
 
   let introVideoEl = introCard.querySelector("#introVideo");
   if (!introVideoEl) {
@@ -609,6 +635,8 @@ function renderIntroCardVideo(stops) {
     introVideoEl.setAttribute("autoplay", "");
     introVideoEl.setAttribute("loop", "");
     introVideoEl.setAttribute("controls", "");
+    introVideoEl.setAttribute("controlslist", "nodownload noplaybackrate");
+    introVideoEl.setAttribute("disablepictureinpicture", "");
     introVideoEl.setAttribute("preload", "metadata");
     introVideoEl.setAttribute("aria-label", "Introduction video");
     introCard.prepend(introVideoEl);
@@ -616,9 +644,11 @@ function renderIntroCardVideo(stops) {
 
   const firstStop = Array.isArray(stops) && stops.length ? stops[0] : null;
   const introVideoUrl = resolveMediaUrl(firstStop?.videoUrl);
-  const introPoster = resolveImageUrl(firstStop?.thumb);
+  const introPoster = resolveImageUrl(firstStop?.media?.[0] || firstStop?.thumb);
   if (introPoster) {
     introVideoEl.poster = introPoster;
+  } else {
+    introVideoEl.removeAttribute("poster");
   }
 
   if (!introVideoUrl) {
@@ -637,19 +667,25 @@ function renderIntroCardVideo(stops) {
   introVideoEl.playsInline = true;
   introVideoEl.loop = true;
   introVideoEl.controls = true;
-  const setIntroVideoFit = () => {
-    const isPortrait = introVideoEl.videoHeight > introVideoEl.videoWidth * 1.08;
-    introVideoEl.classList.toggle("is-portrait", isPortrait);
-    introVideoEl.classList.toggle("is-landscape", !isPortrait);
-  };
-  introVideoEl.onloadedmetadata = setIntroVideoFit;
+  introVideoEl.setAttribute("controlslist", "nodownload noplaybackrate");
+  introVideoEl.setAttribute("disablepictureinpicture", "");
   introVideoEl.classList.remove("hidden");
   introCard.hidden = false;
   introCard.classList.add("has-video");
-  introVideoEl.play().catch(() => {});
-  if (introVideoEl.readyState >= 1) {
-    setIntroVideoFit();
+
+  const applyAspectRatio = () => {
+    const { videoWidth: vw, videoHeight: vh } = introVideoEl;
+    if (vw && vh) {
+      introCard.style.aspectRatio = `${vw} / ${vh}`;
+      introCard.classList.add("has-aspect-ratio");
+    }
+  };
+  introVideoEl.addEventListener("loadedmetadata", applyAspectRatio, { once: true });
+  if (introVideoEl.readyState >= 1 && introVideoEl.videoWidth) {
+    applyAspectRatio();
   }
+
+  introVideoEl.play().catch(() => {});
 }
 
 function renderStopList(stops) {
@@ -676,7 +712,7 @@ function renderStopList(stops) {
     playButton.className = "play-btn";
     playButton.type = "button";
     playButton.setAttribute("aria-label", "Play audio stop");
-    playButton.textContent = "▶";
+    playButton.innerHTML = playIconHtml();
     playButton.dataset.stopId = stop.id;
     playButton.disabled = !stop.audioUrl;
 
@@ -709,7 +745,7 @@ function renderStopList(stops) {
     mapButton.className = "open-link";
     mapButton.type = "button";
     mapButton.dataset.stopId = stop.id;
-    mapButton.textContent = "MAP";
+    mapButton.textContent = "地図";
     mapButton.disabled = !stop.mapUrl;
 
     item.appendChild(thumb);
@@ -925,7 +961,7 @@ function setDetailStop(stop) {
   listPreviewAudio.pause();
   if (activePreviewButton) {
     activePreviewButton.classList.remove("is-playing");
-    activePreviewButton.textContent = "▶";
+    activePreviewButton.innerHTML = playIconHtml();
     activePreviewButton = null;
   }
 
@@ -965,7 +1001,7 @@ function setDetailStop(stop) {
   detailAudio.pause();
   detailAudio.removeAttribute("src");
   detailPlayBtn.classList.remove("is-playing");
-  detailPlayBtn.textContent = "▶";
+  detailPlayBtn.innerHTML = playIconHtml(12);
 
   if (stop.audioUrl) {
     detailAudio.src = stop.audioUrl;
@@ -985,16 +1021,145 @@ function openDetailById(stopId) {
   detailView.scrollTo({ top: 0, behavior: "smooth" });
 }
 
+function updateMapZoomLabel() {
+  if (mapZoomResetBtn) {
+    mapZoomResetBtn.textContent = `${Math.round(mapScale * 100)}%`;
+  }
+}
+
+function applyMapTransform() {
+  if (!mapPreviewImage) return;
+  mapPreviewImage.style.transform = `translate(${mapOffsetX}px, ${mapOffsetY}px) scale(${mapScale})`;
+  mapPreviewImage.style.transformOrigin = "center center";
+  mapPreviewStage?.classList.toggle("is-zoomed", mapScale > 1.01);
+  updateMapZoomLabel();
+}
+
+function clampMapScale(scale) {
+  return Math.max(MAP_MIN_SCALE, Math.min(MAP_MAX_SCALE, scale));
+}
+
+function setMapScale(nextScale) {
+  mapScale = clampMapScale(nextScale);
+  if (mapScale <= 1.01) {
+    mapOffsetX = 0;
+    mapOffsetY = 0;
+  }
+  applyMapTransform();
+}
+
+function resetMapTransform() {
+  mapPointers.clear();
+  mapPinchStart = null;
+  mapDragPointerId = null;
+  mapScale = 1;
+  mapOffsetX = 0;
+  mapOffsetY = 0;
+  applyMapTransform();
+}
+
+function handleMapPointerDown(event) {
+  if (!mapPreviewStage || !mapPreviewModal || mapPreviewModal.classList.contains("hidden")) {
+    return;
+  }
+
+  mapPreviewStage.setPointerCapture?.(event.pointerId);
+  mapPointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+
+  if (mapPointers.size === 1 && mapScale > 1) {
+    mapDragPointerId = event.pointerId;
+    mapDragStartX = event.clientX - mapOffsetX;
+    mapDragStartY = event.clientY - mapOffsetY;
+  }
+
+  if (mapPointers.size === 2) {
+    const [a, b] = Array.from(mapPointers.values());
+    const dx = a.x - b.x;
+    const dy = a.y - b.y;
+    mapPinchStart = {
+      distance: Math.hypot(dx, dy),
+      scale: mapScale
+    };
+    mapDragPointerId = null;
+  }
+}
+
+function handleMapPointerMove(event) {
+  if (!mapPointers.has(event.pointerId)) return;
+  mapPointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+
+  if (mapPointers.size === 2) {
+    const [a, b] = Array.from(mapPointers.values());
+    const dx = a.x - b.x;
+    const dy = a.y - b.y;
+    const distance = Math.hypot(dx, dy);
+
+    if (!mapPinchStart || !mapPinchStart.distance) {
+      mapPinchStart = { distance, scale: mapScale };
+      return;
+    }
+
+    setMapScale(mapPinchStart.scale * (distance / mapPinchStart.distance));
+    event.preventDefault();
+    return;
+  }
+
+  if (mapPointers.size === 1 && mapDragPointerId === event.pointerId && mapScale > 1) {
+    mapOffsetX = event.clientX - mapDragStartX;
+    mapOffsetY = event.clientY - mapDragStartY;
+    applyMapTransform();
+    event.preventDefault();
+  }
+}
+
+function handleMapPointerUp(event) {
+  if (!mapPointers.has(event.pointerId)) return;
+  mapPointers.delete(event.pointerId);
+
+  if (mapPointers.size < 2) {
+    mapPinchStart = null;
+  }
+  if (mapDragPointerId === event.pointerId) {
+    mapDragPointerId = null;
+  }
+
+  mapPreviewStage?.releasePointerCapture?.(event.pointerId);
+}
+
+function handleMapWheel(event) {
+  if (!mapPreviewModal || mapPreviewModal.classList.contains("hidden")) return;
+  event.preventDefault();
+  const delta = event.deltaY < 0 ? MAP_ZOOM_STEP : -MAP_ZOOM_STEP;
+  setMapScale(mapScale + delta);
+}
+
+function handleMapDoubleClick(event) {
+  event.preventDefault();
+  if (mapScale > 1.01) {
+    resetMapTransform();
+  } else {
+    setMapScale(2);
+  }
+}
+
 function openMapPreviewByStopId(stopId) {
   const stop = stopsData.find((item) => item.id === stopId);
   if (!stop || !stop.mapUrl || !mapPreviewImage || !mapPreviewModal) return;
+
+  if (mapPreviewTitle) {
+    mapPreviewTitle.textContent = "地図";
+  }
   mapPreviewImage.src = stop.mapUrl;
   mapPreviewImage.alt = `${stop.title} map preview`;
+  mapPreviewImage.onload = () => {
+    resetMapTransform();
+  };
   mapPreviewModal.classList.remove("hidden");
 }
 
 function closeMapPreview() {
   mapPreviewModal?.classList.add("hidden");
+  resetMapTransform();
 }
 
 function openTermModal(term, fallbackLabel = "Keyword") {
@@ -1169,19 +1334,19 @@ async function toggleStopPreviewAudio(stopId, triggerButton) {
   if (sameButton && !listPreviewAudio.paused) {
     listPreviewAudio.pause();
     triggerButton.classList.remove("is-playing");
-    triggerButton.textContent = "▶";
+    triggerButton.innerHTML = playIconHtml();
     activePreviewButton = null;
     return;
   }
 
   if (activePreviewButton && activePreviewButton !== triggerButton) {
     activePreviewButton.classList.remove("is-playing");
-    activePreviewButton.textContent = "▶";
+    activePreviewButton.innerHTML = playIconHtml();
   }
 
   activePreviewButton = triggerButton;
   triggerButton.classList.add("is-playing");
-  triggerButton.textContent = "⏸";
+  triggerButton.innerHTML = pauseIconHtml();
 
   if (listPreviewAudio.getAttribute("src") !== stop.audioUrl) {
     listPreviewAudio.src = stop.audioUrl;
@@ -1191,7 +1356,7 @@ async function toggleStopPreviewAudio(stopId, triggerButton) {
     await listPreviewAudio.play();
   } catch (error) {
     triggerButton.classList.remove("is-playing");
-    triggerButton.textContent = "▶";
+    triggerButton.innerHTML = playIconHtml();
     activePreviewButton = null;
   }
 }
@@ -1200,7 +1365,7 @@ function closeDetail() {
   appShell.classList.remove("is-detail");
   detailAudio.pause();
   detailPlayBtn.classList.remove("is-playing");
-  detailPlayBtn.textContent = "▶";
+  detailPlayBtn.innerHTML = playIconHtml(12);
   Array.from(detailHeroTrack?.querySelectorAll("video") || []).forEach((video) => {
     video.pause();
   });
@@ -1222,6 +1387,7 @@ function bindKeywordClick(container) {
   });
 }
 
+
 function bindEvents() {
   introButton?.addEventListener("click", () => {
     const firstStop = stopsData[0];
@@ -1231,7 +1397,7 @@ function bindEvents() {
   });
 
   introCard?.addEventListener("click", (event) => {
-    if (event.target.closest("button")) return;
+    if (event.target.closest("button,video")) return;
     const firstStop = stopsData[0];
     if (firstStop) {
       openDetailById(firstStop.id);
@@ -1241,6 +1407,18 @@ function bindEvents() {
   backButton?.addEventListener("click", closeDetail);
   mapPreviewClose?.addEventListener("click", closeMapPreview);
   termModalClose?.addEventListener("click", closeTermModal);
+
+  mapZoomInBtn?.addEventListener("click", () => setMapScale(mapScale + MAP_ZOOM_STEP));
+  mapZoomOutBtn?.addEventListener("click", () => setMapScale(mapScale - MAP_ZOOM_STEP));
+  mapZoomResetBtn?.addEventListener("click", resetMapTransform);
+
+  mapPreviewStage?.addEventListener("pointerdown", handleMapPointerDown);
+  mapPreviewStage?.addEventListener("pointermove", handleMapPointerMove);
+  mapPreviewStage?.addEventListener("pointerup", handleMapPointerUp);
+  mapPreviewStage?.addEventListener("pointercancel", handleMapPointerUp);
+  mapPreviewStage?.addEventListener("pointerleave", handleMapPointerUp);
+  mapPreviewStage?.addEventListener("wheel", handleMapWheel, { passive: false });
+  mapPreviewStage?.addEventListener("dblclick", handleMapDoubleClick);
 
   mapPreviewModal?.addEventListener("click", (event) => {
     if (event.target === mapPreviewModal) closeMapPreview();
@@ -1290,27 +1468,27 @@ function bindEvents() {
       try {
         await detailAudio.play();
         detailPlayBtn.classList.add("is-playing");
-        detailPlayBtn.textContent = "⏸";
+        detailPlayBtn.innerHTML = pauseIconHtml(12);
       } catch (error) {
         detailPlayBtn.classList.remove("is-playing");
-        detailPlayBtn.textContent = "▶";
+        detailPlayBtn.innerHTML = playIconHtml(12);
       }
     } else {
       detailAudio.pause();
       detailPlayBtn.classList.remove("is-playing");
-      detailPlayBtn.textContent = "▶";
+      detailPlayBtn.innerHTML = playIconHtml(12);
     }
   });
 
   detailAudio.addEventListener("ended", () => {
     detailPlayBtn.classList.remove("is-playing");
-    detailPlayBtn.textContent = "▶";
+    detailPlayBtn.innerHTML = playIconHtml(12);
   });
 
   listPreviewAudio.addEventListener("ended", () => {
     if (activePreviewButton) {
       activePreviewButton.classList.remove("is-playing");
-      activePreviewButton.textContent = "▶";
+      activePreviewButton.innerHTML = playIconHtml();
       activePreviewButton = null;
     }
   });
@@ -1343,6 +1521,8 @@ function animateVisibleCards() {
 
 async function init() {
   bindEvents();
+
+  appLoadingOverlay?.classList.remove("hidden");
   renderIntroCardVideo([]);
 
   try {
@@ -1360,6 +1540,7 @@ async function init() {
   renderStopList(stopsData);
   setDetailStop(stopsData[0]);
   animateVisibleCards();
+  appLoadingOverlay?.classList.add("hidden");
 }
 
 init();
