@@ -1,0 +1,228 @@
+:root {
+  --ink-strong: #f2f2f2;
+  --ink-soft: rgba(255, 255, 255, 0.74);
+  --ink-muted: rgba(255, 255, 255, 0.55);
+  --surface: #0b0b0f;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  font-family: "Manrope", sans-serif;
+  background: #000;
+  color: var(--ink-strong);
+}
+
+.entry-shell {
+  width: min(100%, 560px);
+  min-height: 100svh;
+  margin: 0 auto;
+  background: linear-gradient(to bottom, #12131b 0%, #0a0b0f 48%, #08080c 100%);
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+}
+
+.entry-hero {
+  position: relative;
+  width: 100%;
+  height: clamp(250px, 42svh, 430px);
+  background: #111;
+  overflow: hidden;
+}
+
+.entry-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.08), rgba(0, 0, 0, 0.44) 88%);
+}
+
+.entry-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  object-position: center;
+  background: #111;
+  transform: scale(1.25);
+  transform-origin: center;
+}
+
+.entry-content {
+  padding: 1.05rem 1rem 0.65rem;
+  display: grid;
+  align-content: start;
+  gap: 0.72rem;
+}
+
+#entryTitle {
+  margin: 0;
+  color: #f6f6f6;
+  font: 800 1.25rem / 1.3 "Barlow", sans-serif;
+  letter-spacing: 0.01em;
+  padding-bottom: 0.65rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.entry-highlight {
+  margin: 0;
+  color: #e8e8e8;
+  font: 500 0.88rem / 1.36 "Manrope", sans-serif;
+  border-left: 3px solid rgba(255, 255, 255, 0.45);
+  padding-left: 0.75rem;
+}
+
+.entry-text {
+  display: grid;
+  gap: 0.72rem;
+}
+
+.entry-text p {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 0.88rem;
+  line-height: 1.62;
+}
+
+.entry-guide-section {
+  margin-top: 0.55rem;
+}
+
+.entry-guide-section h2 {
+  margin: 0;
+  font: 800 1.05rem / 1.3 "Barlow", sans-serif;
+  color: #f4f4f4;
+}
+
+.entry-guide-divider {
+  margin-top: 0.36rem;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.32);
+}
+
+.entry-guide-gallery {
+  margin-top: 0.72rem;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.entry-guide-track {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  border-radius: 10px;
+}
+
+.entry-guide-track::-webkit-scrollbar {
+  display: none;
+}
+
+.entry-guide-item {
+  flex: 0 0 100%;
+  width: 100%;
+  height: 28svh;
+  object-fit: cover;
+  border-radius: 10px;
+  background: #101114;
+  scroll-snap-align: start;
+  display: block;
+}
+
+.entry-guide-dots {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+}
+
+.entry-guide-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.25);
+  padding: 0;
+  border: none;
+  cursor: pointer;
+  transition: width 150ms ease, background 150ms ease;
+}
+
+.entry-guide-dot.is-active {
+  width: 16px;
+  background: #ffffff;
+}
+
+.entry-footer {
+  position: sticky;
+  bottom: 0;
+  z-index: 3;
+  padding: 0.66rem 1rem calc(0.74rem + env(safe-area-inset-bottom));
+  background: linear-gradient(to top, #090a0e 70%, rgba(9, 10, 14, 0));
+}
+
+.entry-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.48rem;
+}
+
+.entry-action-btn {
+  height: 35px;
+  min-width: 96px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  font: 800 0.73rem "Barlow", sans-serif;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  cursor: pointer;
+  color: #fff;
+  padding: 0 0.95rem;
+}
+
+.entry-action-btn.is-start {
+  background: linear-gradient(135deg, #f6515f, #db3f4c);
+}
+
+.entry-action-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.entry-action-btn:hover,
+.entry-action-btn:focus-visible {
+  filter: brightness(1.16);
+}
+
+.hidden {
+  display: none !important;
+}
+
+@media (min-width: 561px) {
+  body {
+    padding: 1.2rem;
+    background: #040404;
+  }
+
+  .entry-shell {
+    border-radius: 20px;
+    overflow: clip;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.7);
+    min-height: min(94vh, 860px);
+  }
+}

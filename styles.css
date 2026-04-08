@@ -181,7 +181,7 @@ body {
   max-height: min(60svh, 560px);
   border-radius: 0;
   background: #000;
-  object-fit: contain;
+  object-fit: cover;
   object-position: center;
 }
 
@@ -193,7 +193,7 @@ body {
 .intro-card.has-aspect-ratio .intro-video {
   height: 100%;
   max-height: none;
-  object-fit: contain;
+  object-fit: cover;
 }
 
 
@@ -377,8 +377,8 @@ body {
   object-position: center center;
   background: #111;
   opacity: 0;
-  transform: scale(1.02);
-  transition: opacity 420ms ease, transform 420ms ease;
+  transform: none;
+  transition: none;
 }
 
 .detail-hero-slide.is-landscape {
@@ -394,9 +394,14 @@ body {
   background: #000;
 }
 
+.detail-view.is-stop-zero .detail-hero-video {
+  object-fit: cover !important;
+  background: #111;
+}
+
 .detail-hero-slide.active {
   opacity: 1;
-  transform: scale(1);
+  transform: none;
 }
 
 .detail-hero-indicators {
@@ -481,8 +486,8 @@ body {
 
 .detail-number {
   margin: 0;
-  padding-right: 1rem;
-  border-right: 1px solid rgba(255, 255, 255, 0.2);
+  padding-right: 0;
+  border-right: none;
   font: 800 clamp(2rem, 1.8rem + 1vw, 2.5rem) "Barlow", sans-serif;
   line-height: 1;
   color: #f2f2f2;
@@ -490,8 +495,12 @@ body {
 
 .detail-title {
   margin: 0;
-  font: 500 clamp(1.26rem, 0.9rem + 1.1vw, 2rem) / 1.2 "Manrope", sans-serif;
-  text-wrap: balance;
+  border-left: 4px solid #ffffff;
+  padding-left: 0.85rem;
+  font-size: clamp(1.55rem, 1.1rem + 1.4vw, 2.4rem);
+  line-height: 1.2;
+  font-weight: 800;
+  text-wrap: pretty;
   color: #f2f2f2;
 }
 
@@ -509,18 +518,19 @@ body {
 
 .detail-question-block h3 {
   margin: 0;
-  border-left: 4px solid #ffffff;
-  padding-left: 0.85rem;
-  font-size: clamp(1.55rem, 1.1rem + 1.4vw, 2.4rem);
-  line-height: 1.2;
-  font-weight: 800;
-  text-wrap: pretty;
+  font: 400 clamp(1.02rem, 0.9rem + 0.55vw, 1.3rem) / 1.35 "Manrope", sans-serif;
+  text-wrap: balance;
+  border-left: none;
+  padding-left: 0;
   color: #f2f2f2;
 }
 
 .detail-text .detail-highlight-lead {
   border-left: 4px solid #ffffff;
   padding-left: 0.85rem;
+  font-weight: 400;
+  font-size: clamp(1rem, 0.9rem + 0.4vw, 1.22rem);
+  line-height: 1.45;
 }
 
 .detail-text {
@@ -875,6 +885,47 @@ body {
 .detail-play-btn:focus-visible {
   transform: none;
   filter: brightness(1.4);
+}
+
+.detail-stop-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  margin-top: 0.2rem;
+  padding-bottom: 0.45rem;
+}
+
+.detail-stop-nav-btn {
+  border: none;
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  border-radius: 999px;
+  min-height: 42px;
+  min-width: 130px;
+  padding: 0.45rem 0.78rem;
+  font: 700 0.9rem/1 "Barlow", sans-serif;
+  letter-spacing: 0.03em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  cursor: pointer;
+}
+
+.detail-stop-nav-arrow {
+  font: 700 1.2rem/1 "Barlow", sans-serif;
+}
+
+.detail-stop-nav-label {
+  text-transform: uppercase;
+}
+
+.detail-stop-nav-btn:disabled {
+  opacity: 0.28;
+  cursor: not-allowed;
+  transform: none;
+  filter: none;
 }
 
 /* ─── State transitions ────────────────────────────────────── */

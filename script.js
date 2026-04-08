@@ -1,6 +1,5 @@
 const DATA_URL =
   "https://stg-apirakanjicom-stgrakanji.kinsta.cloud/?rest_route=/memorial/v1/tour";
-const SLIDE_INTERVAL_MS = 3000;
 
 const appShell = document.querySelector("#appShell");
 const appLoadingOverlay = document.querySelector("#appLoadingOverlay");
@@ -27,6 +26,8 @@ const detailContent = document.querySelector("#detailContent");
 const detailStrip = document.querySelector(".detail-strip");
 const detailPlayBtn = document.querySelector("#detailPlayBtn");
 const playerDock = document.querySelector(".player-dock");
+const detailPrevBtn = document.querySelector("#detailPrevBtn");
+const detailNextBtn = document.querySelector("#detailNextBtn");
 
 const mapPreviewModal = document.querySelector("#mapPreviewModal");
 const mapPreviewTitle = document.querySelector("#mapPreviewTitle");
@@ -48,9 +49,11 @@ const termGalleryDots = document.querySelector("#termGalleryDots");
 
 const detailAudio = new Audio();
 const listPreviewAudio = new Audio();
+const isTourPage = new URLSearchParams(window.location.search).get("tour") === "1";
 
 let activeStop = null;
 let stopsData = [];
+let tourStopsData = [];
 let activePreviewButton = null;
 let heroSlideIndex = 0;
 let heroSlideTimer = null;
@@ -73,6 +76,24 @@ function playIconHtml(size = 10) {
 }
 function pauseIconHtml(size = 10) {
   return `<svg width="${size}" height="${size}" viewBox="0 0 10 10" fill="currentColor" aria-hidden="true" focusable="false"><rect x="1" y="1" width="3" height="8" rx="0.5"/><rect x="6" y="1" width="3" height="8" rx="0.5"/></svg>`;
+}
+
+function isStopZero(stop) {
+  return safeText(stop?.number, "") === "0";
+}
+
+function getIntroStop(stops = []) {
+  if (!Array.isArray(stops) || !stops.length) return null;
+  return stops.find((stop) => isStopZero(stop)) || stops[0];
+}
+
+function getTourStops(stops = []) {
+  if (!Array.isArray(stops) || !stops.length) return [];
+  const introStop = getIntroStop(stops);
+  if (!introStop || !isStopZero(introStop)) {
+    return stops;
+  }
+  return stops.filter((stop) => stop.id !== introStop.id);
 }
 
 const fallbackStops = [
@@ -642,9 +663,9 @@ function renderIntroCardVideo(stops) {
     introCard.prepend(introVideoEl);
   }
 
-  const firstStop = Array.isArray(stops) && stops.length ? stops[0] : null;
-  const introVideoUrl = resolveMediaUrl(firstStop?.videoUrl);
-  const introPoster = resolveImageUrl(firstStop?.media?.[0] || firstStop?.thumb);
+  const introStop = getIntroStop(stops);
+  const introVideoUrl = resolveMediaUrl(introStop?.videoUrl);
+  const introPoster = resolveImageUrl(introStop?.media?.[0] || introStop?.thumb);
   if (introPoster) {
     introVideoEl.poster = introPoster;
   } else {
@@ -722,7 +743,7 @@ function renderStopList(stops) {
     const stopInfo = document.createElement("div");
     stopInfo.className = "stop-info";
     const stopTitle = document.createElement("h3");
-    stopTitle.textContent = `${stop.number} | ${stop.title}`;
+    stopTitle.textContent = `${stop.number} ${stop.title}`;
     stopInfo.appendChild(stopTitle);
 
     const durationEl = document.createElement("p");
@@ -771,18 +792,13 @@ function animateActiveSlideIndicator(index) {
     node.classList.toggle("active", idx === index);
     if (!bar) return;
     bar.style.animation = "none";
-    bar.style.width = idx < index ? "100%" : "0";
-    if (idx === index) {
-      void bar.offsetWidth;
-      bar.style.animation = `slideProgress ${SLIDE_INTERVAL_MS}ms linear forwards`;
-    }
+    bar.style.width = idx === index ? "100%" : "0";
   });
 }
 
-function showHeroSlide(index, restartTimer = true) {
+function showHeroSlide(index) {
   const slides = detailHeroTrack?.querySelectorAll(".detail-hero-media");
   if (!slides?.length) return;
-  const hasVideo = Array.from(slides).some((slide) => slide instanceof HTMLVideoElement);
 
   heroSlideIndex = (index + slides.length) % slides.length;
   slides.forEach((slide, idx) => {
@@ -793,13 +809,6 @@ function showHeroSlide(index, restartTimer = true) {
     }
   });
   animateActiveSlideIndicator(heroSlideIndex);
-
-  if (restartTimer && slides.length > 1 && !hasVideo) {
-    stopHeroSlideshow();
-    heroSlideTimer = setInterval(() => {
-      showHeroSlide(heroSlideIndex + 1, false);
-    }, SLIDE_INTERVAL_MS);
-  }
 }
 
 function renderHeroSlideshow(stop) {
@@ -811,7 +820,7 @@ function renderHeroSlideshow(stop) {
 
   detailHeroTrack.innerHTML = "";
   detailHeroIndicators.innerHTML = "";
-  if (stop.videoUrl && stop.number !== "0") {
+  if (stop.videoUrl) {
     const video = document.createElement("video");
     video.className = "detail-hero-slide detail-hero-media detail-hero-video active";
     video.src = stop.videoUrl;
@@ -855,7 +864,7 @@ function renderHeroSlideshow(stop) {
 
     img.style.cursor = heroMedia.length > 1 ? "pointer" : "default";
     img.addEventListener("click", () => {
-      if (heroMedia.length > 1) showHeroSlide(heroSlideIndex + 1, true);
+      if (heroMedia.length > 1) showHeroSlide(heroSlideIndex + 1);
     });
     if (index === 0) img.classList.add("active");
     detailHeroTrack.appendChild(img);
@@ -868,13 +877,13 @@ function renderHeroSlideshow(stop) {
     const progress = document.createElement("span");
     progress.className = "slide-progress";
     indicator.appendChild(progress);
-    indicator.addEventListener("click", () => showHeroSlide(index, true));
+    indicator.addEventListener("click", () => showHeroSlide(index));
 
     detailHeroIndicators.appendChild(indicator);
   });
 
   heroSlideIndex = 0;
-  showHeroSlide(0, true);
+  showHeroSlide(0);
 }
 
 function renderRichBlocks(container, blocks) {
@@ -957,6 +966,7 @@ function injectTermTokens(container, terms) {
 function setDetailStop(stop) {
   activeStop = stop;
   activeTermLookup = buildTermLookup(stop.terms || []);
+  detailView?.classList.toggle("is-stop-zero", isStopZero(stop));
 
   listPreviewAudio.pause();
   if (activePreviewButton) {
@@ -968,7 +978,7 @@ function setDetailStop(stop) {
   renderHeroSlideshow(stop);
   detailNumber.textContent = stop.number;
   detailTitle.textContent = stop.title;
-  detailAudioTitle.textContent = `${stop.number} | ${stop.title}`;
+  detailAudioTitle.textContent = `${stop.number} ${stop.title}`;
   detailThumb.src = stop.thumb;
   detailThumb.alt = stop.title;
 
@@ -1011,10 +1021,33 @@ function setDetailStop(stop) {
     detailPlayBtn.disabled = true;
     playerDock.hidden = true;
   }
+
+  updateDetailStopNavState();
+}
+
+function getActiveStopIndex() {
+  if (!activeStop?.id) return -1;
+  return tourStopsData.findIndex((item) => item.id === activeStop.id);
+}
+
+function updateDetailStopNavState() {
+  if (!detailPrevBtn || !detailNextBtn) return;
+  const activeIndex = getActiveStopIndex();
+  detailPrevBtn.disabled = activeIndex <= 0;
+  detailNextBtn.disabled = activeIndex < 0 || activeIndex >= tourStopsData.length - 1;
+}
+
+function openAdjacentStop(step) {
+  const activeIndex = getActiveStopIndex();
+  if (activeIndex < 0) return;
+  const targetStop = tourStopsData[activeIndex + step];
+  if (!targetStop) return;
+  setDetailStop(targetStop);
+  detailView?.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 function openDetailById(stopId) {
-  const stop = stopsData.find((item) => item.id === stopId);
+  const stop = tourStopsData.find((item) => item.id === stopId);
   if (!stop) return;
   setDetailStop(stop);
   appShell.classList.add("is-detail");
@@ -1390,17 +1423,17 @@ function bindKeywordClick(container) {
 
 function bindEvents() {
   introButton?.addEventListener("click", () => {
-    const firstStop = stopsData[0];
-    if (firstStop) {
-      openDetailById(firstStop.id);
+    const firstTourStop = tourStopsData[0];
+    if (firstTourStop) {
+      openDetailById(firstTourStop.id);
     }
   });
 
   introCard?.addEventListener("click", (event) => {
     if (event.target.closest("button,video")) return;
-    const firstStop = stopsData[0];
-    if (firstStop) {
-      openDetailById(firstStop.id);
+    const firstTourStop = tourStopsData[0];
+    if (firstTourStop) {
+      openDetailById(firstTourStop.id);
     }
   });
 
@@ -1493,6 +1526,13 @@ function bindEvents() {
     }
   });
 
+  detailPrevBtn?.addEventListener("click", () => {
+    openAdjacentStop(-1);
+  });
+  detailNextBtn?.addEventListener("click", () => {
+    openAdjacentStop(1);
+  });
+
   bindKeywordClick(detailText);
   bindKeywordClick(detailTranscript);
 }
@@ -1520,6 +1560,11 @@ function animateVisibleCards() {
 }
 
 async function init() {
+  if (!isTourPage) {
+    window.location.replace("./entry.html");
+    return;
+  }
+
   bindEvents();
 
   appLoadingOverlay?.classList.remove("hidden");
@@ -1536,9 +1581,13 @@ async function init() {
     stopsData = fallbackStops;
   }
 
-  renderIntroCardVideo(stopsData);
-  renderStopList(stopsData);
-  setDetailStop(stopsData[0]);
+  tourStopsData = getTourStops(stopsData);
+  renderIntroCardVideo([]);
+  renderStopList(tourStopsData);
+  const initialDetailStop = tourStopsData[0] || getIntroStop(stopsData);
+  if (initialDetailStop) {
+    setDetailStop(initialDetailStop);
+  }
   animateVisibleCards();
   appLoadingOverlay?.classList.add("hidden");
 }
