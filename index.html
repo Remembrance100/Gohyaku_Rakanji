@@ -3,7 +3,11 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#08080c" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
     <title>Memorial Tour Guide · SmartSenior</title>
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <link rel="icon" href="./icons/icon.svg" type="image/svg+xml" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -86,30 +90,14 @@
 
           <div class="detail-text" id="detailText"></div>
 
+          <div class="detail-audio-inline hidden" id="detailAudioInline">
+            <button class="detail-play-btn" id="detailPlayBtn" type="button" aria-label="Play audio guide"></button>
+          </div>
+
           <section class="detail-transcript-block" id="detailTranscriptBlock" hidden>
             <h4>トランスクリプト</h4>
             <div class="detail-transcript" id="detailTranscript"></div>
           </section>
-
-          <div class="player-dock">
-            <article class="player-card">
-              <img
-                id="detailThumb"
-                class="player-thumb"
-                src="https://picsum.photos/id/1040/120/80"
-                alt="Stop thumbnail"
-              />
-              <p id="detailAudioTitle">01 Welcome Gate & Orientation Plaza</p>
-              <button
-                class="detail-play-btn"
-                id="detailPlayBtn"
-                type="button"
-                aria-label="Play stop audio"
-              >
-                ▶
-              </button>
-            </article>
-          </div>
 
           <nav class="detail-stop-nav" aria-label="Stop navigation">
             <button

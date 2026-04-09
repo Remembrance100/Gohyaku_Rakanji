@@ -1,6 +1,7 @@
 const DATA_URL =
   "https://stg-apirakanjicom-stgrakanji.kinsta.cloud/?rest_route=/memorial/v1/tour";
 
+const entryLoadingOverlay = document.querySelector("#entryLoadingOverlay");
 const entryVideo = document.querySelector("#entryVideo");
 const entryTitle = document.querySelector("#entryTitle");
 const entryHighlight = document.querySelector("#entryHighlight");
@@ -21,6 +22,13 @@ const fallbackStopZero = {
   transcriptBlocks: [],
   videoUrl: ""
 };
+
+function registerServiceWorker() {
+  if (!("serviceWorker" in navigator)) return;
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./sw.js").catch(() => {});
+  });
+}
 
 function safeText(value, fallback = "") {
   return typeof value === "string" && value.trim() ? value.trim() : fallback;
@@ -340,7 +348,10 @@ async function init() {
   } catch (error) {
     console.error(error);
     renderEntry(fallbackStopZero);
+  } finally {
+    entryLoadingOverlay?.classList.add("hidden");
   }
 }
 
+registerServiceWorker();
 init();

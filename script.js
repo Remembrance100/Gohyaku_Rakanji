@@ -25,7 +25,7 @@ const detailView = document.querySelector(".detail-view");
 const detailContent = document.querySelector("#detailContent");
 const detailStrip = document.querySelector(".detail-strip");
 const detailPlayBtn = document.querySelector("#detailPlayBtn");
-const playerDock = document.querySelector(".player-dock");
+const playerDock = document.querySelector("#detailAudioInline");
 const detailPrevBtn = document.querySelector("#detailPrevBtn");
 const detailNextBtn = document.querySelector("#detailNextBtn");
 
@@ -62,6 +62,7 @@ let activeTermLookup = new Map();
 const MAP_MIN_SCALE = 1;
 const MAP_MAX_SCALE = 4;
 const MAP_ZOOM_STEP = 0.25;
+const DETAIL_AUDIO_ICON_SIZE = 20;
 let mapScale = 1;
 let mapOffsetX = 0;
 let mapOffsetY = 0;
@@ -70,6 +71,13 @@ let mapPinchStart = null;
 let mapDragPointerId = null;
 let mapDragStartX = 0;
 let mapDragStartY = 0;
+
+function registerServiceWorker() {
+  if (!("serviceWorker" in navigator)) return;
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./sw.js").catch(() => {});
+  });
+}
 
 function playIconHtml(size = 10) {
   return `<svg width="${size}" height="${size}" viewBox="0 0 10 10" fill="currentColor" aria-hidden="true" focusable="false"><polygon points="2,1 9,5 2,9"/></svg>`;
@@ -261,7 +269,6 @@ function sanitizeRichInlineHtml(rawHtml) {
 
     Array.from(node.attributes).forEach((attr) => {
       const name = attr.name.toLowerCase();
-      const value = attr.value;
 
       if (name === "data-term-key") {
         return;
@@ -968,6 +975,10 @@ function setDetailStop(stop) {
   activeTermLookup = buildTermLookup(stop.terms || []);
   detailView?.classList.toggle("is-stop-zero", isStopZero(stop));
 
+  const previewWasPlaying = !listPreviewAudio.paused &&
+    activePreviewButton?.dataset.stopId === stop.id;
+  const previewTime = listPreviewAudio.currentTime;
+
   listPreviewAudio.pause();
   if (activePreviewButton) {
     activePreviewButton.classList.remove("is-playing");
@@ -978,9 +989,8 @@ function setDetailStop(stop) {
   renderHeroSlideshow(stop);
   detailNumber.textContent = stop.number;
   detailTitle.textContent = stop.title;
-  detailAudioTitle.textContent = `${stop.number} ${stop.title}`;
-  detailThumb.src = stop.thumb;
-  detailThumb.alt = stop.title;
+  if (detailAudioTitle) detailAudioTitle.textContent = `${stop.number} ${stop.title}`;
+  if (detailThumb) { detailThumb.src = stop.thumb; detailThumb.alt = stop.title; }
 
   detailQuestion.textContent = stop.question;
   detailQuestionBlock.hidden = !safeText(stop.question, "");
@@ -1011,15 +1021,22 @@ function setDetailStop(stop) {
   detailAudio.pause();
   detailAudio.removeAttribute("src");
   detailPlayBtn.classList.remove("is-playing");
-  detailPlayBtn.innerHTML = playIconHtml(12);
+  detailPlayBtn.innerHTML = playIconHtml(DETAIL_AUDIO_ICON_SIZE);
 
   if (stop.audioUrl) {
     detailAudio.src = stop.audioUrl;
+    if (previewWasPlaying) {
+      detailAudio.currentTime = previewTime;
+      detailAudio.play().then(() => {
+        detailPlayBtn.classList.add("is-playing");
+        detailPlayBtn.innerHTML = pauseIconHtml(DETAIL_AUDIO_ICON_SIZE);
+      }).catch(() => {});
+    }
     detailPlayBtn.disabled = false;
-    playerDock.hidden = false;
+    playerDock?.classList.remove("hidden");
   } else {
     detailPlayBtn.disabled = true;
-    playerDock.hidden = true;
+    playerDock?.classList.add("hidden");
   }
 
   updateDetailStopNavState();
@@ -1361,7 +1378,7 @@ async function toggleStopPreviewAudio(stopId, triggerButton) {
 
   detailAudio.pause();
   detailPlayBtn.classList.remove("is-playing");
-  detailPlayBtn.textContent = "▶";
+  detailPlayBtn.innerHTML = playIconHtml(DETAIL_AUDIO_ICON_SIZE);
 
   const sameButton = activePreviewButton === triggerButton;
   if (sameButton && !listPreviewAudio.paused) {
@@ -1398,7 +1415,7 @@ function closeDetail() {
   appShell.classList.remove("is-detail");
   detailAudio.pause();
   detailPlayBtn.classList.remove("is-playing");
-  detailPlayBtn.innerHTML = playIconHtml(12);
+  detailPlayBtn.innerHTML = playIconHtml(DETAIL_AUDIO_ICON_SIZE);
   Array.from(detailHeroTrack?.querySelectorAll("video") || []).forEach((video) => {
     video.pause();
   });
@@ -1501,21 +1518,21 @@ function bindEvents() {
       try {
         await detailAudio.play();
         detailPlayBtn.classList.add("is-playing");
-        detailPlayBtn.innerHTML = pauseIconHtml(12);
+        detailPlayBtn.innerHTML = pauseIconHtml(DETAIL_AUDIO_ICON_SIZE);
       } catch (error) {
         detailPlayBtn.classList.remove("is-playing");
-        detailPlayBtn.innerHTML = playIconHtml(12);
+        detailPlayBtn.innerHTML = playIconHtml(DETAIL_AUDIO_ICON_SIZE);
       }
     } else {
       detailAudio.pause();
       detailPlayBtn.classList.remove("is-playing");
-      detailPlayBtn.innerHTML = playIconHtml(12);
+      detailPlayBtn.innerHTML = playIconHtml(DETAIL_AUDIO_ICON_SIZE);
     }
   });
 
   detailAudio.addEventListener("ended", () => {
     detailPlayBtn.classList.remove("is-playing");
-    detailPlayBtn.innerHTML = playIconHtml(12);
+    detailPlayBtn.innerHTML = playIconHtml(DETAIL_AUDIO_ICON_SIZE);
   });
 
   listPreviewAudio.addEventListener("ended", () => {
@@ -1592,4 +1609,5 @@ async function init() {
   appLoadingOverlay?.classList.add("hidden");
 }
 
+registerServiceWorker();
 init();
