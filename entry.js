@@ -327,7 +327,9 @@ function mapStop(rawStop, index) {
   const number = safeText(String(rawStop?.number ?? rawStop?.stop_number ?? index), String(index));
   const title = toPlainText(getLocalizedField(rawStop, "title", `Stop ${number}`));
   const highlightRaw =
-    getLocalizedField(rawStop, "highlight", "") || getLocalizedField(rawStop, "featured", "");
+    getLocalizedField(rawStop, "highlight2", "") ||
+    getLocalizedField(rawStop, "highlight", "") ||
+    getLocalizedField(rawStop, "featured", "");
   const paragraphCount = (highlightRaw.match(/<p[\s>]/gi) || []).length;
   const highlight = indentMultilineText(
     normalizeHighlightLines(

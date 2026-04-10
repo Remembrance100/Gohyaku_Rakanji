@@ -581,7 +581,7 @@ body {
   font:
     500 clamp(0.92rem, 0.84rem + 0.35vw, 1.05rem) / 1.62 "Manrope",
     sans-serif;
-  border-left: 2px solid rgba(255, 255, 255, 0.52);
+  border-left: 2px solid #ffffff;
   padding: 0.12rem 0 0.12rem 0.58rem;
   color: #ededed;
   display: grid;

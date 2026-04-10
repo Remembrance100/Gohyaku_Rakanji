@@ -702,8 +702,10 @@ function mapWpStop(rawStop, index, numberOffset = 0) {
   const titleText = toPlainText(getLocalizedField(rawStop, "title", `Stop ${number}`));
   const questionRaw = getLocalizedField(rawStop, "question", "");
   const highlightRaw =
+    getLocalizedField(rawStop, "highlight2", "") ||
     getLocalizedField(rawStop, "highlight", "") ||
     getLocalizedField(rawStop, "featured", "");
+  const paragraphCount = (highlightRaw.match(/<p[\s>]/gi) || []).length;
 
   const textSource =
     getLocalizedField(rawStop, "text", "") ||
@@ -716,7 +718,6 @@ function mapWpStop(rawStop, index, numberOffset = 0) {
   const media = collectMediaUrls(rawStop, index);
   const terms = normalizeStopTerms(rawStop);
   const questionText = toPlainText(questionRaw);
-  const highlightBlock = sanitizeRichInlineHtml(highlightRaw);
   const highlightText = indentMultilineText(
     normalizeHighlightLines(toPlainTextWithBreaks(highlightRaw))
   );
@@ -730,8 +731,6 @@ function mapWpStop(rawStop, index, numberOffset = 0) {
     transcriptBlocks = [];
   }
 
-  const useHighlightAsBody = !textBlocks.length && Boolean(highlightBlock);
-
   return {
     id: safeText(String(rawStop?.id || ""), `stop-${number}`),
     number,
@@ -741,16 +740,9 @@ function mapWpStop(rawStop, index, numberOffset = 0) {
     question: questionText,
     highlight: highlightText,
     highlightHasList: /<li[\s>]/i.test(highlightRaw),
-    highlightForceBullets: /<li[\s>]|<br\s*\/?>/i.test(highlightRaw),
+    highlightForceBullets: /<li[\s>]|<br\s*\/?>/i.test(highlightRaw) || paragraphCount > 1,
     highlightHtml: sanitizeTermModalHtml(highlightRaw),
-    highlightAsBody: useHighlightAsBody,
-    textBlocks: textBlocks.length
-      ? textBlocks
-      : [
-          highlightBlock
-            ? highlightBlock
-            : escapeHtml("Content for this stop is being prepared.")
-        ],
+    textBlocks,
     transcriptBlocks,
     terms,
     audioUrl:
@@ -765,6 +757,16 @@ function mapWpStop(rawStop, index, numberOffset = 0) {
       resolveMediaUrl(rawStop?.map_image) ||
       ""
   };
+}
+
+function renderDetailHighlightSection(container, htmlValue, textValue, forceBullets = false) {
+  if (!container) return false;
+  const richHtml = safeText(htmlValue, "");
+  if (richHtml) {
+    container.innerHTML = richHtml;
+    return true;
+  }
+  return renderHighlightLines(container, textValue, { forceBullets });
 }
 
 async function loadStops() {
@@ -1133,30 +1135,20 @@ function setDetailStop(stop) {
   const hlText =
     (typeof stop.highlight === "string" && stop.highlight) ||
     safeText(stop.question, "");
-  const showHighlightBlock = !stop.highlightAsBody && Boolean(hlText);
   let hasHighlightBlock = false;
 
   if (detailHighlight) {
-    const hlHtml = safeText(stop.highlightHtml, "");
-    if (!stop.highlightAsBody && hlHtml) {
-      detailHighlight.innerHTML = hlHtml;
-      hasHighlightBlock = true;
-    } else {
-      detailHighlight.innerHTML = "";
-      hasHighlightBlock = false;
-    }
+    hasHighlightBlock = renderDetailHighlightSection(
+      detailHighlight,
+      stop.highlightHtml,
+      hlText,
+      Boolean(stop.highlightForceBullets || stop.highlightHasList)
+    );
     detailHighlight.classList.toggle("hidden", !hasHighlightBlock);
   }
 
   renderRichBlocks(detailText, stop.textBlocks);
-  Array.from(detailText.children).forEach((node) => {
-    node.classList.remove("detail-highlight-lead");
-  });
-  if (stop.highlightAsBody && detailText.firstElementChild) {
-    detailText.firstElementChild.classList.add("detail-highlight-lead");
-  }
-  const showHighlightLead = stop.highlightAsBody && Boolean(detailText.firstElementChild);
-  detailHighlightLabel?.classList.toggle("hidden", !(hasHighlightBlock || showHighlightLead));
+  detailHighlightLabel?.classList.toggle("hidden", !hasHighlightBlock);
 
   renderRichBlocks(detailTranscript, stop.transcriptBlocks);
   injectTermTokens(detailText, stop.terms || []);
