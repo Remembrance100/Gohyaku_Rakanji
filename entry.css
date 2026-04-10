@@ -70,30 +70,44 @@ body {
 .entry-hero {
   position: relative;
   width: 100%;
-  height: clamp(250px, 42svh, 430px);
   background: #111;
-  overflow: hidden;
-}
-
-.entry-hero::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.08), rgba(0, 0, 0, 0.44) 88%);
 }
 
 .entry-video {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
   display: block;
-  object-fit: cover;
-  object-position: center;
+  width: 100%;
+  height: auto;
+  max-height: 60svh;
   background: #111;
-  transform: scale(1.25);
-  transform-origin: center;
+}
+
+.entry-video::-webkit-media-controls-wireless-playback-picker-button,
+.entry-video::-webkit-media-controls-fullscreen-button {
+  display: none !important;
+}
+
+.entry-unmute-btn {
+  position: absolute;
+  top: 0.7rem;
+  right: 0.7rem;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.38rem 0.7rem 0.38rem 0.5rem;
+  background: rgba(0, 0, 0, 0.62);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 999px;
+  color: #fff;
+  font: 600 0.72rem "Manrope", sans-serif;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.entry-unmute-btn.is-unmuted {
+  opacity: 0.55;
 }
 
 .entry-content {
@@ -112,12 +126,47 @@ body {
   border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 }
 
+.entry-highlight-label {
+  margin: 0;
+  font: 700 0.72rem "Barlow", sans-serif;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+}
+
 .entry-highlight {
   margin: 0;
-  color: #e8e8e8;
-  font: 500 0.88rem / 1.36 "Manrope", sans-serif;
-  border-left: 3px solid rgba(255, 255, 255, 0.45);
-  padding-left: 0.75rem;
+  color: #ededed;
+  font: 500 0.96rem / 1.6 "Manrope", sans-serif;
+  border-left: 2px solid rgba(255, 255, 255, 0.52);
+  padding: 0.12rem 0 0.12rem 0.58rem;
+  display: grid;
+  gap: 0.28rem;
+}
+
+.entry-highlight p {
+  margin: 0;
+}
+
+.entry-highlight .highlight-bullet-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.34rem;
+}
+
+.entry-highlight .highlight-bullet-list li {
+  margin: 0;
+  position: relative;
+  padding-left: 0.88em;
+}
+
+.entry-highlight .highlight-bullet-list li::before {
+  content: "・";
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
 .entry-text {
@@ -212,21 +261,21 @@ body {
 .entry-actions {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: center;
   gap: 0.48rem;
 }
 
 .entry-action-btn {
-  height: 35px;
-  min-width: 96px;
+  height: 42px;
+  min-width: 122px;
   border-radius: 999px;
   border: 1px solid transparent;
-  font: 800 0.73rem "Barlow", sans-serif;
-  letter-spacing: 0.09em;
+  font: 800 0.86rem "Barlow", sans-serif;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   cursor: pointer;
   color: #fff;
-  padding: 0 0.95rem;
+  padding: 0 1.15rem;
 }
 
 .entry-action-btn.is-start {

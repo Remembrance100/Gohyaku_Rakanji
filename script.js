@@ -16,6 +16,7 @@ const detailNumber = document.querySelector("#detailNumber");
 const detailTitle = document.querySelector("#detailTitle");
 const detailQuestion = document.querySelector("#detailQuestion");
 const detailQuestionBlock = document.querySelector(".detail-question-block");
+const detailHighlightLabel = document.querySelector("#detailHighlightLabel");
 const detailText = document.querySelector("#detailText");
 const detailTranscriptBlock = document.querySelector("#detailTranscriptBlock");
 const detailTranscript = document.querySelector("#detailTranscript");
@@ -25,9 +26,15 @@ const detailView = document.querySelector(".detail-view");
 const detailContent = document.querySelector("#detailContent");
 const detailStrip = document.querySelector(".detail-strip");
 const detailPlayBtn = document.querySelector("#detailPlayBtn");
+const detailMapBtn = document.querySelector("#detailMapBtn");
 const playerDock = document.querySelector("#detailAudioInline");
+const detailHighlight = document.querySelector("#detailHighlight");
 const detailPrevBtn = document.querySelector("#detailPrevBtn");
 const detailNextBtn = document.querySelector("#detailNextBtn");
+const bottomMenuBtn = document.querySelector("#bottomMenuBtn");
+const stopPicker = document.querySelector("#stopPicker");
+const stopPickerItems = document.querySelector("#stopPickerItems");
+const stopPickerBackdrop = document.querySelector("#stopPickerBackdrop");
 
 const mapPreviewModal = document.querySelector("#mapPreviewModal");
 const mapPreviewTitle = document.querySelector("#mapPreviewTitle");
@@ -72,10 +79,13 @@ let mapDragPointerId = null;
 let mapDragStartX = 0;
 let mapDragStartY = 0;
 
-function registerServiceWorker() {
+function disablePwa() {
   if (!("serviceWorker" in navigator)) return;
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("./sw.js").catch(() => {});
+    navigator.serviceWorker
+      .getRegistrations()
+      .then((registrations) => Promise.all(registrations.map((registration) => registration.unregister())))
+      .catch(() => {});
   });
 }
 
@@ -115,6 +125,7 @@ const fallbackStops = [
     ],
     thumb: "https://picsum.photos/id/1040/120/80",
     question: "Why does this memorial begin at the gate?",
+    highlight: "Why does this memorial begin at the gate?",
     textBlocks: [
       "This first stop introduces the idea of arrival, where visitors shift from daily life into a shared space of memory and reflection."
     ],
@@ -190,6 +201,122 @@ function stripHtmlToText(value) {
 function toPlainText(value) {
   const decoded = decodeEntitiesDeep(value);
   return stripHtmlToText(decoded);
+}
+
+function toPlainTextWithBreaks(value) {
+  const input = safeText(value, "");
+  if (!input) return "";
+
+  const temp = document.createElement("div");
+  temp.innerHTML = replaceTermShortcodes(input);
+
+  temp.querySelectorAll("br").forEach((node) => node.replaceWith("\n"));
+  temp.querySelectorAll("p, li").forEach((node) => node.insertAdjacentText("afterend", "\n"));
+
+  const text = (temp.textContent || "")
+    .replace(/\r\n?/g, "\n")
+    .replace(/\n{3,}/g, "\n\n");
+  return safeText(text, "");
+}
+
+function normalizeHighlightLines(value) {
+  const normalized = safeText(value, "")
+    .replace(/[ \t]*(?:\\n|\/n)[ \t]*/g, "\n")
+    .replace(/\r\n?/g, "\n")
+    .replace(/\u00a0/g, " ")
+    .replace(/[ \t]*\n[ \t]*/g, "\n")
+    .replace(/([。！？.!?」）])\s*・/g, "$1\n・")
+    .replace(/\n{3,}/g, "\n\n");
+
+  const lines = normalized
+    .split("\n")
+    .map((line) => safeText(line.replace(/[ \t]{2,}/g, " "), ""))
+    .filter(Boolean);
+
+  const merged = [];
+  lines.forEach((line) => {
+    const isBulletLine = /^[・•●▪◦\-—]/.test(line);
+    if (!merged.length || isBulletLine) {
+      merged.push(line);
+      return;
+    }
+    const previous = merged[merged.length - 1];
+    const previousEndsSentence = /[。！？.!?」）]$/.test(previous);
+    if (previousEndsSentence) {
+      merged.push(line);
+      return;
+    }
+    const joinWithoutSpace =
+      /[\u3040-\u30ff\u3400-\u9fff]$/.test(previous) &&
+      /^[\u3040-\u30ff\u3400-\u9fff]/.test(line);
+    merged[merged.length - 1] = `${previous}${joinWithoutSpace ? "" : " "}${line}`;
+  });
+
+  return merged.join("\n");
+}
+
+function indentMultilineText(value) {
+  return safeText(value, "")
+    .split("\n")
+    .map((line) => safeText(line, ""))
+    .filter(Boolean)
+    .join("\n");
+}
+
+function splitHighlightLines(value) {
+  const bulletChars = /[・･•●▪◦\-—]/;
+  return safeText(value, "")
+    .replace(/\r\n?/g, "\n")
+    .replace(/\u00a0/g, " ")
+    .split("\n")
+    .flatMap((line) => {
+      const cleaned = safeText(line, "");
+      if (!cleaned) return [];
+      if (!bulletChars.test(cleaned)) {
+        return [cleaned];
+      }
+      return cleaned
+        .replace(/([。！？.!?」）])\s*([・･•●▪◦\-—])/g, "$1\n$2")
+        .split("\n")
+        .map((segment) => safeText(segment, ""))
+        .filter(Boolean);
+    });
+}
+
+function renderHighlightLines(container, value, options = {}) {
+  const forceBullets = Boolean(options.forceBullets);
+  if (!container) return false;
+  const lines = splitHighlightLines(value);
+  container.innerHTML = "";
+  if (!lines.length) return false;
+
+  const fragment = document.createDocumentFragment();
+  let bulletList = null;
+
+  lines.forEach((line) => {
+    const bulletMatch = line.match(/^[・･•●▪◦\-—]\s*(.*)$/);
+    const isBulletLine = Boolean(bulletMatch) || forceBullets;
+    const displayText = bulletMatch ? safeText(bulletMatch[1], "") : line;
+    if (isBulletLine) {
+      if (!bulletList) {
+        bulletList = document.createElement("ul");
+        bulletList.className = "highlight-bullet-list";
+        fragment.appendChild(bulletList);
+      }
+      const item = document.createElement("li");
+      item.textContent = displayText;
+      bulletList.appendChild(item);
+      return;
+    }
+
+    bulletList = null;
+    const paragraph = document.createElement("p");
+    paragraph.textContent = displayText;
+    fragment.appendChild(paragraph);
+  });
+
+  container.appendChild(fragment);
+  return true;
 }
 
 function escapeHtml(value) {
@@ -573,6 +700,7 @@ function getStopVideoUrl(rawStop) {
 function mapWpStop(rawStop, index, numberOffset = 0) {
   const number = String(index + numberOffset);
   const titleText = toPlainText(getLocalizedField(rawStop, "title", `Stop ${number}`));
+  const questionRaw = getLocalizedField(rawStop, "question", "");
   const highlightRaw =
     getLocalizedField(rawStop, "highlight", "") ||
     getLocalizedField(rawStop, "featured", "");
@@ -587,8 +715,11 @@ function mapWpStop(rawStop, index, numberOffset = 0) {
   let transcriptBlocks = extractRichBlocksFromSource(transcriptSource);
   const media = collectMediaUrls(rawStop, index);
   const terms = normalizeStopTerms(rawStop);
+  const questionText = toPlainText(questionRaw);
   const highlightBlock = sanitizeRichInlineHtml(highlightRaw);
-  const questionText = toPlainText(highlightRaw);
+  const highlightText = indentMultilineText(
+    normalizeHighlightLines(toPlainTextWithBreaks(highlightRaw))
+  );
 
   const textPlain = textBlocks.map((block) => toPlainText(block)).join("\n").trim();
   const transcriptPlain = transcriptBlocks
@@ -607,7 +738,11 @@ function mapWpStop(rawStop, index, numberOffset = 0) {
     title: titleText || `Stop ${number}`,
     media,
     thumb: media[0],
-    question: useHighlightAsBody ? "" : questionText,
+    question: questionText,
+    highlight: highlightText,
+    highlightHasList: /<li[\s>]/i.test(highlightRaw),
+    highlightForceBullets: /<li[\s>]|<br\s*\/?>/i.test(highlightRaw),
+    highlightHtml: sanitizeTermModalHtml(highlightRaw),
     highlightAsBody: useHighlightAsBody,
     textBlocks: textBlocks.length
       ? textBlocks
@@ -995,6 +1130,24 @@ function setDetailStop(stop) {
   detailQuestion.textContent = stop.question;
   detailQuestionBlock.hidden = !safeText(stop.question, "");
 
+  const hlText =
+    (typeof stop.highlight === "string" && stop.highlight) ||
+    safeText(stop.question, "");
+  const showHighlightBlock = !stop.highlightAsBody && Boolean(hlText);
+  let hasHighlightBlock = false;
+
+  if (detailHighlight) {
+    const hlHtml = safeText(stop.highlightHtml, "");
+    if (!stop.highlightAsBody && hlHtml) {
+      detailHighlight.innerHTML = hlHtml;
+      hasHighlightBlock = true;
+    } else {
+      detailHighlight.innerHTML = "";
+      hasHighlightBlock = false;
+    }
+    detailHighlight.classList.toggle("hidden", !hasHighlightBlock);
+  }
+
   renderRichBlocks(detailText, stop.textBlocks);
   Array.from(detailText.children).forEach((node) => {
     node.classList.remove("detail-highlight-lead");
@@ -1002,6 +1155,9 @@ function setDetailStop(stop) {
   if (stop.highlightAsBody && detailText.firstElementChild) {
     detailText.firstElementChild.classList.add("detail-highlight-lead");
   }
+  const showHighlightLead = stop.highlightAsBody && Boolean(detailText.firstElementChild);
+  detailHighlightLabel?.classList.toggle("hidden", !(hasHighlightBlock || showHighlightLead));
+
   renderRichBlocks(detailTranscript, stop.transcriptBlocks);
   injectTermTokens(detailText, stop.terms || []);
   injectTermTokens(detailTranscript, stop.terms || []);
@@ -1022,6 +1178,9 @@ function setDetailStop(stop) {
   detailAudio.removeAttribute("src");
   detailPlayBtn.classList.remove("is-playing");
   detailPlayBtn.innerHTML = playIconHtml(DETAIL_AUDIO_ICON_SIZE);
+  if (detailMapBtn) {
+    detailMapBtn.disabled = !stop.mapUrl;
+  }
 
   if (stop.audioUrl) {
     detailAudio.src = stop.audioUrl;
@@ -1033,9 +1192,12 @@ function setDetailStop(stop) {
       }).catch(() => {});
     }
     detailPlayBtn.disabled = false;
-    playerDock?.classList.remove("hidden");
   } else {
     detailPlayBtn.disabled = true;
+  }
+  if (stop.audioUrl || stop.mapUrl) {
+    playerDock?.classList.remove("hidden");
+  } else {
     playerDock?.classList.add("hidden");
   }
 
@@ -1413,6 +1575,7 @@ async function toggleStopPreviewAudio(stopId, triggerButton) {
 
 function closeDetail() {
   appShell.classList.remove("is-detail");
+  closeStopPicker();
   detailAudio.pause();
   detailPlayBtn.classList.remove("is-playing");
   detailPlayBtn.innerHTML = playIconHtml(DETAIL_AUDIO_ICON_SIZE);
@@ -1437,6 +1600,49 @@ function bindKeywordClick(container) {
   });
 }
 
+function buildStopPicker() {
+  if (!stopPickerItems) return;
+  stopPickerItems.innerHTML = "";
+
+  tourStopsData.forEach((stop) => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "stop-picker-item";
+    btn.dataset.stopId = stop.id;
+
+    const numSpan = document.createElement("span");
+    numSpan.className = "stop-picker-num";
+    numSpan.textContent = stop.number;
+
+    const titleSpan = document.createElement("span");
+    titleSpan.className = "stop-picker-title";
+    titleSpan.textContent = stop.title;
+
+    btn.appendChild(numSpan);
+    btn.appendChild(titleSpan);
+
+    btn.addEventListener("click", () => {
+      closeStopPicker();
+      openDetailById(stop.id);
+    });
+
+    stopPickerItems.appendChild(btn);
+  });
+}
+
+function openStopPicker() {
+  if (!stopPicker) return;
+  if (stopPickerItems && activeStop) {
+    stopPickerItems.querySelectorAll(".stop-picker-item").forEach((btn) => {
+      btn.classList.toggle("is-active", btn.dataset.stopId === activeStop.id);
+    });
+  }
+  stopPicker.classList.remove("hidden");
+}
+
+function closeStopPicker() {
+  stopPicker?.classList.add("hidden");
+}
 
 function bindEvents() {
   introButton?.addEventListener("click", () => {
@@ -1488,6 +1694,10 @@ function bindEvents() {
       closeTermModal();
       return;
     }
+    if (!stopPicker?.classList.contains("hidden")) {
+      closeStopPicker();
+      return;
+    }
     closeDetail();
   });
 
@@ -1530,6 +1740,11 @@ function bindEvents() {
     }
   });
 
+  detailMapBtn?.addEventListener("click", () => {
+    if (!activeStop?.id || !activeStop?.mapUrl) return;
+    openMapPreviewByStopId(activeStop.id);
+  });
+
   detailAudio.addEventListener("ended", () => {
     detailPlayBtn.classList.remove("is-playing");
     detailPlayBtn.innerHTML = playIconHtml(DETAIL_AUDIO_ICON_SIZE);
@@ -1549,6 +1764,16 @@ function bindEvents() {
   detailNextBtn?.addEventListener("click", () => {
     openAdjacentStop(1);
   });
+
+  bottomMenuBtn?.addEventListener("click", () => {
+    if (stopPicker?.classList.contains("hidden")) {
+      openStopPicker();
+    } else {
+      closeStopPicker();
+    }
+  });
+
+  stopPickerBackdrop?.addEventListener("click", closeStopPicker);
 
   bindKeywordClick(detailText);
   bindKeywordClick(detailTranscript);
@@ -1601,6 +1826,7 @@ async function init() {
   tourStopsData = getTourStops(stopsData);
   renderIntroCardVideo([]);
   renderStopList(tourStopsData);
+  buildStopPicker();
   const initialDetailStop = tourStopsData[0] || getIntroStop(stopsData);
   if (initialDetailStop) {
     setDetailStop(initialDetailStop);
@@ -1609,5 +1835,5 @@ async function init() {
   appLoadingOverlay?.classList.add("hidden");
 }
 
-registerServiceWorker();
+disablePwa();
 init();

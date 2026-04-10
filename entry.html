@@ -6,7 +6,19 @@
     <meta name="theme-color" content="#08080c" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <title>Tour Entry · Stop 0</title>
-    <link rel="manifest" href="./manifest.webmanifest" />
+    <script>
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker
+            .getRegistrations()
+            .then((registrations) => Promise.all(registrations.map((registration) => registration.unregister())))
+            .catch(() => {});
+          if ("caches" in window) {
+            caches.keys().then((keys) => Promise.all(keys.map((key) => caches.delete(key)))).catch(() => {});
+          }
+        });
+      }
+    </script>
     <link rel="icon" href="./icons/icon.svg" type="image/svg+xml" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -14,7 +26,7 @@
       href="https://fonts.googleapis.com/css2?family=Barlow:wght@500;700;800&family=Manrope:wght@500;700;800&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./entry.css" />
+    <link rel="stylesheet" href="./entry.css?v=20260410h" />
   </head>
   <body>
     <main class="entry-shell" aria-label="Stop 0 entry page">
@@ -31,21 +43,29 @@
           id="entryVideo"
           class="entry-video hidden"
           playsinline
-          muted
           autoplay
-          loop
-          preload="metadata"
+          muted
+          preload="auto"
+          x-webkit-airplay="deny"
+          disableremoteplayback
           aria-label="Stop 0 video"
         ></video>
+        <button class="entry-unmute-btn hidden" id="entryUnmuteBtn" type="button" aria-label="音声をオン/オフ">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path id="entryUnmuteIcon" d="M11 5L6 9H2v6h4l5 4V5zM23 9l-6 6M17 9l6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span id="entryUnmuteLabel">音声オン</span>
+        </button>
       </section>
 
       <section class="entry-content" aria-label="Stop 0 description and transcript">
         <h1 id="entryTitle">Welcome</h1>
+        <p class="entry-highlight-label" id="entryHighlightLabel" hidden>ハイライト</p>
         <p id="entryHighlight" class="entry-highlight hidden"></p>
         <div id="entryText" class="entry-text"></div>
 
-        <section class="entry-guide-section" aria-label="Guide image section">
-          <h2>Guide Image</h2>
+        <section class="entry-guide-section" aria-label="ガイド画像セクション">
+          <h2>ガイド画像</h2>
           <div class="entry-guide-divider" aria-hidden="true"></div>
           <div id="entryGuideGallery" class="entry-guide-gallery hidden">
             <div id="entryGuideTrack" class="entry-guide-track"></div>
@@ -60,14 +80,14 @@
             id="entryStartBtn"
             class="entry-action-btn is-start"
             type="button"
-            aria-label="Start tour from stop 1"
+            aria-label="ガイドを開始"
           >
-            Start
+            ガイド開始
           </button>
         </div>
       </footer>
     </main>
 
-    <script src="./entry.js"></script>
+    <script src="./entry.js?v=20260410p"></script>
   </body>
 </html>

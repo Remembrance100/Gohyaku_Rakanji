@@ -6,7 +6,19 @@
     <meta name="theme-color" content="#08080c" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <title>Memorial Tour Guide · SmartSenior</title>
-    <link rel="manifest" href="./manifest.webmanifest" />
+    <script>
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker
+            .getRegistrations()
+            .then((registrations) => Promise.all(registrations.map((registration) => registration.unregister())))
+            .catch(() => {});
+          if ("caches" in window) {
+            caches.keys().then((keys) => Promise.all(keys.map((key) => caches.delete(key)))).catch(() => {});
+          }
+        });
+      }
+    </script>
     <link rel="icon" href="./icons/icon.svg" type="image/svg+xml" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -14,7 +26,7 @@
       href="https://fonts.googleapis.com/css2?family=Barlow:wght@500;700;800&family=Manrope:wght@500;700;800&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./styles.css" />
+    <link rel="stylesheet" href="./styles.css?v=20260410l" />
   </head>
   <body>
     <header class="site-header" aria-label="Site header">
@@ -88,39 +100,54 @@
             </h3>
           </article>
 
+          <p class="detail-highlight-label hidden" id="detailHighlightLabel">ハイライト</p>
+          <div class="detail-stop-highlight hidden" id="detailHighlight"></div>
+
           <div class="detail-text" id="detailText"></div>
 
           <div class="detail-audio-inline hidden" id="detailAudioInline">
             <button class="detail-play-btn" id="detailPlayBtn" type="button" aria-label="Play audio guide"></button>
+            <button class="detail-map-btn" id="detailMapBtn" type="button" aria-label="地図を開く" disabled>
+              地図
+            </button>
           </div>
 
           <section class="detail-transcript-block" id="detailTranscriptBlock" hidden>
-            <h4>トランスクリプト</h4>
+            <h4>音声ガイド</h4>
             <div class="detail-transcript" id="detailTranscript"></div>
           </section>
 
-          <nav class="detail-stop-nav" aria-label="Stop navigation">
-            <button
-              class="detail-stop-nav-btn"
-              id="detailPrevBtn"
-              type="button"
-              aria-label="Go to previous stop"
-            >
-              <span class="detail-stop-nav-arrow" aria-hidden="true">&lt;</span>
-              <span class="detail-stop-nav-label">Previous</span>
-            </button>
-            <button
-              class="detail-stop-nav-btn"
-              id="detailNextBtn"
-              type="button"
-              aria-label="Go to next stop"
-            >
-              <span class="detail-stop-nav-label">Next</span>
-              <span class="detail-stop-nav-arrow" aria-hidden="true">&gt;</span>
-            </button>
-          </nav>
         </div>
       </section>
+
+      <nav class="bottom-nav" id="bottomNav" aria-label="Tour navigation">
+        <button class="bottom-nav-btn bottom-nav-arrow" id="detailPrevBtn" type="button" aria-label="Go to previous stop">
+          <svg width="10" height="16" viewBox="0 0 10 16" fill="none" aria-hidden="true">
+            <polyline points="8,2 2,8 8,14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <button class="bottom-nav-btn bottom-nav-menu-btn" id="bottomMenuBtn" type="button" aria-label="Menu">
+          <svg width="20" height="14" viewBox="0 0 20 14" fill="none" aria-hidden="true">
+            <line x1="0" y1="1" x2="20" y2="1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            <line x1="0" y1="7" x2="20" y2="7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            <line x1="0" y1="13" x2="20" y2="13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+        </button>
+        <button class="bottom-nav-btn bottom-nav-arrow" id="detailNextBtn" type="button" aria-label="Go to next stop">
+          <svg width="10" height="16" viewBox="0 0 10 16" fill="none" aria-hidden="true">
+            <polyline points="2,2 8,8 2,14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </nav>
+
+      <div class="stop-picker hidden" id="stopPicker" role="dialog" aria-modal="true" aria-label="スポットを選択">
+        <div class="stop-picker-backdrop" id="stopPickerBackdrop"></div>
+        <div class="stop-picker-panel">
+          <div class="stop-picker-handle" aria-hidden="true"></div>
+          <h3 class="stop-picker-heading">全スポット</h3>
+          <div class="stop-picker-items" id="stopPickerItems"></div>
+        </div>
+      </div>
     </main>
 
     <section
@@ -187,6 +214,6 @@
       <p>Memorial Tour Guide &middot; SmartSenior</p>
     </footer>
 
-    <script src="./script.js"></script>
+    <script src="./script.js?v=20260410s"></script>
   </body>
 </html>

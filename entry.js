@@ -2,7 +2,11 @@ const DATA_URL =
   "https://stg-apirakanjicom-stgrakanji.kinsta.cloud/?rest_route=/memorial/v1/tour";
 
 const entryLoadingOverlay = document.querySelector("#entryLoadingOverlay");
+const entryHighlightLabel = document.querySelector("#entryHighlightLabel");
 const entryVideo = document.querySelector("#entryVideo");
+const entryUnmuteBtn = document.querySelector("#entryUnmuteBtn");
+const entryUnmuteLabel = document.querySelector("#entryUnmuteLabel");
+const entryUnmuteIcon = document.querySelector("#entryUnmuteIcon");
 const entryTitle = document.querySelector("#entryTitle");
 const entryHighlight = document.querySelector("#entryHighlight");
 const entryText = document.querySelector("#entryText");
@@ -23,10 +27,13 @@ const fallbackStopZero = {
   videoUrl: ""
 };
 
-function registerServiceWorker() {
+function disablePwa() {
   if (!("serviceWorker" in navigator)) return;
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("./sw.js").catch(() => {});
+    navigator.serviceWorker
+      .getRegistrations()
+      .then((registrations) => Promise.all(registrations.map((registration) => registration.unregister())))
+      .catch(() => {});
   });
 }
 
@@ -94,6 +101,122 @@ function stripHtmlToText(value) {
 
 function toPlainText(value) {
   return stripHtmlToText(replaceTermShortcodes(value));
+}
+
+function toPlainTextWithBreaks(value) {
+  const input = safeText(value, "");
+  if (!input) return "";
+
+  const temp = document.createElement("div");
+  temp.innerHTML = replaceTermShortcodes(input);
+
+  temp.querySelectorAll("br").forEach((node) => node.replaceWith("\n"));
+  temp.querySelectorAll("p, li").forEach((node) => node.insertAdjacentText("afterend", "\n"));
+
+  const text = (temp.textContent || "")
+    .replace(/\r\n?/g, "\n")
+    .replace(/\n{3,}/g, "\n\n");
+  return safeText(text, "");
+}
+
+function normalizeHighlightLines(value) {
+  const normalized = safeText(value, "")
+    .replace(/[ \t]*(?:\\n|\/n)[ \t]*/g, "\n")
+    .replace(/\r\n?/g, "\n")
+    .replace(/\u00a0/g, " ")
+    .replace(/[ \t]*\n[ \t]*/g, "\n")
+    .replace(/([。！？.!?」）])\s*・/g, "$1\n・")
+    .replace(/\n{3,}/g, "\n\n");
+
+  const lines = normalized
+    .split("\n")
+    .map((line) => safeText(line.replace(/[ \t]{2,}/g, " "), ""))
+    .filter(Boolean);
+
+  const merged = [];
+  lines.forEach((line) => {
+    const isBulletLine = /^[・•●▪◦\-—]/.test(line);
+    if (!merged.length || isBulletLine) {
+      merged.push(line);
+      return;
+    }
+    const previous = merged[merged.length - 1];
+    const previousEndsSentence = /[。！？.!?」）]$/.test(previous);
+    if (previousEndsSentence) {
+      merged.push(line);
+      return;
+    }
+    const joinWithoutSpace =
+      /[\u3040-\u30ff\u3400-\u9fff]$/.test(previous) &&
+      /^[\u3040-\u30ff\u3400-\u9fff]/.test(line);
+    merged[merged.length - 1] = `${previous}${joinWithoutSpace ? "" : " "}${line}`;
+  });
+
+  return merged.join("\n");
+}
+
+function indentMultilineText(value) {
+  return safeText(value, "")
+    .split("\n")
+    .map((line) => safeText(line, ""))
+    .filter(Boolean)
+    .join("\n");
+}
+
+function splitHighlightLines(value) {
+  const bulletChars = /[・･•●▪◦\-—]/;
+  return safeText(value, "")
+    .replace(/\r\n?/g, "\n")
+    .replace(/\u00a0/g, " ")
+    .split("\n")
+    .flatMap((line) => {
+      const cleaned = safeText(line, "");
+      if (!cleaned) return [];
+      if (!bulletChars.test(cleaned)) {
+        return [cleaned];
+      }
+      return cleaned
+        .replace(/([。！？.!?」）])\s*([・･•●▪◦\-—])/g, "$1\n$2")
+        .split("\n")
+        .map((segment) => safeText(segment, ""))
+        .filter(Boolean);
+    });
+}
+
+function renderHighlightLines(container, value, options = {}) {
+  const forceBullets = Boolean(options.forceBullets);
+  if (!container) return false;
+  const lines = splitHighlightLines(value);
+  container.innerHTML = "";
+  if (!lines.length) return false;
+
+  const fragment = document.createDocumentFragment();
+  let bulletList = null;
+
+  lines.forEach((line) => {
+    const bulletMatch = line.match(/^[・･•●▪◦\-—]\s*(.*)$/);
+    const isBulletLine = Boolean(bulletMatch) || forceBullets;
+    const displayText = bulletMatch ? safeText(bulletMatch[1], "") : line;
+    if (isBulletLine) {
+      if (!bulletList) {
+        bulletList = document.createElement("ul");
+        bulletList.className = "highlight-bullet-list";
+        fragment.appendChild(bulletList);
+      }
+      const item = document.createElement("li");
+      item.textContent = displayText;
+      bulletList.appendChild(item);
+      return;
+    }
+
+    bulletList = null;
+    const paragraph = document.createElement("p");
+    paragraph.textContent = displayText;
+    fragment.appendChild(paragraph);
+  });
+
+  container.appendChild(fragment);
+  return true;
 }
 
 function getLocalizedField(rawObj, key, fallback = "") {
@@ -203,8 +326,15 @@ function extractTextBlocks(rawHtml) {
 function mapStop(rawStop, index) {
   const number = safeText(String(rawStop?.number ?? rawStop?.stop_number ?? index), String(index));
   const title = toPlainText(getLocalizedField(rawStop, "title", `Stop ${number}`));
-  const highlight = toPlainText(
-    getLocalizedField(rawStop, "highlight", "") || getLocalizedField(rawStop, "featured", "")
+  const highlightRaw =
+    getLocalizedField(rawStop, "highlight", "") || getLocalizedField(rawStop, "featured", "");
+  const paragraphCount = (highlightRaw.match(/<p[\s>]/gi) || []).length;
+  const highlight = indentMultilineText(
+    normalizeHighlightLines(
+      toPlainTextWithBreaks(
+        highlightRaw
+      )
+    )
   );
 
   const textSource =
@@ -221,6 +351,8 @@ function mapStop(rawStop, index) {
     number,
     title,
     highlight,
+    highlightHasList: /<li[\s>]/i.test(highlightRaw),
+    highlightForceBullets: /<li[\s>]|<br\s*\/?>/i.test(highlightRaw) || paragraphCount > 1,
     textBlocks: extractTextBlocks(textSource),
     transcriptBlocks: extractTextBlocks(transcriptSource),
     videoUrl: getStopVideoUrl(rawStop),
@@ -256,9 +388,15 @@ function renderEntry(stop) {
   }
 
   if (entryHighlight) {
-    const highlightText = safeText(current.highlight, "");
-    entryHighlight.textContent = highlightText;
-    entryHighlight.classList.toggle("hidden", !highlightText);
+    const highlightText =
+      typeof current.highlight === "string" && current.highlight
+        ? current.highlight
+        : "";
+    const hasHighlight = renderHighlightLines(entryHighlight, highlightText, {
+      forceBullets: Boolean(current.highlightForceBullets || current.highlightHasList)
+    });
+    entryHighlight.classList.toggle("hidden", !hasHighlight);
+    if (entryHighlightLabel) entryHighlightLabel.hidden = !hasHighlight;
   }
 
   if (entryText) {
@@ -285,7 +423,7 @@ function renderEntry(stop) {
       guideImages.forEach((url, i) => {
         const img = document.createElement("img");
         img.src = url;
-        img.alt = `Guide image ${i + 1}`;
+        img.alt = `ガイド画像 ${i + 1}`;
         img.className = "entry-guide-item";
         img.loading = "lazy";
         entryGuideTrack.appendChild(img);
@@ -293,7 +431,7 @@ function renderEntry(stop) {
         const dot = document.createElement("button");
         dot.type = "button";
         dot.className = "entry-guide-dot" + (i === 0 ? " is-active" : "");
-        dot.setAttribute("aria-label", `Image ${i + 1}`);
+        dot.setAttribute("aria-label", `画像 ${i + 1}`);
         dot.addEventListener("click", () => {
           entryGuideTrack.scrollTo({ left: entryGuideTrack.offsetWidth * i, behavior: "smooth" });
         });
@@ -320,22 +458,50 @@ function renderEntry(stop) {
     if (videoUrl) {
       entryVideo.src = videoUrl;
       entryVideo.controls = false;
+      entryVideo.muted = true;
+      entryVideo.autoplay = true;
+      entryVideo.loop = false;
       entryVideo.removeAttribute("poster");
       entryVideo.classList.remove("hidden");
+      entryVideo.currentTime = 0;
       entryVideo.play().catch(() => {});
+      entryUnmuteBtn?.classList.remove("hidden");
+      updateUnmuteBtn();
     } else {
       entryVideo.pause();
       entryVideo.removeAttribute("src");
       entryVideo.load();
       entryVideo.classList.add("hidden");
+      entryUnmuteBtn?.classList.add("hidden");
     }
   }
+}
 
+function updateUnmuteBtn() {
+  if (!entryVideo || !entryUnmuteBtn) return;
+  const muted = entryVideo.muted;
+  if (entryUnmuteLabel) entryUnmuteLabel.textContent = muted ? "音声オン" : "音声オフ";
+  if (entryUnmuteIcon) {
+    entryUnmuteIcon.setAttribute(
+      "d",
+      muted
+        ? "M11 5L6 9H2v6h4l5 4V5zM23 9l-6 6M17 9l6 6"
+        : "M11 5L6 9H2v6h4l5 4V5zM15.54 8.46a5 5 0 010 7.07M19.07 4.93a10 10 0 010 14.14"
+    );
+  }
+  entryUnmuteBtn.classList.toggle("is-unmuted", !muted);
 }
 
 function bindEvents() {
   entryStartBtn?.addEventListener("click", () => {
+    entryVideo?.pause();
     window.location.href = "./index.html?tour=1";
+  });
+
+  entryUnmuteBtn?.addEventListener("click", () => {
+    if (!entryVideo) return;
+    entryVideo.muted = !entryVideo.muted;
+    updateUnmuteBtn();
   });
 }
 
@@ -353,5 +519,5 @@ async function init() {
   }
 }
 
-registerServiceWorker();
+disablePwa();
 init();
