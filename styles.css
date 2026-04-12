@@ -10,6 +10,11 @@
   box-sizing: border-box;
 }
 
+button {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
 html,
 body {
   margin: 0;
@@ -219,6 +224,8 @@ body {
   display: grid;
   gap: 0.78rem;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
   min-height: 0;
   padding-right: 0.2rem;
   padding-bottom: 76px;
@@ -382,6 +389,8 @@ body {
 .detail-view {
   background: #080808;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
   transform: translateX(100%);
   opacity: 0.25;
   z-index: 3;
@@ -396,6 +405,7 @@ body {
 .detail-hero-track {
   position: absolute;
   inset: 0;
+  touch-action: pan-y;
 }
 
 .detail-hero-slide {
@@ -408,7 +418,8 @@ body {
   background: #111;
   opacity: 0;
   transform: none;
-  transition: none;
+  transition: transform 220ms ease, opacity 180ms ease;
+  will-change: transform, opacity;
 }
 
 .detail-hero-slide.is-landscape {
@@ -434,6 +445,13 @@ body {
   transform: none;
 }
 
+.detail-hero-image {
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
+  cursor: default;
+}
+
 .detail-hero-indicators {
   position: absolute;
   z-index: 5;
@@ -449,12 +467,11 @@ body {
 .slide-indicator {
   position: relative;
   height: 3px;
-  border: none;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.35);
   overflow: clip;
-  padding: 0;
-  pointer-events: auto;
+  pointer-events: none;
+  display: block;
 }
 
 .slide-indicator .slide-progress {
@@ -466,13 +483,6 @@ body {
 
 .slide-indicator.active .slide-progress {
   animation: slideProgress 3000ms linear forwards;
-}
-
-.slide-indicator:hover,
-.slide-indicator:focus-visible,
-.slide-indicator:active {
-  transform: none;
-  filter: none;
 }
 
 .detail-hero::after {
@@ -682,7 +692,7 @@ body {
 
 .overlay-modal-inner {
   width: min(100%, 680px);
-  max-height: calc(100vh - 2rem);
+  max-height: calc(100svh - 2rem);
   border-radius: 14px;
   background: #111111;
   border: 1px solid rgba(255, 255, 255, 0.12);
@@ -781,13 +791,14 @@ body {
 
 .term-modal-inner {
   width: min(100%, 680px);
-  max-height: calc(100vh - 1.2rem);
+  max-height: calc(100svh - 1.2rem);
 }
 
 .term-modal-scroll {
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   padding: 0.85rem;
-  max-height: calc(100vh - 7.5rem);
+  max-height: calc(100svh - 7.5rem);
 }
 
 .term-gallery-meta {
@@ -1290,7 +1301,13 @@ button {
     opacity 180ms ease;
 }
 
-button:hover,
+@media (hover: hover) {
+  button:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.15);
+  }
+}
+
 button:focus-visible {
   transform: translateY(-1px);
   filter: brightness(1.15);
@@ -1298,6 +1315,7 @@ button:focus-visible {
 
 button:active {
   transform: translateY(0);
+  filter: none;
 }
 
 /* ─── Detail enter animations ──────────────────────────────── */
@@ -1450,9 +1468,12 @@ button:active {
     display: none;
   }
 
+  body {
+    min-height: 100svh;
+  }
+
   .app-shell {
     width: 100%;
-    min-height: 100vh;
     height: 100svh;
     border-radius: 0;
     border: none;

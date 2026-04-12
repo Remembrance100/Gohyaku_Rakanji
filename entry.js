@@ -91,6 +91,66 @@ function replaceTermShortcodes(rawText) {
   return text;
 }
 
+function sanitizeEntryBlockHtml(rawHtml) {
+  const temp = document.createElement("div");
+  temp.innerHTML = replaceTermShortcodes(rawHtml);
+
+  const allowed = new Set([
+    "P",
+    "BR",
+    "STRONG",
+    "EM",
+    "B",
+    "I",
+    "U",
+    "A",
+    "UL",
+    "OL",
+    "LI",
+    "BLOCKQUOTE",
+    "H2",
+    "H3",
+    "H4",
+    "MARK",
+    "CODE",
+    "SPAN"
+  ]);
+
+  Array.from(temp.querySelectorAll("*")).forEach((node) => {
+    if (!allowed.has(node.tagName)) {
+      node.replaceWith(document.createTextNode(node.textContent || ""));
+      return;
+    }
+
+    Array.from(node.attributes).forEach((attr) => {
+      const name = attr.name.toLowerCase();
+      if (node.tagName === "A" && (name === "href" || name === "target" || name === "rel")) {
+        return;
+      }
+      node.removeAttribute(attr.name);
+    });
+
+    if (node.tagName === "A") {
+      const href = safeText(node.getAttribute("href"), "");
+      const safeHref =
+        href.startsWith("http://") ||
+        href.startsWith("https://") ||
+        href.startsWith("mailto:") ||
+        href.startsWith("tel:") ||
+        href.startsWith("#");
+      if (!safeHref) {
+        node.removeAttribute("href");
+      }
+      if (node.getAttribute("href")?.startsWith("http")) {
+        node.setAttribute("target", "_blank");
+        node.setAttribute("rel", "noopener noreferrer");
+      }
+    }
+  });
+
+  return safeText(temp.innerHTML, "");
+}
+
 function stripHtmlToText(value) {
   const input = safeText(value, "");
   if (!input) return "";
@@ -308,8 +368,8 @@ function extractTextBlocks(rawHtml) {
   const temp = document.createElement("div");
   temp.innerHTML = decoded;
 
-  const blocks = Array.from(temp.querySelectorAll("p, li"))
-    .map((node) => safeText(node.textContent || "", ""))
+  const blocks = Array.from(temp.querySelectorAll("h2, h3, h4, p, ul, ol, blockquote"))
+    .map((node) => sanitizeEntryBlockHtml(node.outerHTML || node.textContent || ""))
     .filter(Boolean);
 
   if (blocks.length) return blocks;
@@ -319,7 +379,7 @@ function extractTextBlocks(rawHtml) {
 
   return fullText
     .split(/\n{2,}/)
-    .map((line) => safeText(line, ""))
+    .map((line) => sanitizeEntryBlockHtml(`<p>${line}</p>`))
     .filter(Boolean);
 }
 
@@ -398,7 +458,9 @@ function renderEntry(stop) {
       forceBullets: Boolean(current.highlightForceBullets || current.highlightHasList)
     });
     entryHighlight.classList.toggle("hidden", !hasHighlight);
-    if (entryHighlightLabel) entryHighlightLabel.hidden = !hasHighlight;
+  }
+  if (entryHighlightLabel) {
+    entryHighlightLabel.hidden = !entryHighlight || entryHighlight.classList.contains("hidden");
   }
 
   if (entryText) {
@@ -411,9 +473,10 @@ function renderEntry(stop) {
           : fallbackStopZero.textBlocks;
 
     narrativeBlocks.forEach((line) => {
-      const p = document.createElement("p");
-      p.textContent = line;
-      entryText.appendChild(p);
+      const block = document.createElement("div");
+      block.className = "entry-rich-block";
+      block.innerHTML = line;
+      entryText.appendChild(block);
     });
   }
 
@@ -462,7 +525,7 @@ function renderEntry(stop) {
       entryVideo.controls = false;
       entryVideo.muted = true;
       entryVideo.autoplay = true;
-      entryVideo.loop = false;
+      entryVideo.loop = true;
       entryVideo.removeAttribute("poster");
       entryVideo.classList.remove("hidden");
       entryVideo.currentTime = 0;
