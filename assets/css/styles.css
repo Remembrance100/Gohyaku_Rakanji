@@ -536,13 +536,6 @@ body {
   color: rgba(255, 255, 255, 0.65);
 }
 
-.detail-text [data-term-key],
-.detail-transcript [data-term-key] {
-  color: #ffffff;
-  border-bottom: 1px dashed rgba(255, 255, 255, 0.5);
-  cursor: pointer;
-}
-
 /* ─── Overlay modals ───────────────────────────────────────── */
 
 .overlay-modal {

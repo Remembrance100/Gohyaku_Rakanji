@@ -7,24 +7,11 @@
 - `assets/icons/`: app icons and favicon assets
 - `manifest.webmanifest` and `sw.js`: root-level PWA files
 
-### 1. UI/Navigation — Major Changes Decided
-
-**Switching to map-based navigation:** //finished
-
-- Replacing the current 1–20 list view. Now when users tap "Start Guide," a **large temple grounds map appears** with numbered buttons on it. Users tap a number to jump to that stop.
-
 **Switching to one-scroll format:**
 
 - Eliminating the multi-page structure within each stop (highlight → main text → details → map). Instead, **everything fits on a single page that you scroll top to bottom.**
 - This also solves the "close button problem" — where tapping the browser back button from a detail page sent users all the way back to the intro instead of the stop they were viewing.
 - Hyperlinked detail subpages are eliminated. Images and explanatory text will be embedded directly in the main body.
-
-**Adding a language settings page:** / Finished
-
-- A new page **before** the introduction where users can select language and font size.
-- Visitor etiquette/notices (e.g., no photography rules) will also be placed on this page.
-
----
 
 ### 2. Photos/Content Direction
 

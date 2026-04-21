@@ -345,9 +345,8 @@ function escapeHtml(value) {
 }
 
 function renderTermTokenHtml(keyRaw, labelRaw = "") {
-  const key = normalizeTermKey(keyRaw) || safeText(String(keyRaw || ""), "");
   const label = toPlainText(labelRaw) || toPlainText(keyRaw) || "term";
-  return `<span data-term-key="${escapeHtml(key)}">${escapeHtml(label)}</span>`;
+  return escapeHtml(label);
 }
 
 function replaceTermShortcodes(rawText) {
@@ -1187,6 +1186,7 @@ function renderHeroSlideshow(stop) {
 
   detailHeroTrack.innerHTML = "";
   detailHeroIndicators.innerHTML = "";
+  detailHeroIndicators.hidden = true;
   if (stop.videoUrl) {
     const video = document.createElement("video");
     video.className =
@@ -1205,47 +1205,31 @@ function renderHeroSlideshow(stop) {
     }
     detailHeroTrack.appendChild(video);
     video.play().catch(() => {});
-    detailHeroIndicators.hidden = true;
     heroSlideIndex = 0;
     return;
   }
 
-  const imageMedia =
-    Array.isArray(stop.media) && stop.media.length ? stop.media : [stop.thumb];
-  const heroMedia = imageMedia.map((src) => ({ type: "image", src }));
-  detailHeroIndicators.hidden = heroMedia.length <= 1;
+  const leadImage =
+    (Array.isArray(stop.media) && stop.media.find(Boolean)) || stop.thumb || "";
+  if (!leadImage) return;
 
-  heroMedia.forEach((mediaItem, index) => {
-    const img = document.createElement("img");
-    img.className = "detail-hero-slide detail-hero-media detail-hero-image";
-    img.alt = `${stop.title} image ${index + 1}`;
-    const setOrientationClass = () => {
-      const isPortrait = img.naturalHeight > img.naturalWidth * 1.08;
-      img.classList.toggle("is-portrait", isPortrait);
-      img.classList.toggle("is-landscape", !isPortrait);
-    };
-    img.addEventListener("load", setOrientationClass);
-    img.src = mediaItem.src;
-    if (img.complete && img.naturalWidth > 0) {
-      setOrientationClass();
-    }
+  const img = document.createElement("img");
+  img.className = "detail-hero-slide detail-hero-media detail-hero-image active";
+  img.alt = `${stop.title} image 1`;
+  const setOrientationClass = () => {
+    const isPortrait = img.naturalHeight > img.naturalWidth * 1.08;
+    img.classList.toggle("is-portrait", isPortrait);
+    img.classList.toggle("is-landscape", !isPortrait);
+  };
+  img.addEventListener("load", setOrientationClass);
+  img.src = leadImage;
+  if (img.complete && img.naturalWidth > 0) {
+    setOrientationClass();
+  }
 
-    if (index === 0) img.classList.add("active");
-    detailHeroTrack.appendChild(img);
-
-    const indicator = document.createElement("span");
-    indicator.className = "slide-indicator";
-    indicator.setAttribute("aria-hidden", "true");
-
-    const progress = document.createElement("span");
-    progress.className = "slide-progress";
-    indicator.appendChild(progress);
-
-    detailHeroIndicators.appendChild(indicator);
-  });
+  detailHeroTrack.appendChild(img);
 
   heroSlideIndex = 0;
-  showHeroSlide(0);
 }
 
 function renderRichBlocks(container, blocks) {
@@ -1255,75 +1239,6 @@ function renderRichBlocks(container, blocks) {
     const p = document.createElement("p");
     p.innerHTML = blockHtml;
     container.appendChild(p);
-  });
-}
-
-function escapeRegExp(value) {
-  return String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
-
-function injectTermTokens(container, terms) {
-  if (!container || !Array.isArray(terms) || !terms.length) return;
-
-  const labelToKey = new Map();
-  terms.forEach((term) => {
-    const label = safeText(term.label, "");
-    const key = normalizeTermKey(term.key);
-    if (label && key && !labelToKey.has(label)) {
-      labelToKey.set(label, key);
-    }
-  });
-
-  const labels = Array.from(labelToKey.keys()).sort(
-    (a, b) => b.length - a.length,
-  );
-  if (!labels.length) return;
-  const pattern = new RegExp(`(${labels.map(escapeRegExp).join("|")})`, "g");
-
-  const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT);
-  const textNodes = [];
-  while (walker.nextNode()) {
-    textNodes.push(walker.currentNode);
-  }
-
-  textNodes.forEach((node) => {
-    const parent = node.parentElement;
-    if (!parent) return;
-    if (parent.closest("[data-term-key],a,button")) return;
-
-    const source = node.nodeValue || "";
-    if (!source || !pattern.test(source)) {
-      pattern.lastIndex = 0;
-      return;
-    }
-    pattern.lastIndex = 0;
-
-    const fragment = document.createDocumentFragment();
-    let lastIndex = 0;
-    let match;
-    while ((match = pattern.exec(source)) !== null) {
-      const termLabel = match[0];
-      const start = match.index;
-      if (start > lastIndex) {
-        fragment.appendChild(
-          document.createTextNode(source.slice(lastIndex, start)),
-        );
-      }
-
-      const span = document.createElement("span");
-      span.setAttribute(
-        "data-term-key",
-        labelToKey.get(termLabel) || normalizeTermKey(termLabel),
-      );
-      span.textContent = termLabel;
-      fragment.appendChild(span);
-      lastIndex = start + termLabel.length;
-    }
-
-    if (lastIndex < source.length) {
-      fragment.appendChild(document.createTextNode(source.slice(lastIndex)));
-    }
-    node.replaceWith(fragment);
   });
 }
 
@@ -1364,8 +1279,6 @@ function setDetailStop(stop) {
   detailHighlightLabel?.classList.toggle("hidden", !hasHighlightBlock);
 
   renderRichBlocks(detailTranscript, stop.transcriptBlocks);
-  injectTermTokens(detailText, stop.terms || []);
-  injectTermTokens(detailTranscript, stop.terms || []);
   detailTranscriptBlock.hidden = stop.transcriptBlocks.length === 0;
 
   if (detailContent) {
@@ -1763,23 +1676,6 @@ function closeDetail() {
   stopHeroSlideshow();
 }
 
-function bindKeywordClick(container) {
-  if (!container) return;
-  container.addEventListener("click", (event) => {
-    const keywordNode = event.target.closest("[data-term-key]");
-    if (!keywordNode) return;
-
-    event.preventDefault();
-    const key = normalizeTermKey(
-      keywordNode.getAttribute("data-term-key") || "",
-    );
-    if (!key) return;
-
-    const term = activeTermLookup.get(key);
-    openTermModal(term, toPlainText(keywordNode.textContent || "Keyword"));
-  });
-}
-
 function buildStopPicker() {
   if (!stopPickerItems) return;
   stopPickerItems.innerHTML = "";
@@ -1931,8 +1827,6 @@ function bindEvents() {
 
   stopPickerBackdrop?.addEventListener("click", closeStopPicker);
 
-  bindKeywordClick(detailText);
-  bindKeywordClick(detailTranscript);
 }
 
 async function init() {
