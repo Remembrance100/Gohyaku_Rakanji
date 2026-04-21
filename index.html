@@ -1,219 +1,320 @@
-<!DOCTYPE html>
+<!doctype html>
+<!-- Entry page: language/font settings plus the intro experience before the tour starts. -->
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#08080c" />
+    <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
-    <title>Memorial Tour Guide · SmartSenior</title>
+    <title>Tour Entry · Stop 0</title>
     <script>
       if ("serviceWorker" in navigator) {
         window.addEventListener("load", () => {
           navigator.serviceWorker
             .getRegistrations()
-            .then((registrations) => Promise.all(registrations.map((registration) => registration.unregister())))
+            .then((registrations) =>
+              Promise.all(
+                registrations.map((registration) => registration.unregister()),
+              ),
+            )
             .catch(() => {});
           if ("caches" in window) {
-            caches.keys().then((keys) => Promise.all(keys.map((key) => caches.delete(key)))).catch(() => {});
+            caches
+              .keys()
+              .then((keys) =>
+                Promise.all(keys.map((key) => caches.delete(key))),
+              )
+              .catch(() => {});
           }
         });
       }
     </script>
-    <link rel="icon" href="./icons/icon.svg" type="image/svg+xml" />
+    <link rel="icon" href="./assets/icons/icon.svg" type="image/svg+xml" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Barlow:wght@500;700;800&family=Manrope:wght@500;700;800&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./styles.css?v=20260412f" />
+    <link rel="stylesheet" href="./assets/css/entry.css?v=20260421a" />
   </head>
   <body>
-    <header class="site-header" aria-label="Site header">
-      <div class="site-header-inner">
-        <div class="site-brand">
-          <svg class="site-brand-icon" width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
-            <circle cx="9" cy="9" r="8" stroke="currentColor" stroke-width="1.2" stroke-opacity="0.5"/>
-            <circle cx="9" cy="9" r="3.5" fill="currentColor" fill-opacity="0.45"/>
-            <line x1="9" y1="1" x2="9" y2="4" stroke="currentColor" stroke-width="1.2" stroke-opacity="0.45"/>
-            <line x1="9" y1="14" x2="9" y2="17" stroke="currentColor" stroke-width="1.2" stroke-opacity="0.45"/>
-            <line x1="1" y1="9" x2="4" y2="9" stroke="currentColor" stroke-width="1.2" stroke-opacity="0.45"/>
-            <line x1="14" y1="9" x2="17" y2="9" stroke="currentColor" stroke-width="1.2" stroke-opacity="0.45"/>
-          </svg>
-          <span class="site-brand-name">SmartSenior</span>
-        </div>
-        <span class="site-badge">Audio Tour</span>
-      </div>
-    </header>
-
-    <main class="app-shell" id="appShell">
-      <div class="app-loading-overlay" id="appLoadingOverlay" role="status" aria-label="Loading content">
-        <div class="app-loading-dots" aria-hidden="true">
-          <span class="loading-dot"></span>
-          <span class="loading-dot"></span>
-          <span class="loading-dot"></span>
-        </div>
-      </div>
-
-      <section class="tour-sheet" aria-label="Tour stops">
-        <article class="intro-card">
-          <video
-            id="introVideo"
-            class="intro-video hidden"
-            playsinline
-            muted
-            autoplay
-            loop
-            controls
-            controlslist="nodownload noplaybackrate"
-            preload="metadata"
-            aria-label="Introduction video"
-          ></video>
-        </article>
-        <div class="stop-list"></div>
-      </section>
-
-      <section class="detail-view" aria-label="Stop detail">
-        <div class="detail-hero">
-          <button class="back-btn" id="backButton" type="button" aria-label="Go back">
-            <
-          </button>
-          <div class="detail-hero-track" id="detailHeroTrack"></div>
-          <div
-            class="detail-hero-indicators"
-            id="detailHeroIndicators"
-            aria-label="Image slide indicators"
-          ></div>
-        </div>
-
-        <header class="detail-strip">
-          <p class="detail-number" id="detailNumber">01</p>
-          <h2 class="detail-title" id="detailTitle">
-            Welcome Gate & Orientation Plaza
-          </h2>
-        </header>
-
-        <div class="detail-content" id="detailContent">
-          <article class="detail-question-block">
-            <h3 id="detailQuestion">
-              Why was this site chosen as a place of remembrance?
-            </h3>
-          </article>
-
-          <p class="detail-highlight-label hidden" id="detailHighlightLabel">ハイライト</p>
-          <div class="detail-stop-highlight hidden" id="detailHighlight"></div>
-
-          <div class="detail-text" id="detailText"></div>
-
-          <div class="detail-audio-inline hidden" id="detailAudioInline">
-            <button class="detail-play-btn" id="detailPlayBtn" type="button" aria-label="Play audio guide"></button>
-            <button class="detail-map-btn" id="detailMapBtn" type="button" aria-label="地図を開く" disabled>
-              地図
-            </button>
-          </div>
-
-          <section class="detail-transcript-block" id="detailTranscriptBlock" hidden>
-            <h4>音声ガイド</h4>
-            <div class="detail-transcript" id="detailTranscript"></div>
+    <!-- Settings modal shown first so visitors can pick language and text size. -->
+    <!-- Settings screen (shown first) -->
+    <div
+      id="settingsScreen"
+      class="settings-screen"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Preferences"
+    >
+      <div class="settings-inner">
+        <div class="settings-scroll">
+          <!-- Language -->
+          <section
+            class="settings-section"
+            aria-labelledby="settingsLangHeading"
+          >
+            <h2 class="settings-heading" id="settingsLangHeading">
+              <span data-t="lang-heading">言語</span>
+            </h2>
+            <div
+              class="settings-lang-grid"
+              id="settingsLangGrid"
+              role="group"
+              aria-label="Select language"
+            >
+              <button
+                class="settings-lang-btn is-active"
+                type="button"
+                data-lang="ja"
+                aria-pressed="true"
+              >
+                <span class="settings-lang-flag">🇯🇵</span>
+                <span class="settings-lang-name">日本語</span>
+              </button>
+              <button
+                class="settings-lang-btn"
+                type="button"
+                data-lang="en"
+                aria-pressed="false"
+              >
+                <span class="settings-lang-flag">🇬🇧</span>
+                <span class="settings-lang-name">English</span>
+              </button>
+            </div>
           </section>
 
+          <!-- Font size -->
+          <section
+            class="settings-section"
+            aria-labelledby="settingsFontHeading"
+          >
+            <h2 class="settings-heading" id="settingsFontHeading">
+              <span data-t="font-heading">文字サイズ</span>
+            </h2>
+            <div
+              class="settings-font-row"
+              role="group"
+              aria-label="Select text size"
+            >
+              <button
+                class="settings-font-btn"
+                type="button"
+                data-size="small"
+                aria-pressed="false"
+              >
+                <span class="settings-font-sample" style="font-size: 0.78rem"
+                  >A</span
+                >
+                <span class="settings-font-label" data-t="font-small">小</span>
+              </button>
+              <button
+                class="settings-font-btn"
+                type="button"
+                data-size="normal"
+                aria-pressed="false"
+              >
+                <span class="settings-font-sample" style="font-size: 1rem"
+                  >A</span
+                >
+                <span class="settings-font-label" data-t="font-normal"
+                  >標準</span
+                >
+              </button>
+              <button
+                class="settings-font-btn is-active"
+                type="button"
+                data-size="large"
+                aria-pressed="true"
+              >
+                <span class="settings-font-sample" style="font-size: 1.28rem"
+                  >A</span
+                >
+                <span class="settings-font-label" data-t="font-large">大</span>
+              </button>
+              <button
+                class="settings-font-btn"
+                type="button"
+                data-size="xlarge"
+                aria-pressed="false"
+              >
+                <span class="settings-font-sample" style="font-size: 1.52rem"
+                  >A</span
+                >
+                <span class="settings-font-label" data-t="font-xlarge"
+                  >特大</span
+                >
+              </button>
+            </div>
+          </section>
+
+          <!-- Visitor notices -->
+          <section
+            class="settings-section settings-section--notices"
+            aria-labelledby="settingsNoticesHeading"
+          >
+            <h2 class="settings-heading" id="settingsNoticesHeading">
+              <span data-t="notices-heading">ご注意</span>
+            </h2>
+            <ul class="settings-notices-list" id="settingsNoticesList">
+              <li class="settings-notice-item">
+                <span class="settings-notice-icon" aria-hidden="true">📵</span>
+                <span class="settings-notice-text" data-t="notice-photo"
+                  >墓石や位牌の撮影はご遠慮ください。</span
+                >
+              </li>
+              <li class="settings-notice-item">
+                <span class="settings-notice-icon" aria-hidden="true">🤫</span>
+                <span class="settings-notice-text" data-t="notice-quiet"
+                  >見学中は静かにお話しください。</span
+                >
+              </li>
+              <li class="settings-notice-item">
+                <span class="settings-notice-icon" aria-hidden="true">🚭</span>
+                <span class="settings-notice-text" data-t="notice-smoke"
+                  >境内での喫煙は禁止されています。</span
+                >
+              </li>
+              <li class="settings-notice-item">
+                <span class="settings-notice-icon" aria-hidden="true">🐕</span>
+                <span class="settings-notice-text" data-t="notice-pets"
+                  >ペットの境内への持ち込みはご遠慮ください。</span
+                >
+              </li>
+              <li class="settings-notice-item">
+                <span class="settings-notice-icon" aria-hidden="true">🌿</span>
+                <span class="settings-notice-text" data-t="notice-plants"
+                  >花や植物を摘まないようにお願いします。</span
+                >
+              </li>
+            </ul>
+          </section>
+        </div>
+
+        <div class="settings-footer">
+          <button
+            class="settings-confirm-btn"
+            id="settingsConfirmBtn"
+            type="button"
+          >
+            <span data-t="confirm-btn">ガイド開始</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main entry layout for stop 0 video, summary text, and the Start Tour action. -->
+    <main class="entry-shell" aria-label="Stop 0 entry page">
+      <div
+        id="entryLoadingOverlay"
+        class="entry-loading-overlay"
+        role="status"
+        aria-label="Loading"
+      >
+        <div class="entry-loading-dots" aria-hidden="true">
+          <span class="loading-dot"></span>
+          <span class="loading-dot"></span>
+          <span class="loading-dot"></span>
+        </div>
+      </div>
+
+      <section class="entry-hero" aria-label="Stop 0 introduction video">
+        <video
+          id="entryVideo"
+          class="entry-video hidden"
+          playsinline
+          autoplay
+          muted
+          preload="auto"
+          x-webkit-airplay="deny"
+          disableremoteplayback
+          aria-label="Stop 0 video"
+        ></video>
+        <button
+          class="entry-unmute-btn hidden"
+          id="entryUnmuteBtn"
+          type="button"
+          aria-label="音声をオン/オフ"
+        >
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            aria-hidden="true"
+          >
+            <path
+              id="entryUnmuteIcon"
+              d="M11 5L6 9H2v6h4l5 4V5zM23 9l-6 6M17 9l6 6"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+          <span id="entryUnmuteLabel">音声オン</span>
+        </button>
+        <button
+          class="entry-settings-btn"
+          id="entrySettingsBtn"
+          type="button"
+          aria-label="設定を開く"
+        >
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <circle cx="12" cy="12" r="3" />
+            <path
+              d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"
+            />
+          </svg>
+        </button>
+      </section>
+
+      <section
+        class="entry-content"
+        aria-label="Stop 0 description and transcript"
+      >
+        <h1 id="entryTitle">Welcome</h1>
+        <p class="entry-highlight-label" id="entryHighlightLabel" hidden>
+          ハイライト
+        </p>
+        <div id="entryHighlight" class="entry-highlight hidden"></div>
+        <div id="entryText" class="entry-text"></div>
+
+        <div
+          id="entryGuideGallery"
+          class="entry-guide-gallery hidden"
+          aria-hidden="true"
+        >
+          <div id="entryGuideTrack" class="entry-guide-track"></div>
         </div>
       </section>
 
-      <nav class="bottom-nav" id="bottomNav" aria-label="Tour navigation">
-        <button class="bottom-nav-btn bottom-nav-arrow" id="detailPrevBtn" type="button" aria-label="Go to previous stop">
-          <svg width="10" height="16" viewBox="0 0 10 16" fill="none" aria-hidden="true">
-            <polyline points="8,2 2,8 8,14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </button>
-        <button class="bottom-nav-btn bottom-nav-menu-btn" id="bottomMenuBtn" type="button" aria-label="Menu">
-          <svg width="20" height="14" viewBox="0 0 20 14" fill="none" aria-hidden="true">
-            <line x1="0" y1="1" x2="20" y2="1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-            <line x1="0" y1="7" x2="20" y2="7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-            <line x1="0" y1="13" x2="20" y2="13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-          </svg>
-        </button>
-        <button class="bottom-nav-btn bottom-nav-arrow" id="detailNextBtn" type="button" aria-label="Go to next stop">
-          <svg width="10" height="16" viewBox="0 0 10 16" fill="none" aria-hidden="true">
-            <polyline points="2,2 8,8 2,14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </button>
-      </nav>
-
-      <div class="stop-picker hidden" id="stopPicker" role="dialog" aria-modal="true" aria-label="スポットを選択">
-        <div class="stop-picker-backdrop" id="stopPickerBackdrop"></div>
-        <div class="stop-picker-panel">
-          <div class="stop-picker-handle" aria-hidden="true"></div>
-          <h3 class="stop-picker-heading">全スポット</h3>
-          <div class="stop-picker-items" id="stopPickerItems"></div>
+      <footer class="entry-footer">
+        <div class="entry-actions">
+          <button
+            id="entryStartBtn"
+            class="entry-action-btn is-start"
+            type="button"
+            aria-label="ガイドを開始"
+          >
+            ガイド開始
+          </button>
         </div>
-      </div>
+      </footer>
     </main>
 
-    <section
-      class="overlay-modal hidden"
-      id="mapPreviewModal"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="mapPreviewTitle"
-    >
-      <div class="overlay-modal-inner">
-        <div class="overlay-modal-head">
-          <h3 id="mapPreviewTitle">地図</h3>
-          <button
-            type="button"
-            class="overlay-modal-close"
-            id="mapPreviewClose"
-            aria-label="Close map preview"
-          >
-            x
-          </button>
-        </div>
-        <div class="overlay-map-stage" id="mapPreviewStage">
-          <img id="mapPreviewImage" class="overlay-image" src="" alt="Stop map preview" />
-        </div>
-        <div class="overlay-map-controls">
-          <button type="button" class="overlay-map-btn" id="mapZoomOut" aria-label="地図を縮小">−</button>
-          <button type="button" class="overlay-map-btn" id="mapZoomReset" aria-label="地図をリセット">100%</button>
-          <button type="button" class="overlay-map-btn" id="mapZoomIn" aria-label="地図を拡大">＋</button>
-        </div>
-      </div>
-    </section>
-
-    <section
-      class="overlay-modal hidden"
-      id="termModal"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="termModalTitle"
-    >
-      <div class="overlay-modal-inner term-modal-inner">
-        <div class="overlay-modal-head">
-          <h3 id="termModalTitle">Keyword</h3>
-          <button
-            type="button"
-            class="overlay-modal-close"
-            id="termModalClose"
-            aria-label="Close keyword details"
-          >
-            x
-          </button>
-        </div>
-        <div class="term-modal-scroll" id="termModalScroll">
-          <div id="termGalleryMeta" class="term-gallery-meta hidden">
-            <span id="termGalleryCount" class="term-gallery-count">1 / 1</span>
-            <div id="termGalleryDots" class="term-gallery-dots" aria-label="Image position"></div>
-          </div>
-          <div id="termModalMedia" class="term-modal-media hidden"></div>
-          <div id="termModalBody" class="term-modal-body"></div>
-        </div>
-      </div>
-    </section>
-
-    <footer class="site-footer" aria-label="Site footer">
-      <p>Memorial Tour Guide &middot; SmartSenior</p>
-    </footer>
-
-    <script src="./script.js?v=20260412f"></script>
+    <script src="./assets/js/entry.js?v=20260421a"></script>
   </body>
 </html>

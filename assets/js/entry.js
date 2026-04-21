@@ -1,3 +1,4 @@
+// Bootstraps index.html: loads stop 0, applies saved settings, and sends the user into the tour.
 const DATA_URL =
   "https://stg-apirakanjicom-stgrakanji.kinsta.cloud/?rest_route=/memorial/v1/tour";
 
@@ -557,10 +558,156 @@ function updateUnmuteBtn() {
   entryUnmuteBtn.classList.toggle("is-unmuted", !muted);
 }
 
+// ─── Settings screen ────────────────────────────────────────────────────────
+
+const PREFS_KEY = "tourPrefs";
+
+const TRANSLATIONS = {
+  en: {
+    "lang-heading": "Language",
+    "font-heading": "Text Size",
+    "font-small": "Small",
+    "font-normal": "Normal",
+    "font-large": "Large",
+    "font-xlarge": "XL",
+    "notices-heading": "Visitor Etiquette",
+    "notice-photo": "Photography of graves and memorial tablets is not permitted.",
+    "notice-quiet": "Please keep your voice low throughout the tour.",
+    "notice-smoke": "Smoking is not permitted on the grounds.",
+    "notice-pets": "Pets are not allowed inside the temple grounds.",
+    "notice-plants": "Please do not pick flowers or plants.",
+    "confirm-btn": "Start Tour"
+  },
+  ja: {
+    "lang-heading": "言語",
+    "font-heading": "文字サイズ",
+    "font-small": "小",
+    "font-normal": "標準",
+    "font-large": "大",
+    "font-xlarge": "特大",
+    "notices-heading": "ご注意",
+    "notice-photo": "墓石や位牌の撮影はご遠慮ください。",
+    "notice-quiet": "見学中は静かにお話しください。",
+    "notice-smoke": "境内での喫煙は禁止されています。",
+    "notice-pets": "ペットの境内への持ち込みはご遠慮ください。",
+    "notice-plants": "花や植物を摘まないようにお願いします。",
+    "confirm-btn": "ガイド開始"
+  }
+};
+
+const FONT_SCALES = { small: 0.88, normal: 1, large: 1.14, xlarge: 1.3 };
+
+function loadPrefs() {
+  try {
+    return JSON.parse(localStorage.getItem(PREFS_KEY) || "{}");
+  } catch {
+    return {};
+  }
+}
+
+function savePrefs(prefs) {
+  try {
+    localStorage.setItem(PREFS_KEY, JSON.stringify(prefs));
+  } catch {}
+}
+
+function applyLang(lang) {
+  document.documentElement.lang = lang;
+  const t = TRANSLATIONS[lang] || TRANSLATIONS.en;
+  document.querySelectorAll("[data-t]").forEach((el) => {
+    const key = el.getAttribute("data-t");
+    if (t[key]) el.textContent = t[key];
+  });
+}
+
+function applyFontScale(size) {
+  const scale = FONT_SCALES[size] || 1;
+  document.documentElement.style.setProperty("--tour-font-scale", String(scale));
+}
+
+function initSettings() {
+  const screen = document.getElementById("settingsScreen");
+  const confirmBtn = document.getElementById("settingsConfirmBtn");
+  const langGrid = document.getElementById("settingsLangGrid");
+  const entrySettingsBtn = document.getElementById("entrySettingsBtn");
+
+  if (!screen) return;
+
+  const prefs = loadPrefs();
+  let selectedLang = prefs.lang || "ja";
+  let selectedSize = prefs.size || "large";
+
+  // Apply saved prefs immediately
+  applyLang(selectedLang);
+  applyFontScale(selectedSize);
+
+  // Sync button states
+  function syncLangBtns() {
+    langGrid?.querySelectorAll(".settings-lang-btn").forEach((btn) => {
+      const active = btn.dataset.lang === selectedLang;
+      btn.classList.toggle("is-active", active);
+      btn.setAttribute("aria-pressed", String(active));
+    });
+  }
+
+  function syncFontBtns() {
+    document.querySelectorAll(".settings-font-btn").forEach((btn) => {
+      const active = btn.dataset.size === selectedSize;
+      btn.classList.toggle("is-active", active);
+      btn.setAttribute("aria-pressed", String(active));
+    });
+  }
+
+  syncLangBtns();
+  syncFontBtns();
+
+  // Language selection
+  langGrid?.addEventListener("click", (e) => {
+    const btn = e.target.closest(".settings-lang-btn");
+    if (!btn) return;
+    selectedLang = btn.dataset.lang;
+    applyLang(selectedLang);
+    syncLangBtns();
+  });
+
+  // Font size selection
+  document.querySelectorAll(".settings-font-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      selectedSize = btn.dataset.size;
+      applyFontScale(selectedSize);
+      syncFontBtns();
+    });
+  });
+
+  function hideSettings() {
+    screen.classList.add("is-hidden");
+    savePrefs({ lang: selectedLang, size: selectedSize });
+  }
+
+  // Confirm — also propagate lang to index via query param when navigating
+  confirmBtn?.addEventListener("click", hideSettings);
+
+  // Re-open from gear icon
+  entrySettingsBtn?.addEventListener("click", () => {
+    screen.classList.remove("is-hidden");
+    syncLangBtns();
+    syncFontBtns();
+  });
+
+  // Always show settings on page load
+  screen.classList.remove("is-hidden");
+}
+
+// ─── Entry events & init ─────────────────────────────────────────────────────
+
 function bindEvents() {
   entryStartBtn?.addEventListener("click", () => {
     entryVideo?.pause();
-    window.location.href = "./index.html?tour=1";
+    const prefs = loadPrefs();
+    const lang = prefs.lang || "en";
+    const targetUrl = new URL("./tour.html", window.location.href);
+    targetUrl.searchParams.set("lang", lang);
+    window.location.href = targetUrl.toString();
   });
 
   entryUnmuteBtn?.addEventListener("click", () => {
@@ -571,6 +718,7 @@ function bindEvents() {
 }
 
 async function init() {
+  initSettings();
   bindEvents();
 
   try {

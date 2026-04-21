@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<!-- Tour page: interactive map, stop detail content, and in-tour overlays. -->
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#08080c" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <title>Memorial Tour Guide · SmartSenior</title>
+    <script>
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker
+            .getRegistrations()
+            .then((registrations) => Promise.all(registrations.map((registration) => registration.unregister())))
+            .catch(() => {});
+          if ("caches" in window) {
+            caches.keys().then((keys) => Promise.all(keys.map((key) => caches.delete(key)))).catch(() => {});
+          }
+        });
+      }
+    </script>
+    <link rel="icon" href="./assets/icons/icon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Barlow:wght@500;700;800&family=Manrope:wght@500;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./assets/css/styles.css?v=20260421b" />
+  </head>
+  <body>
+    <!-- Persistent chrome around the tour experience. -->
+    <header class="site-header" aria-label="Site header">
+      <div class="site-header-inner">
+        <div class="site-brand">
+          <svg class="site-brand-icon" width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+            <circle cx="9" cy="9" r="8" stroke="currentColor" stroke-width="1.2" stroke-opacity="0.5"/>
+            <circle cx="9" cy="9" r="3.5" fill="currentColor" fill-opacity="0.45"/>
+            <line x1="9" y1="1" x2="9" y2="4" stroke="currentColor" stroke-width="1.2" stroke-opacity="0.45"/>
+            <line x1="9" y1="14" x2="9" y2="17" stroke="currentColor" stroke-width="1.2" stroke-opacity="0.45"/>
+            <line x1="1" y1="9" x2="4" y2="9" stroke="currentColor" stroke-width="1.2" stroke-opacity="0.45"/>
+            <line x1="14" y1="9" x2="17" y2="9" stroke="currentColor" stroke-width="1.2" stroke-opacity="0.45"/>
+          </svg>
+          <span class="site-brand-name">SmartSenior</span>
+        </div>
+        <span class="site-badge">Audio Tour</span>
+      </div>
+    </header>
+
+    <!-- Main tour app shell: map view, detail panel, and bottom navigation. -->
+    <main class="app-shell" id="appShell">
+      <div class="app-loading-overlay" id="appLoadingOverlay" role="status" aria-label="Loading content">
+        <div class="app-loading-dots" aria-hidden="true">
+          <span class="loading-dot"></span>
+          <span class="loading-dot"></span>
+          <span class="loading-dot"></span>
+        </div>
+      </div>
+
+      <section class="tour-sheet" aria-label="Tour stops">
+        <div class="map-view" id="mapView">
+          <div class="map-stage" id="mapStage">
+            <div class="map-inner" id="mapInner">
+              <img class="map-image" id="mapImage" src="" alt="Temple grounds map" />
+              <div class="map-pins" id="mapPins" aria-label="Tour stop buttons"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="detail-view" aria-label="Stop detail">
+        <div class="detail-hero">
+          <button class="back-btn" id="backButton" type="button" aria-label="Go back">
+            <
+          </button>
+          <div class="detail-hero-track" id="detailHeroTrack"></div>
+          <div
+            class="detail-hero-indicators"
+            id="detailHeroIndicators"
+            aria-label="Image slide indicators"
+          ></div>
+        </div>
+
+        <header class="detail-strip">
+          <p class="detail-number" id="detailNumber">01</p>
+          <h2 class="detail-title" id="detailTitle">
+            Welcome Gate & Orientation Plaza
+          </h2>
+        </header>
+
+        <div class="detail-content" id="detailContent">
+          <article class="detail-question-block">
+            <h3 id="detailQuestion">
+              Why was this site chosen as a place of remembrance?
+            </h3>
+          </article>
+
+          <p class="detail-highlight-label hidden" id="detailHighlightLabel">ハイライト</p>
+          <div class="detail-stop-highlight hidden" id="detailHighlight"></div>
+
+          <div class="detail-text" id="detailText"></div>
+
+          <div class="detail-audio-inline hidden" id="detailAudioInline">
+            <button class="detail-play-btn" id="detailPlayBtn" type="button" aria-label="Play audio guide"></button>
+            <button class="detail-map-btn" id="detailMapBtn" type="button" aria-label="地図を開く" disabled>
+              地図
+            </button>
+          </div>
+
+          <section class="detail-transcript-block" id="detailTranscriptBlock" hidden>
+            <h4>音声ガイド</h4>
+            <div class="detail-transcript" id="detailTranscript"></div>
+          </section>
+
+        </div>
+      </section>
+
+      <nav class="bottom-nav" id="bottomNav" aria-label="Tour navigation">
+        <button class="bottom-nav-btn bottom-nav-arrow" id="detailPrevBtn" type="button" aria-label="Go to previous stop">
+          <svg width="10" height="16" viewBox="0 0 10 16" fill="none" aria-hidden="true">
+            <polyline points="8,2 2,8 8,14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <button class="bottom-nav-btn bottom-nav-menu-btn" id="bottomMenuBtn" type="button" aria-label="Menu">
+          <svg width="20" height="14" viewBox="0 0 20 14" fill="none" aria-hidden="true">
+            <line x1="0" y1="1" x2="20" y2="1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            <line x1="0" y1="7" x2="20" y2="7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            <line x1="0" y1="13" x2="20" y2="13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+        </button>
+        <button class="bottom-nav-btn bottom-nav-arrow" id="detailNextBtn" type="button" aria-label="Go to next stop">
+          <svg width="10" height="16" viewBox="0 0 10 16" fill="none" aria-hidden="true">
+            <polyline points="2,2 8,8 2,14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </nav>
+
+      <div class="stop-picker hidden" id="stopPicker" role="dialog" aria-modal="true" aria-label="スポットを選択">
+        <div class="stop-picker-backdrop" id="stopPickerBackdrop"></div>
+        <div class="stop-picker-panel">
+          <div class="stop-picker-handle" aria-hidden="true"></div>
+          <h3 class="stop-picker-heading">全スポット</h3>
+          <div class="stop-picker-items" id="stopPickerItems"></div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Zoomable map preview modal for a stop-specific map image. -->
+    <section
+      class="overlay-modal hidden"
+      id="mapPreviewModal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="mapPreviewTitle"
+    >
+      <div class="overlay-modal-inner">
+        <div class="overlay-modal-head">
+          <h3 id="mapPreviewTitle">地図</h3>
+          <button
+            type="button"
+            class="overlay-modal-close"
+            id="mapPreviewClose"
+            aria-label="Close map preview"
+          >
+            x
+          </button>
+        </div>
+        <div class="overlay-map-stage" id="mapPreviewStage">
+          <img id="mapPreviewImage" class="overlay-image" src="" alt="Stop map preview" />
+        </div>
+        <div class="overlay-map-controls">
+          <button type="button" class="overlay-map-btn" id="mapZoomOut" aria-label="地図を縮小">−</button>
+          <button type="button" class="overlay-map-btn" id="mapZoomReset" aria-label="地図をリセット">100%</button>
+          <button type="button" class="overlay-map-btn" id="mapZoomIn" aria-label="地図を拡大">＋</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Keyword/term modal used when the body content contains tappable glossary terms. -->
+    <section
+      class="overlay-modal hidden"
+      id="termModal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="termModalTitle"
+    >
+      <div class="overlay-modal-inner term-modal-inner">
+        <div class="overlay-modal-head">
+          <h3 id="termModalTitle">Keyword</h3>
+          <button
+            type="button"
+            class="overlay-modal-close"
+            id="termModalClose"
+            aria-label="Close keyword details"
+          >
+            x
+          </button>
+        </div>
+        <div class="term-modal-scroll" id="termModalScroll">
+          <div id="termGalleryMeta" class="term-gallery-meta hidden">
+            <span id="termGalleryCount" class="term-gallery-count">1 / 1</span>
+            <div id="termGalleryDots" class="term-gallery-dots" aria-label="Image position"></div>
+          </div>
+          <div id="termModalMedia" class="term-modal-media hidden"></div>
+          <div id="termModalBody" class="term-modal-body"></div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="site-footer" aria-label="Site footer">
+      <p>Memorial Tour Guide &middot; SmartSenior</p>
+    </footer>
+
+    <script src="./assets/js/script.js?v=20260421b"></script>
+  </body>
+</html>

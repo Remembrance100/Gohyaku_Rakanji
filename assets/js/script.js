@@ -1,12 +1,12 @@
+// Bootstraps tour.html: loads tour stops, renders the map, and manages stop/detail interactions.
 const DATA_URL =
   "https://stg-apirakanjicom-stgrakanji.kinsta.cloud/?rest_route=/memorial/v1/tour";
 
 const appShell = document.querySelector("#appShell");
 const appLoadingOverlay = document.querySelector("#appLoadingOverlay");
-const stopList = document.querySelector(".stop-list");
-const introButton = document.querySelector(".intro-cta");
-const introCard = document.querySelector(".intro-card");
-const introVideo = document.querySelector("#introVideo");
+const mapPins = document.querySelector("#mapPins");
+const mapImage = document.querySelector("#mapImage");
+const mapInner = document.querySelector("#mapInner");
 const title = document.querySelector(".sheet-title-row h1");
 const backButton = document.querySelector("#backButton");
 
@@ -55,13 +55,12 @@ const termGalleryCount = document.querySelector("#termGalleryCount");
 const termGalleryDots = document.querySelector("#termGalleryDots");
 
 const detailAudio = new Audio();
-const listPreviewAudio = new Audio();
-const isTourPage = new URLSearchParams(window.location.search).get("tour") === "1";
+const isTourPage =
+  new URLSearchParams(window.location.search).get("tour") === "1";
 
 let activeStop = null;
 let stopsData = [];
 let tourStopsData = [];
-let activePreviewButton = null;
 let heroSlideIndex = 0;
 let heroSlideTimer = null;
 let heroTouchStartX = 0;
@@ -91,7 +90,11 @@ function disablePwa() {
   window.addEventListener("load", () => {
     navigator.serviceWorker
       .getRegistrations()
-      .then((registrations) => Promise.all(registrations.map((registration) => registration.unregister())))
+      .then((registrations) =>
+        Promise.all(
+          registrations.map((registration) => registration.unregister()),
+        ),
+      )
       .catch(() => {});
   });
 }
@@ -128,21 +131,21 @@ const fallbackStops = [
     title: "Welcome Gate & Orientation Plaza",
     media: [
       "https://picsum.photos/id/1040/1280/960",
-      "https://picsum.photos/id/1035/1280/960"
+      "https://picsum.photos/id/1035/1280/960",
     ],
     thumb: "https://picsum.photos/id/1040/120/80",
     question: "Why does this memorial begin at the gate?",
     highlight: "Why does this memorial begin at the gate?",
     textBlocks: [
-      "This first stop introduces the idea of arrival, where visitors shift from daily life into a shared space of memory and reflection."
+      "This first stop introduces the idea of arrival, where visitors shift from daily life into a shared space of memory and reflection.",
     ],
     transcriptBlocks: [
-      "Welcome to the memorial grounds. This tour begins at the entrance."
+      "Welcome to the memorial grounds. This tour begins at the entrance.",
     ],
     terms: [],
     audioUrl: "",
-    mapUrl: ""
-  }
+    mapUrl: "",
+  },
 ];
 
 function safeText(value, fallback = "") {
@@ -169,7 +172,10 @@ function normalizeWpImageUrl(url) {
   if (!input) return "";
 
   const [base, query = ""] = input.split("?");
-  const upgraded = base.replace(/-\d+x\d+(?=\.(jpe?g|png|webp|gif|avif)$)/i, "");
+  const upgraded = base.replace(
+    /-\d+x\d+(?=\.(jpe?g|png|webp|gif|avif)$)/i,
+    "",
+  );
   return query ? `${upgraded}?${query}` : upgraded;
 }
 
@@ -218,7 +224,9 @@ function toPlainTextWithBreaks(value) {
   temp.innerHTML = replaceTermShortcodes(input);
 
   temp.querySelectorAll("br").forEach((node) => node.replaceWith("\n"));
-  temp.querySelectorAll("p, li").forEach((node) => node.insertAdjacentText("afterend", "\n"));
+  temp
+    .querySelectorAll("p, li")
+    .forEach((node) => node.insertAdjacentText("afterend", "\n"));
 
   const text = (temp.textContent || "")
     .replace(/\r\n?/g, "\n")
@@ -256,7 +264,8 @@ function normalizeHighlightLines(value) {
     const joinWithoutSpace =
       /[\u3040-\u30ff\u3400-\u9fff]$/.test(previous) &&
       /^[\u3040-\u30ff\u3400-\u9fff]/.test(line);
-    merged[merged.length - 1] = `${previous}${joinWithoutSpace ? "" : " "}${line}`;
+    merged[merged.length - 1] =
+      `${previous}${joinWithoutSpace ? "" : " "}${line}`;
   });
 
   return merged.join("\n");
@@ -346,22 +355,21 @@ function replaceTermShortcodes(rawText) {
 
   text = text.replace(
     /\[term\s+key=(['"])(.*?)\1\]?\s*([\s\S]*?)\[\/term\]/gi,
-    (_match, _quote, key, label) => renderTermTokenHtml(key, label)
+    (_match, _quote, key, label) => renderTermTokenHtml(key, label),
   );
 
   text = text.replace(
     /\[term\s+key=(['"])(.*?)\1\]?\s*\[\/term\]/gi,
-    (_match, _quote, key) => renderTermTokenHtml(key, key)
+    (_match, _quote, key) => renderTermTokenHtml(key, key),
   );
 
   text = text.replace(
     /\[term\s+key=([^\]'" \t\r\n]+)\]?\s*([\s\S]*?)\[\/term\]/gi,
-    (_match, key, label) => renderTermTokenHtml(key, label)
+    (_match, key, label) => renderTermTokenHtml(key, label),
   );
 
-  text = text.replace(
-    /\[term\s+key=([^\]'" \t\r\n]+)\]/gi,
-    (_match, key) => renderTermTokenHtml(key, key)
+  text = text.replace(/\[term\s+key=([^\]'" \t\r\n]+)\]/gi, (_match, key) =>
+    renderTermTokenHtml(key, key),
   );
 
   return text;
@@ -370,6 +378,30 @@ function replaceTermShortcodes(rawText) {
 function getLangKey() {
   const lang = (document.documentElement.lang || "en").toLowerCase();
   return lang.startsWith("ja") ? "ja" : "en";
+}
+
+const PREFS_KEY = "tourPrefs";
+
+function loadPrefs() {
+  try {
+    return JSON.parse(localStorage.getItem(PREFS_KEY) || "{}");
+  } catch {
+    return {};
+  }
+}
+
+function getRequestedLang() {
+  const params = new URLSearchParams(window.location.search);
+  const langParam = safeText(params.get("lang"), "").toLowerCase();
+  if (langParam.startsWith("ja")) return "ja";
+  if (langParam.startsWith("en")) return "en";
+
+  const savedLang = safeText(loadPrefs().lang, "").toLowerCase();
+  return savedLang.startsWith("ja") ? "ja" : "en";
+}
+
+function applySelectedLanguage() {
+  document.documentElement.lang = getRequestedLang();
 }
 
 function getLocalizedField(rawObj, key, fallback = "") {
@@ -393,7 +425,20 @@ function sanitizeRichInlineHtml(rawHtml) {
   const temp = document.createElement("div");
   temp.innerHTML = replaceTermShortcodes(rawHtml);
 
-  const allowed = new Set(["A", "SPAN", "STRONG", "EM", "B", "I", "U", "BR", "MARK", "CODE", "SUB", "SUP"]);
+  const allowed = new Set([
+    "A",
+    "SPAN",
+    "STRONG",
+    "EM",
+    "B",
+    "I",
+    "U",
+    "BR",
+    "MARK",
+    "CODE",
+    "SUB",
+    "SUP",
+  ]);
 
   Array.from(temp.querySelectorAll("*")).forEach((node) => {
     if (!allowed.has(node.tagName)) {
@@ -410,7 +455,10 @@ function sanitizeRichInlineHtml(rawHtml) {
       if (name === "class") {
         return;
       }
-      if (node.tagName === "A" && (name === "href" || name === "target" || name === "rel")) {
+      if (
+        node.tagName === "A" &&
+        (name === "href" || name === "target" || name === "rel")
+      ) {
         return;
       }
       node.removeAttribute(attr.name);
@@ -455,7 +503,7 @@ function sanitizeTermModalHtml(rawHtml) {
     "LI",
     "BLOCKQUOTE",
     "IMG",
-    "SPAN"
+    "SPAN",
   ]);
 
   Array.from(temp.querySelectorAll("*")).forEach((node) => {
@@ -471,11 +519,20 @@ function sanitizeTermModalHtml(rawHtml) {
         return;
       }
 
-      if (node.tagName === "A" && (name === "href" || name === "target" || name === "rel")) {
+      if (
+        node.tagName === "A" &&
+        (name === "href" || name === "target" || name === "rel")
+      ) {
         return;
       }
 
-      if (node.tagName === "IMG" && (name === "src" || name === "alt" || name === "title" || name === "loading")) {
+      if (
+        node.tagName === "IMG" &&
+        (name === "src" ||
+          name === "alt" ||
+          name === "title" ||
+          name === "loading")
+      ) {
         return;
       }
 
@@ -536,7 +593,7 @@ function extractRichBlocksFromSource(source) {
   }
 
   const blocks = Array.from(
-    temp.querySelectorAll("p, li, blockquote, h2, h3, h4, div")
+    temp.querySelectorAll("p, li, blockquote, h2, h3, h4, div"),
   );
 
   if (!blocks.length) {
@@ -545,7 +602,9 @@ function extractRichBlocksFromSource(source) {
   }
 
   return blocks
-    .map((node) => sanitizeRichInlineHtml(node.innerHTML || node.textContent || ""))
+    .map((node) =>
+      sanitizeRichInlineHtml(node.innerHTML || node.textContent || ""),
+    )
     .map((html) => safeText(html, ""))
     .filter(Boolean);
 }
@@ -607,7 +666,7 @@ function normalizeStopTerms(rawStop) {
           "media",
           "file",
           "attachment",
-          "value"
+          "value",
         ].forEach((key) => {
           if (key in candidate) {
             pushCandidate(candidate[key]);
@@ -625,7 +684,7 @@ function normalizeStopTerms(rawStop) {
       row.images,
       row.gallery,
       row.popup_gallery,
-      row.popupGallery
+      row.popupGallery,
     ];
     candidates.forEach(pushCandidate);
     return urls;
@@ -637,7 +696,7 @@ function normalizeStopTerms(rawStop) {
     rawStop?.terms,
     rawStop?.glossary,
     rawStop?.keyword_popups,
-    rawStop?.keywordPopups
+    rawStop?.keywordPopups,
   ];
   const rows = rawGroups.find((value) => Array.isArray(value)) || [];
 
@@ -645,7 +704,9 @@ function normalizeStopTerms(rawStop) {
     .map((row) => {
       if (!row || typeof row !== "object") return null;
 
-      const label = toPlainText(row.label || row.word || row.term || row.keyword || "");
+      const label = toPlainText(
+        row.label || row.word || row.term || row.keyword || "",
+      );
       const keySeed =
         row.term_id || row.termId || row.key || row.slug || row.id || label;
       const key = normalizeTermKey(keySeed);
@@ -655,15 +716,27 @@ function normalizeStopTerms(rawStop) {
       return {
         key,
         label,
-        title: toPlainText(row.popup_title || row.title || row.heading || label),
+        title: toPlainText(
+          row.popup_title || row.title || row.heading || label,
+        ),
         text: toPlainText(
-          row.popup_text || row.description || row.text || row.content || row.details || ""
+          row.popup_text ||
+            row.description ||
+            row.text ||
+            row.content ||
+            row.details ||
+            "",
         ),
         textHtml: sanitizeTermModalHtml(
-          row.popup_text || row.description || row.text || row.content || row.details || ""
+          row.popup_text ||
+            row.description ||
+            row.text ||
+            row.content ||
+            row.details ||
+            "",
         ),
         imageUrls,
-        imageUrl: imageUrls[0] || ""
+        imageUrl: imageUrls[0] || "",
       };
     })
     .filter(Boolean);
@@ -698,7 +771,7 @@ function getStopVideoUrl(rawStop) {
     rawStop?.acf?.intro_video,
     rawStop?.acf?.introVideo,
     rawStop?.acf?.intro_video_url,
-    rawStop?.acf?.introVideoUrl
+    rawStop?.acf?.introVideoUrl,
   ];
 
   return candidates.map((value) => resolveMediaUrl(value)).find(Boolean) || "";
@@ -706,7 +779,9 @@ function getStopVideoUrl(rawStop) {
 
 function mapWpStop(rawStop, index, numberOffset = 0) {
   const number = String(index + numberOffset);
-  const titleText = toPlainText(getLocalizedField(rawStop, "title", `Stop ${number}`));
+  const titleText = toPlainText(
+    getLocalizedField(rawStop, "title", `Stop ${number}`),
+  );
   const questionRaw = getLocalizedField(rawStop, "question", "");
   const highlightRaw =
     getLocalizedField(rawStop, "highlight2", "") ||
@@ -726,10 +801,13 @@ function mapWpStop(rawStop, index, numberOffset = 0) {
   const terms = normalizeStopTerms(rawStop);
   const questionText = toPlainText(questionRaw);
   const highlightText = indentMultilineText(
-    normalizeHighlightLines(toPlainTextWithBreaks(highlightRaw))
+    normalizeHighlightLines(toPlainTextWithBreaks(highlightRaw)),
   );
 
-  const textPlain = textBlocks.map((block) => toPlainText(block)).join("\n").trim();
+  const textPlain = textBlocks
+    .map((block) => toPlainText(block))
+    .join("\n")
+    .trim();
   const transcriptPlain = transcriptBlocks
     .map((block) => toPlainText(block))
     .join("\n")
@@ -747,7 +825,8 @@ function mapWpStop(rawStop, index, numberOffset = 0) {
     question: questionText,
     highlight: highlightText,
     highlightHasList: /<li[\s>]/i.test(highlightRaw),
-    highlightForceBullets: /<li[\s>]|<br\s*\/?>/i.test(highlightRaw) || paragraphCount > 1,
+    highlightForceBullets:
+      /<li[\s>]|<br\s*\/?>/i.test(highlightRaw) || paragraphCount > 1,
     highlightHtml: sanitizeTermModalHtml(highlightRaw),
     textBlocks,
     transcriptBlocks,
@@ -762,11 +841,16 @@ function mapWpStop(rawStop, index, numberOffset = 0) {
       resolveMediaUrl(rawStop?.map_url) ||
       resolveMediaUrl(rawStop?.mapImage) ||
       resolveMediaUrl(rawStop?.map_image) ||
-      ""
+      "",
   };
 }
 
-function renderDetailHighlightSection(container, htmlValue, textValue, forceBullets = false) {
+function renderDetailHighlightSection(
+  container,
+  htmlValue,
+  textValue,
+  forceBullets = false,
+) {
   if (!container) return false;
   const richHtml = safeText(htmlValue, "");
   if (richHtml) {
@@ -788,143 +872,123 @@ async function loadStops() {
   return data.stops.map((stop, index) => mapWpStop(stop, index, 0));
 }
 
-function renderIntroCardVideo(stops) {
-  if (!introCard) return;
+// Percentage positions [left%, top%] for stops 1–20 derived from the map image.
+// These are calibrated to the temple grounds map provided.
+const MAP_PIN_POSITIONS = {
+  1: [53.2, 92.3],
+  2: [53, 70],
+  3: [61.9, 68.1],
+  4: [68.1, 67.9],
+  5: [68.4, 61.7],
+  6: [68.4, 55],
+  7: [60.7, 47.5],
+  8: [52.5, 51.5],
+  9: [68.1, 19.9],
+  10: [57.2, 34.1],
+  11: [40.3, 29.2],
+  12: [39, 16.2],
+  13: [44.8, 16],
+  14: [50.2, 15.8],
+  15: [41.3, 22.3],
+  16: [47.7, 22.3],
+  17: [33.6, 41.4],
+  18: [44, 40.4],
+  19: [42.8, 47.2],
+  20: [29.1, 58.4],
+};
 
-  introCard
-    .querySelectorAll(".intro-label, h2, .intro-cta")
-    .forEach((node) => node.remove());
-  introCard.classList.remove("has-video", "has-aspect-ratio");
-  introCard.style.aspectRatio = "";
+const MAP_IMAGE_URL = "";
 
-  let introVideoEl = introCard.querySelector("#introVideo");
-  if (!introVideoEl) {
-    introVideoEl = document.createElement("video");
-    introVideoEl.id = "introVideo";
-    introVideoEl.className = "intro-video hidden";
-    introVideoEl.setAttribute("playsinline", "");
-    introVideoEl.setAttribute("muted", "");
-    introVideoEl.setAttribute("autoplay", "");
-    introVideoEl.setAttribute("loop", "");
-    introVideoEl.setAttribute("controls", "");
-    introVideoEl.setAttribute("controlslist", "nodownload noplaybackrate");
-    introVideoEl.setAttribute("disablepictureinpicture", "");
-    introVideoEl.setAttribute("preload", "metadata");
-    introVideoEl.setAttribute("aria-label", "Introduction video");
-    introCard.prepend(introVideoEl);
-  }
+function renderMapPins(stops) {
+  if (!mapPins) return;
+  mapPins.innerHTML = "";
 
-  const introStop = getIntroStop(stops);
-  const introVideoUrl = resolveMediaUrl(introStop?.videoUrl);
-  const introPoster = resolveImageUrl(introStop?.media?.[0] || introStop?.thumb);
-  if (introPoster) {
-    introVideoEl.poster = introPoster;
-  } else {
-    introVideoEl.removeAttribute("poster");
-  }
+  const calibrationMode = new URLSearchParams(location.search).has("pins");
 
-  if (!introVideoUrl) {
-    introCard.classList.remove("has-video");
-    introVideoEl.pause();
-    introVideoEl.removeAttribute("src");
-    introVideoEl.load();
-    introVideoEl.classList.add("hidden");
-    introCard.hidden = true;
+  if (calibrationMode) {
+    // Click anywhere on the map to log percentage coordinates for that spot.
+    // Open DevTools console, then click each stop location and copy the output
+    // into MAP_PIN_POSITIONS above.
+    let nextPin = 1;
+    const overlay = document.createElement("div");
+    overlay.style.cssText =
+      "position:fixed;bottom:0;left:0;right:0;background:rgba(0,0,0,0.82);color:#fff;font:700 13px monospace;padding:10px 14px;z-index:9999;pointer-events:none;";
+    overlay.textContent = "PIN MODE — tap map to place stop 1";
+    document.body.appendChild(overlay);
+
+    const placed = {};
+
+    mapInner.addEventListener("click", (e) => {
+      const rect = mapInner.getBoundingClientRect();
+      const x = (((e.clientX - rect.left) / rect.width) * 100).toFixed(1);
+      const y = (((e.clientY - rect.top) / rect.height) * 100).toFixed(1);
+      placed[nextPin] = [parseFloat(x), parseFloat(y)];
+
+      const dot = document.createElement("div");
+      dot.style.cssText = `position:absolute;left:${x}%;top:${y}%;transform:translate(-50%,-50%);width:26px;height:26px;border-radius:50%;background:#e8a020;border:2px solid #fff;color:#fff;font:800 0.7rem Barlow,sans-serif;display:grid;place-items:center;pointer-events:none;`;
+      dot.textContent = nextPin;
+      mapInner.appendChild(dot);
+
+      console.log(`  ${nextPin}: [${x}, ${y}],`);
+      nextPin++;
+      if (nextPin <= 20) {
+        overlay.textContent = `PIN MODE — tap map to place stop ${nextPin}`;
+      } else {
+        overlay.textContent =
+          "PIN MODE — all 20 placed! See console for output.";
+        console.log("=== MAP_PIN_POSITIONS ===");
+        console.log(
+          Object.entries(placed)
+            .map(([k, v]) => `  ${k}: [${v[0]}, ${v[1]}],`)
+            .join("\n"),
+        );
+      }
+    });
     return;
   }
 
-  introVideoEl.src = introVideoUrl;
-  introVideoEl.muted = true;
-  introVideoEl.autoplay = true;
-  introVideoEl.playsInline = true;
-  introVideoEl.loop = true;
-  introVideoEl.controls = true;
-  introVideoEl.setAttribute("controlslist", "nodownload noplaybackrate");
-  introVideoEl.setAttribute("disablepictureinpicture", "");
-  introVideoEl.classList.remove("hidden");
-  introCard.hidden = false;
-  introCard.classList.add("has-video");
+  stops.forEach((stop) => {
+    const pos = MAP_PIN_POSITIONS[stop.number];
+    if (!pos) return;
 
-  const applyAspectRatio = () => {
-    const { videoWidth: vw, videoHeight: vh } = introVideoEl;
-    if (vw && vh) {
-      introCard.style.aspectRatio = `${vw} / ${vh}`;
-      introCard.classList.add("has-aspect-ratio");
-    }
-  };
-  introVideoEl.addEventListener("loadedmetadata", applyAspectRatio, { once: true });
-  if (introVideoEl.readyState >= 1 && introVideoEl.videoWidth) {
-    applyAspectRatio();
-  }
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "map-pin";
+    btn.textContent = stop.number;
+    btn.setAttribute("aria-label", `Stop ${stop.number}: ${stop.title}`);
+    btn.dataset.stopId = stop.id;
+    btn.style.left = `${pos[0]}%`;
+    btn.style.top = `${pos[1]}%`;
 
-  introVideoEl.play().catch(() => {});
+    btn.addEventListener("click", () => openDetailById(stop.id));
+    mapPins.appendChild(btn);
+  });
 }
 
-function renderStopList(stops) {
-  if (!stopList) return;
-  stopList.innerHTML = "";
+function syncMapInnerSize() {
+  if (!mapImage || !mapInner) return;
+  const w = mapImage.offsetWidth;
+  const h = mapImage.offsetHeight;
+  if (!w || !h) return;
+  mapInner.style.width = `${w}px`;
+  mapInner.style.height = `${h}px`;
+}
 
-  stops.forEach((stop, index) => {
-    const item = document.createElement("article");
-    item.className = "stop-card";
-    item.style.setProperty("--i", String(index + 1));
-    item.dataset.stopId = stop.id;
-
-    const thumb = document.createElement("div");
-    thumb.className = "thumb";
-    thumb.setAttribute("role", "img");
-    thumb.setAttribute("aria-label", stop.title);
-
-    const thumbImage = document.createElement("img");
-    thumbImage.className = "stop-thumb-image";
-    thumbImage.src = stop.thumb;
-    thumbImage.alt = stop.title;
-
-    const playButton = document.createElement("button");
-    playButton.className = "play-btn";
-    playButton.type = "button";
-    playButton.setAttribute("aria-label", "Play audio stop");
-    playButton.innerHTML = playIconHtml();
-    playButton.dataset.stopId = stop.id;
-    playButton.disabled = !stop.audioUrl;
-
-    thumb.appendChild(thumbImage);
-    thumb.appendChild(playButton);
-
-    const stopInfo = document.createElement("div");
-    stopInfo.className = "stop-info";
-    const stopTitle = document.createElement("h3");
-    stopTitle.textContent = `${stop.number} ${stop.title}`;
-    stopInfo.appendChild(stopTitle);
-
-    const durationEl = document.createElement("p");
-    durationEl.className = "stop-duration";
-    durationEl.textContent = stop.audioUrl ? "–:––" : "";
-    stopInfo.appendChild(durationEl);
-    if (stop.audioUrl) {
-      const metaAudio = new Audio();
-      metaAudio.preload = "metadata";
-      metaAudio.addEventListener("loadedmetadata", () => {
-        const mins = Math.floor(metaAudio.duration / 60);
-        const secs = Math.floor(metaAudio.duration % 60).toString().padStart(2, "0");
-        durationEl.textContent = `${mins}:${secs}`;
-        metaAudio.src = "";
-      });
-      metaAudio.src = stop.audioUrl;
-    }
-
-    const mapButton = document.createElement("button");
-    mapButton.className = "open-link";
-    mapButton.type = "button";
-    mapButton.dataset.stopId = stop.id;
-    mapButton.textContent = "地図";
-    mapButton.disabled = !stop.mapUrl;
-
-    item.appendChild(thumb);
-    item.appendChild(stopInfo);
-    item.appendChild(mapButton);
-    stopList.appendChild(item);
-  });
+function setMapImageUrl(url) {
+  if (!mapImage) return;
+  if (!url) return;
+  mapImage.src = url;
+  mapImage.addEventListener(
+    "load",
+    () => {
+      syncMapInnerSize();
+    },
+    { once: true },
+  );
+  if (mapImage.complete && mapImage.naturalWidth) {
+    syncMapInnerSize();
+  }
+  window.addEventListener("resize", syncMapInnerSize);
 }
 
 function stopHeroSlideshow() {
@@ -1021,8 +1085,11 @@ function applyHeroDragVisual(deltaX) {
   const slides = detailHeroTrack?.querySelectorAll(".detail-hero-media");
   if (!slides?.length || slides.length < 2) return;
   const trackWidth = detailHeroTrack?.offsetWidth || 320;
-  const clamped = Math.sign(deltaX) * Math.min(Math.abs(deltaX), trackWidth * 0.45);
-  const adjacentIdx = ((deltaX < 0 ? heroSlideIndex + 1 : heroSlideIndex - 1) + slides.length) % slides.length;
+  const clamped =
+    Math.sign(deltaX) * Math.min(Math.abs(deltaX), trackWidth * 0.45);
+  const adjacentIdx =
+    ((deltaX < 0 ? heroSlideIndex + 1 : heroSlideIndex - 1) + slides.length) %
+    slides.length;
 
   slides.forEach((slide, idx) => {
     slide.style.transition = "none";
@@ -1031,7 +1098,9 @@ function applyHeroDragVisual(deltaX) {
       slide.style.transform = `translateX(${clamped}px)`;
     } else if (idx === adjacentIdx) {
       const fromX = deltaX < 0 ? trackWidth : -trackWidth;
-      slide.style.opacity = String(Math.min(1, Math.abs(clamped) / (trackWidth * 0.25)));
+      slide.style.opacity = String(
+        Math.min(1, Math.abs(clamped) / (trackWidth * 0.25)),
+      );
       slide.style.transform = `translateX(${fromX + clamped}px)`;
     } else {
       slide.style.opacity = "0";
@@ -1096,7 +1165,10 @@ function handleHeroTouchEnd() {
     return;
   }
 
-  if (heroSwipeLockedAxis === "x" && Math.abs(heroTouchDeltaX) >= HERO_SWIPE_THRESHOLD) {
+  if (
+    heroSwipeLockedAxis === "x" &&
+    Math.abs(heroTouchDeltaX) >= HERO_SWIPE_THRESHOLD
+  ) {
     const direction = heroTouchDeltaX < 0 ? 1 : -1;
     commitHeroSwipe(direction);
   } else if (heroSwipeLockedAxis === "x") {
@@ -1117,7 +1189,8 @@ function renderHeroSlideshow(stop) {
   detailHeroIndicators.innerHTML = "";
   if (stop.videoUrl) {
     const video = document.createElement("video");
-    video.className = "detail-hero-slide detail-hero-media detail-hero-video active";
+    video.className =
+      "detail-hero-slide detail-hero-media detail-hero-video active";
     video.src = stop.videoUrl;
     video.controls = true;
     video.muted = true;
@@ -1201,7 +1274,9 @@ function injectTermTokens(container, terms) {
     }
   });
 
-  const labels = Array.from(labelToKey.keys()).sort((a, b) => b.length - a.length);
+  const labels = Array.from(labelToKey.keys()).sort(
+    (a, b) => b.length - a.length,
+  );
   if (!labels.length) return;
   const pattern = new RegExp(`(${labels.map(escapeRegExp).join("|")})`, "g");
 
@@ -1231,14 +1306,14 @@ function injectTermTokens(container, terms) {
       const start = match.index;
       if (start > lastIndex) {
         fragment.appendChild(
-          document.createTextNode(source.slice(lastIndex, start))
+          document.createTextNode(source.slice(lastIndex, start)),
         );
       }
 
       const span = document.createElement("span");
       span.setAttribute(
         "data-term-key",
-        labelToKey.get(termLabel) || normalizeTermKey(termLabel)
+        labelToKey.get(termLabel) || normalizeTermKey(termLabel),
       );
       span.textContent = termLabel;
       fragment.appendChild(span);
@@ -1257,22 +1332,15 @@ function setDetailStop(stop) {
   activeTermLookup = buildTermLookup(stop.terms || []);
   detailView?.classList.toggle("is-stop-zero", isStopZero(stop));
 
-  const previewWasPlaying = !listPreviewAudio.paused &&
-    activePreviewButton?.dataset.stopId === stop.id;
-  const previewTime = listPreviewAudio.currentTime;
-
-  listPreviewAudio.pause();
-  if (activePreviewButton) {
-    activePreviewButton.classList.remove("is-playing");
-    activePreviewButton.innerHTML = playIconHtml();
-    activePreviewButton = null;
-  }
-
   renderHeroSlideshow(stop);
   detailNumber.textContent = stop.number;
   detailTitle.textContent = stop.title;
-  if (detailAudioTitle) detailAudioTitle.textContent = `${stop.number} ${stop.title}`;
-  if (detailThumb) { detailThumb.src = stop.thumb; detailThumb.alt = stop.title; }
+  if (detailAudioTitle)
+    detailAudioTitle.textContent = `${stop.number} ${stop.title}`;
+  if (detailThumb) {
+    detailThumb.src = stop.thumb;
+    detailThumb.alt = stop.title;
+  }
 
   detailQuestion.textContent = stop.question;
   detailQuestionBlock.hidden = !safeText(stop.question, "");
@@ -1287,7 +1355,7 @@ function setDetailStop(stop) {
       detailHighlight,
       stop.highlightHtml,
       hlText,
-      Boolean(stop.highlightForceBullets || stop.highlightHasList)
+      Boolean(stop.highlightForceBullets || stop.highlightHasList),
     );
     detailHighlight.classList.toggle("hidden", !hasHighlightBlock);
   }
@@ -1321,13 +1389,6 @@ function setDetailStop(stop) {
 
   if (stop.audioUrl) {
     detailAudio.src = stop.audioUrl;
-    if (previewWasPlaying) {
-      detailAudio.currentTime = previewTime;
-      detailAudio.play().then(() => {
-        detailPlayBtn.classList.add("is-playing");
-        detailPlayBtn.innerHTML = pauseIconHtml(DETAIL_AUDIO_ICON_SIZE);
-      }).catch(() => {});
-    }
     detailPlayBtn.disabled = false;
   } else {
     detailPlayBtn.disabled = true;
@@ -1350,7 +1411,8 @@ function updateDetailStopNavState() {
   if (!detailPrevBtn || !detailNextBtn) return;
   const activeIndex = getActiveStopIndex();
   detailPrevBtn.disabled = activeIndex <= 0;
-  detailNextBtn.disabled = activeIndex < 0 || activeIndex >= tourStopsData.length - 1;
+  detailNextBtn.disabled =
+    activeIndex < 0 || activeIndex >= tourStopsData.length - 1;
 }
 
 function openAdjacentStop(step) {
@@ -1408,7 +1470,11 @@ function resetMapTransform() {
 }
 
 function handleMapPointerDown(event) {
-  if (!mapPreviewStage || !mapPreviewModal || mapPreviewModal.classList.contains("hidden")) {
+  if (
+    !mapPreviewStage ||
+    !mapPreviewModal ||
+    mapPreviewModal.classList.contains("hidden")
+  ) {
     return;
   }
 
@@ -1427,7 +1493,7 @@ function handleMapPointerDown(event) {
     const dy = a.y - b.y;
     mapPinchStart = {
       distance: Math.hypot(dx, dy),
-      scale: mapScale
+      scale: mapScale,
     };
     mapDragPointerId = null;
   }
@@ -1453,7 +1519,11 @@ function handleMapPointerMove(event) {
     return;
   }
 
-  if (mapPointers.size === 1 && mapDragPointerId === event.pointerId && mapScale > 1) {
+  if (
+    mapPointers.size === 1 &&
+    mapDragPointerId === event.pointerId &&
+    mapScale > 1
+  ) {
     mapOffsetX = event.clientX - mapDragStartX;
     mapOffsetY = event.clientY - mapDragStartY;
     applyMapTransform();
@@ -1520,7 +1590,7 @@ function openTermModal(term, fallbackLabel = "Keyword") {
     termModalBody.innerHTML = html;
   } else {
     termModalBody.innerHTML = `<p>${escapeHtml(
-      term?.text || "No additional details available."
+      term?.text || "No additional details available.",
     )}</p>`;
   }
 
@@ -1532,7 +1602,7 @@ function openTermModal(term, fallbackLabel = "Keyword") {
         src,
         alt:
           safeText(img.getAttribute("alt"), "") ||
-          `${term?.title || fallbackLabel} image ${index + 1}`
+          `${term?.title || fallbackLabel} image ${index + 1}`,
       };
     })
     .filter(Boolean);
@@ -1544,17 +1614,18 @@ function openTermModal(term, fallbackLabel = "Keyword") {
     const mediaTrack = document.createElement("div");
     mediaTrack.className = "term-modal-media-track";
     termModalMedia.appendChild(mediaTrack);
-    const urlsFromTerm = Array.isArray(term?.imageUrls) && term.imageUrls.length
-      ? term.imageUrls.map((url) => normalizeWpImageUrl(url))
-      : term?.imageUrl
-      ? [normalizeWpImageUrl(term.imageUrl)]
-      : [];
+    const urlsFromTerm =
+      Array.isArray(term?.imageUrls) && term.imageUrls.length
+        ? term.imageUrls.map((url) => normalizeWpImageUrl(url))
+        : term?.imageUrl
+          ? [normalizeWpImageUrl(term.imageUrl)]
+          : [];
     const mediaItems = [
       ...urlsFromTerm.map((url, index) => ({
         src: url,
-        alt: `${term?.title || fallbackLabel} image ${index + 1}`
+        alt: `${term?.title || fallbackLabel} image ${index + 1}`,
       })),
-      ...inlineBodyImages
+      ...inlineBodyImages,
     ].filter((item) => item?.src);
 
     const seen = new Set();
@@ -1588,7 +1659,9 @@ function openTermModal(term, fallbackLabel = "Keyword") {
         mediaTrack.appendChild(frame);
       });
 
-      const frames = Array.from(mediaTrack.querySelectorAll(".term-media-item"));
+      const frames = Array.from(
+        mediaTrack.querySelectorAll(".term-media-item"),
+      );
       const containerW = termModalMedia.clientWidth;
       if (containerW > 0) {
         frames.forEach((frame) => {
@@ -1623,7 +1696,11 @@ function openTermModal(term, fallbackLabel = "Keyword") {
           dot.className = "term-gallery-dot";
           dot.setAttribute("aria-label", `Go to image ${dotIndex + 1}`);
           dot.addEventListener("click", () => {
-            frame.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "start" });
+            frame.scrollIntoView({
+              behavior: "smooth",
+              block: "nearest",
+              inline: "start",
+            });
             paintGalleryMeta(dotIndex);
           });
           termGalleryDots.appendChild(dot);
@@ -1632,11 +1709,12 @@ function openTermModal(term, fallbackLabel = "Keyword") {
 
       const updateActiveFromScroll = () => {
         if (!frames.length) return;
-        const gap = parseFloat(
-          getComputedStyle(mediaTrack).columnGap ||
-          getComputedStyle(mediaTrack).gap ||
-          "0"
-        ) || 0;
+        const gap =
+          parseFloat(
+            getComputedStyle(mediaTrack).columnGap ||
+              getComputedStyle(mediaTrack).gap ||
+              "0",
+          ) || 0;
         const first = frames[0];
         const step = first.getBoundingClientRect().width + gap;
         if (!step) return;
@@ -1671,54 +1749,17 @@ function closeTermModal() {
   termModal?.classList.add("hidden");
 }
 
-async function toggleStopPreviewAudio(stopId, triggerButton) {
-  const stop = stopsData.find((item) => item.id === stopId);
-  if (!stop || !stop.audioUrl) return;
-
-  detailAudio.pause();
-  detailPlayBtn.classList.remove("is-playing");
-  detailPlayBtn.innerHTML = playIconHtml(DETAIL_AUDIO_ICON_SIZE);
-
-  const sameButton = activePreviewButton === triggerButton;
-  if (sameButton && !listPreviewAudio.paused) {
-    listPreviewAudio.pause();
-    triggerButton.classList.remove("is-playing");
-    triggerButton.innerHTML = playIconHtml();
-    activePreviewButton = null;
-    return;
-  }
-
-  if (activePreviewButton && activePreviewButton !== triggerButton) {
-    activePreviewButton.classList.remove("is-playing");
-    activePreviewButton.innerHTML = playIconHtml();
-  }
-
-  activePreviewButton = triggerButton;
-  triggerButton.classList.add("is-playing");
-  triggerButton.innerHTML = pauseIconHtml();
-
-  if (listPreviewAudio.getAttribute("src") !== stop.audioUrl) {
-    listPreviewAudio.src = stop.audioUrl;
-  }
-
-  try {
-    await listPreviewAudio.play();
-  } catch (error) {
-    triggerButton.classList.remove("is-playing");
-    triggerButton.innerHTML = playIconHtml();
-    activePreviewButton = null;
-  }
-}
-
 function closeDetail() {
   appShell.classList.remove("is-detail");
   closeStopPicker();
   detailAudio.pause();
   detailPlayBtn.classList.remove("is-playing");
   detailPlayBtn.innerHTML = playIconHtml(DETAIL_AUDIO_ICON_SIZE);
-  Array.from(detailHeroTrack?.querySelectorAll("video") || []).forEach((video) => {
-    video.pause();
-  });
+  Array.from(detailHeroTrack?.querySelectorAll("video") || []).forEach(
+    (video) => {
+      video.pause();
+    },
+  );
   stopHeroSlideshow();
 }
 
@@ -1729,7 +1770,9 @@ function bindKeywordClick(container) {
     if (!keywordNode) return;
 
     event.preventDefault();
-    const key = normalizeTermKey(keywordNode.getAttribute("data-term-key") || "");
+    const key = normalizeTermKey(
+      keywordNode.getAttribute("data-term-key") || "",
+    );
     if (!key) return;
 
     const term = activeTermLookup.get(key);
@@ -1782,27 +1825,16 @@ function closeStopPicker() {
 }
 
 function bindEvents() {
-  introButton?.addEventListener("click", () => {
-    const firstTourStop = tourStopsData[0];
-    if (firstTourStop) {
-      openDetailById(firstTourStop.id);
-    }
-  });
-
-  introCard?.addEventListener("click", (event) => {
-    if (event.target.closest("button,video")) return;
-    const firstTourStop = tourStopsData[0];
-    if (firstTourStop) {
-      openDetailById(firstTourStop.id);
-    }
-  });
-
   backButton?.addEventListener("click", closeDetail);
   mapPreviewClose?.addEventListener("click", closeMapPreview);
   termModalClose?.addEventListener("click", closeTermModal);
 
-  mapZoomInBtn?.addEventListener("click", () => setMapScale(mapScale + MAP_ZOOM_STEP));
-  mapZoomOutBtn?.addEventListener("click", () => setMapScale(mapScale - MAP_ZOOM_STEP));
+  mapZoomInBtn?.addEventListener("click", () =>
+    setMapScale(mapScale + MAP_ZOOM_STEP),
+  );
+  mapZoomOutBtn?.addEventListener("click", () =>
+    setMapScale(mapScale - MAP_ZOOM_STEP),
+  );
   mapZoomResetBtn?.addEventListener("click", resetMapTransform);
 
   mapPreviewStage?.addEventListener("pointerdown", handleMapPointerDown);
@@ -1810,13 +1842,23 @@ function bindEvents() {
   mapPreviewStage?.addEventListener("pointerup", handleMapPointerUp);
   mapPreviewStage?.addEventListener("pointercancel", handleMapPointerUp);
   mapPreviewStage?.addEventListener("pointerleave", handleMapPointerUp);
-  mapPreviewStage?.addEventListener("wheel", handleMapWheel, { passive: false });
+  mapPreviewStage?.addEventListener("wheel", handleMapWheel, {
+    passive: false,
+  });
   mapPreviewStage?.addEventListener("dblclick", handleMapDoubleClick);
 
-  detailHeroTrack?.addEventListener("touchstart", handleHeroTouchStart, { passive: true });
-  detailHeroTrack?.addEventListener("touchmove", handleHeroTouchMove, { passive: false });
-  detailHeroTrack?.addEventListener("touchend", handleHeroTouchEnd, { passive: true });
-  detailHeroTrack?.addEventListener("touchcancel", handleHeroTouchEnd, { passive: true });
+  detailHeroTrack?.addEventListener("touchstart", handleHeroTouchStart, {
+    passive: true,
+  });
+  detailHeroTrack?.addEventListener("touchmove", handleHeroTouchMove, {
+    passive: false,
+  });
+  detailHeroTrack?.addEventListener("touchend", handleHeroTouchEnd, {
+    passive: true,
+  });
+  detailHeroTrack?.addEventListener("touchcancel", handleHeroTouchEnd, {
+    passive: true,
+  });
 
   mapPreviewModal?.addEventListener("click", (event) => {
     if (event.target === mapPreviewModal) closeMapPreview();
@@ -1841,26 +1883,6 @@ function bindEvents() {
       return;
     }
     closeDetail();
-  });
-
-  stopList?.addEventListener("click", (event) => {
-    const mapButton = event.target.closest(".open-link");
-    if (mapButton) {
-      openMapPreviewByStopId(mapButton.dataset.stopId || "");
-      return;
-    }
-
-    const playButton = event.target.closest(".play-btn");
-    if (playButton) {
-      toggleStopPreviewAudio(playButton.dataset.stopId || "", playButton);
-      return;
-    }
-
-    const stopInfo = event.target.closest(".stop-info");
-    if (stopInfo) {
-      const card = stopInfo.closest(".stop-card");
-      openDetailById(card?.dataset.stopId || "");
-    }
   });
 
   detailPlayBtn?.addEventListener("click", async () => {
@@ -1892,14 +1914,6 @@ function bindEvents() {
     detailPlayBtn.innerHTML = playIconHtml(DETAIL_AUDIO_ICON_SIZE);
   });
 
-  listPreviewAudio.addEventListener("ended", () => {
-    if (activePreviewButton) {
-      activePreviewButton.classList.remove("is-playing");
-      activePreviewButton.innerHTML = playIconHtml();
-      activePreviewButton = null;
-    }
-  });
-
   detailPrevBtn?.addEventListener("click", () => {
     openAdjacentStop(-1);
   });
@@ -1921,38 +1935,11 @@ function bindEvents() {
   bindKeywordClick(detailTranscript);
 }
 
-function animateVisibleCards() {
-  const cards = document.querySelectorAll(".stop-card");
-  const observer = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          entry.target.style.animationPlayState = "running";
-        }
-      });
-    },
-    {
-      root: document.querySelector(".stop-list"),
-      threshold: 0.25
-    }
-  );
-
-  cards.forEach((card) => {
-    card.style.animationPlayState = "paused";
-    observer.observe(card);
-  });
-}
-
 async function init() {
-  if (!isTourPage) {
-    window.location.replace("./entry.html");
-    return;
-  }
-
   bindEvents();
 
   appLoadingOverlay?.classList.remove("hidden");
-  renderIntroCardVideo([]);
+  applySelectedLanguage();
 
   try {
     stopsData = await loadStops();
@@ -1966,14 +1953,18 @@ async function init() {
   }
 
   tourStopsData = getTourStops(stopsData);
-  renderIntroCardVideo([]);
-  renderStopList(tourStopsData);
+
+  // Use the map image from stop 0 if available, or the first stop
+  const introStop = getIntroStop(stopsData);
+  const mapUrl =
+    resolveImageUrl(introStop?.mapUrl) ||
+    resolveImageUrl(introStop?.map_url) ||
+    resolveImageUrl(introStop?.media?.[0]) ||
+    "";
+  setMapImageUrl(mapUrl);
+
+  renderMapPins(tourStopsData);
   buildStopPicker();
-  const initialDetailStop = tourStopsData[0] || getIntroStop(stopsData);
-  if (initialDetailStop) {
-    setDetailStop(initialDetailStop);
-  }
-  animateVisibleCards();
   appLoadingOverlay?.classList.add("hidden");
 }
 

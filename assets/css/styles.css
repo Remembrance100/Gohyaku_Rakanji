@@ -1,3 +1,4 @@
+/* Styles for tour.html: map navigation, stop details, overlays, and shared tour UI. */
 :root {
   --ink-strong: #f2f2f2;
   --ink-soft: rgba(255, 255, 255, 0.45);
@@ -154,234 +155,103 @@ body {
 }
 
 .tour-sheet {
-  padding: 0.9rem 0.95rem 1rem;
+  padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.88rem;
-  background: rgba(10, 10, 10, 0.97);
+  background: #f5f0e8;
   z-index: 2;
+  overflow: hidden;
 }
 
-/* ─── Intro video ──────────────────────────────────────────── */
+/* ─── Map view ─────────────────────────────────────────────── */
 
-.intro-card {
-  margin: -0.9rem -0.95rem 0;
-  padding: 0;
-  border: none;
-  border-radius: 0;
-  overflow: clip;
-  background: #000;
-  cursor: default;
+.map-view {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: #f5f0e8;
+}
+
+.map-stage {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.map-inner {
   position: relative;
-  display: none;
-  line-height: 0;
-  font-size: 0;
+  /* JS sets explicit width/height after image loads to anchor pins correctly */
+}
+
+.map-image {
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
   height: auto;
-  min-height: 0;
-  max-height: none;
+  user-select: none;
+  -webkit-user-drag: none;
+  pointer-events: none;
 }
 
-.intro-card > :not(.intro-video) {
-  display: none !important;
-}
-
-.intro-card.has-video {
-  display: block;
-}
-
-.intro-card::before,
-.intro-card::after {
-  display: none;
-}
-
-.intro-video {
-  display: block;
+.map-pins {
+  position: absolute;
+  /* Pins are sized to match the image, not the scroll container */
+  top: 0;
+  left: 0;
   width: 100%;
-  height: auto;
-  min-height: 0;
-  max-height: min(60svh, 560px);
-  border-radius: 0;
-  background: #000;
-  object-fit: cover;
-  object-position: center;
-}
-
-/* Once JS sets the container's aspect-ratio, the video fills it perfectly */
-.intro-card.has-aspect-ratio {
-  max-height: min(60svh, 560px);
-}
-
-.intro-card.has-aspect-ratio .intro-video {
   height: 100%;
-  max-height: none;
-  object-fit: cover;
 }
 
-/* ─── Stop list ────────────────────────────────────────────── */
-
-.stop-list {
-  flex: 1;
-  display: grid;
-  gap: 0.78rem;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  overscroll-behavior-y: contain;
-  min-height: 0;
-  padding-right: 0.2rem;
-  padding-bottom: 76px;
-  scroll-behavior: smooth;
-  align-content: start;
+.map-pin {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  background: linear-gradient(135deg, #e8a020, #c47d0a);
+  color: #fff;
+  font: 800 0.72rem "Barlow", sans-serif;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.55), 0 0 0 2px rgba(232,160,32,0.35);
+  transition: transform 120ms ease, box-shadow 120ms ease;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  padding: 0;
+  line-height: 1;
 }
 
-.stop-list::-webkit-scrollbar,
+.map-pin:active {
+  transform: translate(-50%, -50%) scale(0.88);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.55);
+}
+
+@media (hover: hover) {
+  .map-pin:hover {
+    transform: translate(-50%, -50%) scale(1.15);
+    box-shadow: 0 4px 14px rgba(0,0,0,0.6), 0 0 0 3px rgba(232,160,32,0.5);
+  }
+}
+
 .detail-view::-webkit-scrollbar {
   width: 5px;
 }
 
-.stop-list::-webkit-scrollbar-track,
 .detail-view::-webkit-scrollbar-track {
   background: rgba(255, 255, 255, 0.05);
   border-radius: 999px;
 }
 
-.stop-list::-webkit-scrollbar-thumb,
 .detail-view::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.18);
   border-radius: 999px;
-}
-
-.stop-card {
-  display: grid;
-  grid-template-columns: 78px 1fr auto;
-  gap: 0.62rem;
-  align-items: center;
-  opacity: 0;
-  transform: translateY(12px);
-  animation: cardReveal 280ms ease forwards;
-  animation-delay: calc(var(--i, 0) * 38ms + 30ms);
-}
-
-.stop-card:nth-child(1) {
-  --i: 1;
-}
-.stop-card:nth-child(2) {
-  --i: 2;
-}
-.stop-card:nth-child(3) {
-  --i: 3;
-}
-.stop-card:nth-child(4) {
-  --i: 4;
-}
-.stop-card:nth-child(5) {
-  --i: 5;
-}
-
-.thumb {
-  position: relative;
-  width: 78px;
-  height: 62px;
-  border-radius: 6px;
-  overflow: clip;
-  background: linear-gradient(145deg, #3a3a3a, #222 52%, #181818);
-}
-
-.stop-thumb-image {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
-
-.stop-card:nth-child(2) .thumb {
-  background: linear-gradient(145deg, #2e2e2e, #1e1e1e 60%, #161616);
-}
-
-.stop-card:nth-child(3) .thumb {
-  background: linear-gradient(145deg, #404040, #282828 60%, #1e1e1e);
-}
-
-.stop-card:nth-child(4) .thumb {
-  background: linear-gradient(145deg, #353535, #252525 58%, #1a1a1a);
-}
-
-.stop-card:nth-child(5) .thumb {
-  background: linear-gradient(145deg, #2a2a2a, #1c1c1c 60%, #141414);
-}
-
-.play-btn {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  width: 33px;
-  height: 33px;
-  border-radius: 50%;
-  border: 1.5px solid rgba(255, 255, 255, 0.8);
-  background: rgba(0, 0, 0, 0.4);
-  color: #fff;
-  cursor: pointer;
-  font-size: 0.85rem;
-  line-height: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-}
-
-.play-btn:hover,
-.play-btn:focus-visible {
-  transform: translate(-50%, -50%);
-  filter: brightness(1.3);
-}
-
-.play-btn.is-playing::after {
-  content: "";
-  position: absolute;
-  inset: -5px;
-  border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, 0.35);
-  animation: ripple 900ms ease-out infinite;
-}
-
-.stop-info h3 {
-  margin: 0;
-  font-size: clamp(1.02rem, 0.95rem + 0.5vw, 1.36rem);
-  line-height: 1.12;
-  text-wrap: pretty;
-  color: var(--ink-strong);
-}
-
-.stop-info {
-  cursor: pointer;
-}
-
-.stop-info p,
-.stop-duration {
-  margin: 0.3rem 0 0;
-  color: var(--ink-soft);
-  font:
-    700 0.92rem "Barlow",
-    sans-serif;
-}
-
-.open-link {
-  border: none;
-  background: none;
-  color: var(--ink-strong);
-  opacity: 0.7;
-  font:
-    800 0.84rem "Barlow",
-    sans-serif;
-  letter-spacing: 0.06em;
-  cursor: pointer;
-}
-
-.open-link:disabled,
-.play-btn:disabled {
-  opacity: 0.2;
-  cursor: not-allowed;
 }
 
 /* ─── Detail view ──────────────────────────────────────────── */
@@ -1126,8 +996,12 @@ body {
   align-items: center;
   justify-content: space-between;
   padding: 0.6rem 1.25rem calc(0.75rem + env(safe-area-inset-bottom));
-  background: linear-gradient(to top, #080808 60%, rgba(8, 8, 8, 0));
+  background: linear-gradient(to top, #f5f0e8 60%, rgba(245, 240, 232, 0));
   pointer-events: none;
+}
+
+.app-shell.is-detail .bottom-nav {
+  background: linear-gradient(to top, #080808 60%, rgba(8, 8, 8, 0));
 }
 
 .bottom-nav-btn {

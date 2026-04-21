@@ -1,3 +1,4 @@
+// Root service worker kept only to clear old caches/registrations while PWA behavior is disabled.
 self.addEventListener("install", () => {
   self.skipWaiting();
 });

@@ -1,8 +1,10 @@
+/* Styles for index.html: settings screen, stop 0 intro media, and entry page layout. */
 :root {
   --ink-strong: #f2f2f2;
   --ink-soft: rgba(255, 255, 255, 0.74);
   --ink-muted: rgba(255, 255, 255, 0.55);
   --surface: #0b0b0f;
+  --tour-font-scale: 1;
 }
 
 *,
@@ -115,6 +117,26 @@ body {
   opacity: 0.55;
 }
 
+.entry-settings-btn {
+  position: absolute;
+  top: 0.7rem;
+  left: 0.7rem;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  background: rgba(0, 0, 0, 0.62);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  color: #fff;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
 .entry-content {
   padding: 1.05rem 1rem 0.65rem;
   display: grid;
@@ -142,7 +164,7 @@ body {
 .entry-highlight {
   margin: 0;
   color: #ededed;
-  font: 500 0.96rem / 1.6 "Manrope", sans-serif;
+  font: 500 calc(0.96rem * var(--tour-font-scale)) / 1.6 "Manrope", sans-serif;
   border-left: 2px solid #ffffff;
   padding: 0.12rem 0 0.12rem 0.58rem;
   display: grid;
@@ -193,7 +215,7 @@ body {
 .entry-text blockquote {
   margin: 0;
   color: var(--ink-soft);
-  font-size: 0.88rem;
+  font-size: calc(0.88rem * var(--tour-font-scale));
   line-height: 1.62;
 }
 
@@ -348,6 +370,219 @@ body {
 
 .hidden {
   display: none !important;
+}
+
+/* ─── Settings screen ───────────────────────────────── */
+
+.settings-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: #08080c;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  transition: opacity 280ms ease, visibility 280ms ease;
+}
+
+.settings-screen.is-hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.settings-inner {
+  width: min(100%, 560px);
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(to bottom, #12131b 0%, #0a0b0f 60%, #08080c 100%);
+}
+
+.settings-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0.6rem 1rem 0.5rem;
+  display: grid;
+  align-content: start;
+  gap: 0.1rem;
+}
+
+.settings-section {
+  padding: 1rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.settings-section:last-child {
+  border-bottom: none;
+}
+
+.settings-heading {
+  margin: 0 0 0.75rem;
+  font: 700 0.72rem "Barlow", sans-serif;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+}
+
+/* Language picker */
+
+.settings-lang-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.55rem;
+}
+
+.settings-lang-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.72rem 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  color: var(--ink-soft);
+  font: 600 0.9rem "Manrope", sans-serif;
+  cursor: pointer;
+  transition: background 150ms ease, border-color 150ms ease;
+  text-align: left;
+}
+
+.settings-lang-btn.is-active {
+  background: rgba(246, 81, 95, 0.15);
+  border-color: #f6515f;
+  color: #fff;
+}
+
+.settings-lang-flag {
+  font-size: 1.35rem;
+  line-height: 1;
+}
+
+/* Font size picker */
+
+.settings-font-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+}
+
+.settings-font-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.65rem 0.4rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  color: var(--ink-soft);
+  cursor: pointer;
+  transition: background 150ms ease, border-color 150ms ease;
+}
+
+.settings-font-btn.is-active {
+  background: rgba(246, 81, 95, 0.15);
+  border-color: #f6515f;
+  color: #fff;
+}
+
+.settings-font-sample {
+  font-family: "Barlow", sans-serif;
+  font-weight: 800;
+  color: inherit;
+  line-height: 1;
+}
+
+.settings-font-label {
+  font: 600 0.68rem "Manrope", sans-serif;
+  color: var(--ink-muted);
+  letter-spacing: 0.04em;
+}
+
+.settings-font-btn.is-active .settings-font-label {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+/* Notices list */
+
+.settings-section--notices {
+  border-bottom: none;
+}
+
+.settings-notices-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.62rem;
+}
+
+.settings-notice-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  padding: 0.65rem 0.75rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 10px;
+}
+
+.settings-notice-icon {
+  font-size: 1.15rem;
+  line-height: 1.4;
+  flex-shrink: 0;
+}
+
+.settings-notice-text {
+  font: 500 calc(0.84rem * var(--tour-font-scale)) / 1.5 "Manrope", sans-serif;
+  color: var(--ink-soft);
+}
+
+/* Confirm button */
+
+.settings-footer {
+  padding: 0.66rem 1rem calc(0.9rem + env(safe-area-inset-bottom));
+  background: linear-gradient(to top, #090a0e 70%, rgba(9, 10, 14, 0));
+}
+
+.settings-confirm-btn {
+  display: block;
+  width: 100%;
+  height: 54px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  background: linear-gradient(135deg, #f6515f, #db3f4c);
+  color: #fff;
+  font: 800 1rem "Barlow", sans-serif;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+@media (hover: hover) {
+  .settings-confirm-btn:hover {
+    filter: brightness(1.14);
+  }
+  .settings-lang-btn:hover:not(.is-active) {
+    background: rgba(255, 255, 255, 0.09);
+    border-color: rgba(255, 255, 255, 0.2);
+  }
+  .settings-font-btn:hover:not(.is-active) {
+    background: rgba(255, 255, 255, 0.09);
+    border-color: rgba(255, 255, 255, 0.2);
+  }
+}
+
+@media (min-width: 561px) {
+  .settings-inner {
+    border-radius: 20px;
+    overflow: clip;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.7);
+    min-height: min(94vh, 860px);
+    margin: 1.2rem auto;
+    max-height: min(94vh, 860px);
+  }
 }
 
 @media (min-width: 561px) {
