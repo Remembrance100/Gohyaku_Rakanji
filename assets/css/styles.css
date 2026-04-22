@@ -3,6 +3,7 @@
   --ink-strong: #f2f2f2;
   --ink-soft: rgba(255, 255, 255, 0.45);
   --line: rgba(255, 255, 255, 0.1);
+  --tour-font-scale: 1;
 }
 
 *,
@@ -490,7 +491,7 @@ body {
 .detail-text .detail-highlight-lead {
   border-left: 4px solid #ffffff;
   font-weight: 400;
-  font-size: clamp(1rem, 0.9rem + 0.4vw, 1.22rem);
+  font-size: calc(clamp(1rem, 0.9rem + 0.4vw, 1.22rem) * var(--tour-font-scale));
   padding-left: 0.85rem;
   line-height: 1.45;
 }
@@ -498,7 +499,7 @@ body {
 .detail-text {
   display: grid;
   gap: 1rem;
-  font-size: clamp(1.28rem, 0.98rem + 0.8vw, 1.92rem);
+  font-size: calc(clamp(1.28rem, 0.98rem + 0.8vw, 1.92rem) * var(--tour-font-scale));
   line-height: 1.5;
   font-weight: 700;
   color: #f2f2f2;
@@ -531,7 +532,7 @@ body {
 
 .detail-transcript p {
   margin: 0;
-  font-size: clamp(1rem, 0.9rem + 0.3vw, 1.15rem);
+  font-size: calc(clamp(1rem, 0.9rem + 0.3vw, 1.15rem) * var(--tour-font-scale));
   line-height: 1.5;
   color: rgba(255, 255, 255, 0.65);
 }

@@ -670,7 +670,7 @@ function initSettings() {
     syncLangBtns();
   });
 
-  // Font size selection
+  // Font size buttons
   document.querySelectorAll(".settings-font-btn").forEach((btn) => {
     btn.addEventListener("click", () => {
       selectedSize = btn.dataset.size;
@@ -684,7 +684,6 @@ function initSettings() {
     savePrefs({ lang: selectedLang, size: selectedSize });
   }
 
-  // Confirm — also propagate lang to index via query param when navigating
   confirmBtn?.addEventListener("click", hideSettings);
 
   // Re-open from gear icon
@@ -717,12 +716,25 @@ function bindEvents() {
   });
 }
 
+function applySettingsBg(stop) {
+  const screen = document.getElementById("settingsScreen");
+  if (!screen) return;
+  const images = Array.isArray(stop?.guideImages) ? stop.guideImages.filter(Boolean) : [];
+  const url = images[0] || "";
+  if (url) {
+    screen.style.backgroundImage = `url(${JSON.stringify(url)})`;
+    screen.style.backgroundSize = "cover";
+    screen.style.backgroundPosition = "center";
+  }
+}
+
 async function init() {
   initSettings();
   bindEvents();
 
   try {
     const stopZero = await loadStopZero();
+    applySettingsBg(stopZero);
     renderEntry(stopZero || fallbackStopZero);
   } catch (error) {
     console.error(error);

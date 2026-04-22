@@ -401,6 +401,12 @@ function applySelectedLanguage() {
   document.documentElement.lang = getRequestedLang();
 }
 
+function applyFontScale() {
+  const scales = { small: 0.88, normal: 1, large: 1.14, xlarge: 1.3 };
+  const size = loadPrefs().size || "large";
+  document.documentElement.style.setProperty("--tour-font-scale", String(scales[size] || 1));
+}
+
 function getLocalizedField(rawObj, key, fallback = "") {
   const lang = getLangKey();
   const direct = safeText(rawObj?.[`${key}_${lang}`], "");
@@ -1871,6 +1877,7 @@ async function init() {
 
   appLoadingOverlay?.classList.remove("hidden");
   applySelectedLanguage();
+  applyFontScale();
 
   try {
     stopsData = await loadStops();

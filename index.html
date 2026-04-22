@@ -37,10 +37,9 @@
       href="https://fonts.googleapis.com/css2?family=Barlow:wght@500;700;800&family=Manrope:wght@500;700;800&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./assets/css/entry.css?v=20260421a" />
+    <link rel="stylesheet" href="./assets/css/entry.css?v=20260421f" />
   </head>
   <body>
-    <!-- Settings modal shown first so visitors can pick language and text size. -->
     <!-- Settings screen (shown first) -->
     <div
       id="settingsScreen"
@@ -50,150 +49,68 @@
       aria-label="Preferences"
     >
       <div class="settings-inner">
-        <div class="settings-scroll">
-          <!-- Language -->
-          <section
-            class="settings-section"
-            aria-labelledby="settingsLangHeading"
+        <div class="settings-card">
+          <div
+            class="settings-lang-grid"
+            id="settingsLangGrid"
+            role="group"
+            aria-label="Select language"
           >
-            <h2 class="settings-heading" id="settingsLangHeading">
-              <span data-t="lang-heading">言語</span>
-            </h2>
-            <div
-              class="settings-lang-grid"
-              id="settingsLangGrid"
-              role="group"
-              aria-label="Select language"
+            <button
+              class="settings-lang-btn is-active"
+              type="button"
+              data-lang="ja"
+              aria-pressed="true"
             >
-              <button
-                class="settings-lang-btn is-active"
-                type="button"
-                data-lang="ja"
-                aria-pressed="true"
-              >
-                <span class="settings-lang-flag">🇯🇵</span>
-                <span class="settings-lang-name">日本語</span>
-              </button>
-              <button
-                class="settings-lang-btn"
-                type="button"
-                data-lang="en"
-                aria-pressed="false"
-              >
-                <span class="settings-lang-flag">🇬🇧</span>
-                <span class="settings-lang-name">English</span>
-              </button>
-            </div>
-          </section>
-
-          <!-- Font size -->
-          <section
-            class="settings-section"
-            aria-labelledby="settingsFontHeading"
-          >
-            <h2 class="settings-heading" id="settingsFontHeading">
-              <span data-t="font-heading">文字サイズ</span>
-            </h2>
-            <div
-              class="settings-font-row"
-              role="group"
-              aria-label="Select text size"
+              <span class="settings-lang-flag">🇯🇵</span>
+              <span class="settings-lang-name">日本語</span>
+            </button>
+            <button
+              class="settings-lang-btn"
+              type="button"
+              data-lang="en"
+              aria-pressed="false"
             >
-              <button
-                class="settings-font-btn"
-                type="button"
-                data-size="small"
-                aria-pressed="false"
-              >
-                <span class="settings-font-sample" style="font-size: 0.78rem"
-                  >A</span
-                >
-                <span class="settings-font-label" data-t="font-small">小</span>
-              </button>
-              <button
-                class="settings-font-btn"
-                type="button"
-                data-size="normal"
-                aria-pressed="false"
-              >
-                <span class="settings-font-sample" style="font-size: 1rem"
-                  >A</span
-                >
-                <span class="settings-font-label" data-t="font-normal"
-                  >標準</span
-                >
-              </button>
-              <button
-                class="settings-font-btn is-active"
-                type="button"
-                data-size="large"
-                aria-pressed="true"
-              >
-                <span class="settings-font-sample" style="font-size: 1.28rem"
-                  >A</span
-                >
-                <span class="settings-font-label" data-t="font-large">大</span>
-              </button>
-              <button
-                class="settings-font-btn"
-                type="button"
-                data-size="xlarge"
-                aria-pressed="false"
-              >
-                <span class="settings-font-sample" style="font-size: 1.52rem"
-                  >A</span
-                >
-                <span class="settings-font-label" data-t="font-xlarge"
-                  >特大</span
-                >
-              </button>
-            </div>
-          </section>
+              <span class="settings-lang-flag">🇬🇧</span>
+              <span class="settings-lang-name">English</span>
+            </button>
+          </div>
 
-          <!-- Visitor notices -->
-          <section
-            class="settings-section settings-section--notices"
-            aria-labelledby="settingsNoticesHeading"
-          >
-            <h2 class="settings-heading" id="settingsNoticesHeading">
-              <span data-t="notices-heading">ご注意</span>
-            </h2>
-            <ul class="settings-notices-list" id="settingsNoticesList">
-              <li class="settings-notice-item">
-                <span class="settings-notice-icon" aria-hidden="true">📵</span>
-                <span class="settings-notice-text" data-t="notice-photo"
-                  >墓石や位牌の撮影はご遠慮ください。</span
-                >
-              </li>
-              <li class="settings-notice-item">
-                <span class="settings-notice-icon" aria-hidden="true">🤫</span>
-                <span class="settings-notice-text" data-t="notice-quiet"
-                  >見学中は静かにお話しください。</span
-                >
-              </li>
-              <li class="settings-notice-item">
-                <span class="settings-notice-icon" aria-hidden="true">🚭</span>
-                <span class="settings-notice-text" data-t="notice-smoke"
-                  >境内での喫煙は禁止されています。</span
-                >
-              </li>
-              <li class="settings-notice-item">
-                <span class="settings-notice-icon" aria-hidden="true">🐕</span>
-                <span class="settings-notice-text" data-t="notice-pets"
-                  >ペットの境内への持ち込みはご遠慮ください。</span
-                >
-              </li>
-              <li class="settings-notice-item">
-                <span class="settings-notice-icon" aria-hidden="true">🌿</span>
-                <span class="settings-notice-text" data-t="notice-plants"
-                  >花や植物を摘まないようにお願いします。</span
-                >
-              </li>
-            </ul>
-          </section>
-        </div>
+          <div class="settings-font-row" role="group" aria-label="文字サイズ">
+            <button class="settings-font-btn" type="button" data-size="small" aria-pressed="false">
+              <span class="settings-font-label">小</span>
+            </button>
+            <button class="settings-font-btn" type="button" data-size="normal" aria-pressed="false">
+              <span class="settings-font-label">中</span>
+            </button>
+            <button class="settings-font-btn is-active" type="button" data-size="large" aria-pressed="true">
+              <span class="settings-font-label">大</span>
+            </button>
+          </div>
 
-        <div class="settings-footer">
+          <ul class="settings-notices-list">
+            <li class="settings-notice-item">
+              <span class="settings-notice-icon" aria-hidden="true">📵</span>
+              <span class="settings-notice-text" data-t="notice-photo">墓石や位牌の撮影はご遠慮ください。</span>
+            </li>
+            <li class="settings-notice-item">
+              <span class="settings-notice-icon" aria-hidden="true">🤫</span>
+              <span class="settings-notice-text" data-t="notice-quiet">見学中は静かにお話しください。</span>
+            </li>
+            <li class="settings-notice-item">
+              <span class="settings-notice-icon" aria-hidden="true">🚭</span>
+              <span class="settings-notice-text" data-t="notice-smoke">境内での喫煙は禁止されています。</span>
+            </li>
+            <li class="settings-notice-item">
+              <span class="settings-notice-icon" aria-hidden="true">🐕</span>
+              <span class="settings-notice-text" data-t="notice-pets">ペットの境内への持ち込みはご遠慮ください。</span>
+            </li>
+            <li class="settings-notice-item">
+              <span class="settings-notice-icon" aria-hidden="true">🌿</span>
+              <span class="settings-notice-text" data-t="notice-plants">花や植物を摘まないようにお願いします。</span>
+            </li>
+          </ul>
+
           <button
             class="settings-confirm-btn"
             id="settingsConfirmBtn"
@@ -315,6 +232,6 @@
       </footer>
     </main>
 
-    <script src="./assets/js/entry.js?v=20260421a"></script>
+    <script src="./assets/js/entry.js?v=20260421f"></script>
   </body>
 </html>
