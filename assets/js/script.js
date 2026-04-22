@@ -404,7 +404,10 @@ function applySelectedLanguage() {
 function applyFontScale() {
   const scales = { small: 0.88, normal: 1, large: 1.14, xlarge: 1.3 };
   const size = loadPrefs().size || "large";
-  document.documentElement.style.setProperty("--tour-font-scale", String(scales[size] || 1));
+  document.documentElement.style.setProperty(
+    "--tour-font-scale",
+    String(scales[size] || 1),
+  );
 }
 
 function getLocalizedField(rawObj, key, fallback = "") {
@@ -631,14 +634,14 @@ function extractRichBlocksFromSource(source) {
       return [];
     }
 
-    if (
-      node.matches("p, li, blockquote, h2, h3, h4, div, img, figure")
-    ) {
+    if (node.matches("p, li, blockquote, h2, h3, h4, div, img, figure")) {
       return [node];
     }
 
     return Array.from(
-      node.querySelectorAll(":scope > p, :scope > li, :scope > blockquote, :scope > h2, :scope > h3, :scope > h4, :scope > div, :scope > img, :scope > figure"),
+      node.querySelectorAll(
+        ":scope > p, :scope > li, :scope > blockquote, :scope > h2, :scope > h3, :scope > h4, :scope > div, :scope > img, :scope > figure",
+      ),
     );
   });
 
@@ -864,7 +867,9 @@ function mapWpStop(rawStop, index, numberOffset = 0) {
     .map((block) => toPlainText(block))
     .join("\n")
     .trim();
-  const transcriptHasMedia = transcriptBlocks.some((block) => /<img\b/i.test(block));
+  const transcriptHasMedia = transcriptBlocks.some((block) =>
+    /<img\b/i.test(block),
+  );
   if (
     !transcriptHasMedia &&
     textPlain &&
@@ -933,26 +938,26 @@ async function loadStops() {
 // Percentage positions [left%, top%] for stops 1–20 derived from the map image.
 // These are calibrated to the temple grounds map provided.
 const MAP_PIN_POSITIONS = {
-  1: [53.2, 92.3],
-  2: [53, 70],
-  3: [61.9, 68.1],
-  4: [68.1, 67.9],
-  5: [68.4, 61.7],
-  6: [68.4, 55],
-  7: [60.7, 47.5],
-  8: [52.5, 51.5],
-  9: [68.1, 19.9],
-  10: [57.2, 34.1],
-  11: [40.3, 29.2],
-  12: [39, 16.2],
-  13: [44.8, 16],
-  14: [50.2, 15.8],
-  15: [41.3, 22.3],
-  16: [47.7, 22.3],
-  17: [33.6, 41.4],
-  18: [44, 40.4],
-  19: [42.8, 47.2],
-  20: [29.1, 58.4],
+  1: [53.2, 91.6],
+  2: [53.5, 73.7],
+  3: [68.2, 67.3],
+  4: [75.6, 66.8],
+  5: [75.4, 60.8],
+  6: [75.4, 54.7],
+  7: [63.7, 46.9],
+  8: [54.2, 50],
+  9: [74.4, 18.9],
+  10: [58.5, 32.4],
+  11: [35.8, 26.5],
+  12: [34.8, 13.6],
+  13: [42, 13.1],
+  14: [49.5, 13],
+  15: [38.3, 18.9],
+  16: [45.5, 18.7],
+  17: [28.1, 39.8],
+  18: [40.5, 38.2],
+  19: [39.3, 44.2],
+  20: [20.1, 58.6],
 };
 
 const MAP_IMAGE_URL = "";
@@ -961,7 +966,9 @@ function renderMapPins(stops) {
   if (!mapPins) return;
   mapPins.innerHTML = "";
 
-  const calibrationMode = new URLSearchParams(location.search).has("pins");
+  const calibrationMode =
+    new URLSearchParams(location.search).has("pins") ||
+    localStorage.getItem("pinMode");
 
   if (calibrationMode) {
     // Click anywhere on the map to log percentage coordinates for that spot.
@@ -1273,7 +1280,8 @@ function renderHeroSlideshow(stop) {
   if (!leadImage) return;
 
   const img = document.createElement("img");
-  img.className = "detail-hero-slide detail-hero-media detail-hero-image active";
+  img.className =
+    "detail-hero-slide detail-hero-media detail-hero-image active";
   img.alt = `${stop.title} image 1`;
   const setOrientationClass = () => {
     const isPortrait = img.naturalHeight > img.naturalWidth * 1.08;
@@ -1869,7 +1877,6 @@ function bindEvents() {
   });
 
   stopPickerBackdrop?.addEventListener("click", closeStopPicker);
-
 }
 
 async function init() {
