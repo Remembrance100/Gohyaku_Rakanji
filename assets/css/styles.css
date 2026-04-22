@@ -536,6 +536,18 @@ body {
   color: rgba(255, 255, 255, 0.65);
 }
 
+.detail-transcript img {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  max-height: 420px;
+  object-fit: contain;
+  border-radius: 12px;
+  background: #0a0a0a;
+  margin: 0.2rem 0;
+}
+
 /* ─── Overlay modals ───────────────────────────────────────── */
 
 .overlay-modal {

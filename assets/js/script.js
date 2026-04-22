@@ -26,12 +26,10 @@ const detailView = document.querySelector(".detail-view");
 const detailContent = document.querySelector("#detailContent");
 const detailStrip = document.querySelector(".detail-strip");
 const detailPlayBtn = document.querySelector("#detailPlayBtn");
-const detailMapBtn = document.querySelector("#detailMapBtn");
 const playerDock = document.querySelector("#detailAudioInline");
 const detailHighlight = document.querySelector("#detailHighlight");
 const detailPrevBtn = document.querySelector("#detailPrevBtn");
 const detailNextBtn = document.querySelector("#detailNextBtn");
-const bottomMenuBtn = document.querySelector("#bottomMenuBtn");
 const stopPicker = document.querySelector("#stopPicker");
 const stopPickerItems = document.querySelector("#stopPickerItems");
 const stopPickerBackdrop = document.querySelector("#stopPickerBackdrop");
@@ -426,6 +424,7 @@ function sanitizeRichInlineHtml(rawHtml) {
 
   const allowed = new Set([
     "A",
+    "IMG",
     "SPAN",
     "STRONG",
     "EM",
@@ -460,6 +459,15 @@ function sanitizeRichInlineHtml(rawHtml) {
       ) {
         return;
       }
+      if (
+        node.tagName === "IMG" &&
+        (name === "src" ||
+          name === "alt" ||
+          name === "title" ||
+          name === "loading")
+      ) {
+        return;
+      }
       node.removeAttribute(attr.name);
     });
 
@@ -477,6 +485,20 @@ function sanitizeRichInlineHtml(rawHtml) {
       if (node.getAttribute("href")?.startsWith("http")) {
         node.setAttribute("target", "_blank");
         node.setAttribute("rel", "noopener noreferrer");
+      }
+    }
+
+    if (node.tagName === "IMG") {
+      const src = safeText(node.getAttribute("src"), "");
+      const safeSrc =
+        src.startsWith("http://") ||
+        src.startsWith("https://") ||
+        src.startsWith("data:image/") ||
+        src.startsWith("/");
+      if (!safeSrc) {
+        node.remove();
+      } else if (!node.getAttribute("loading")) {
+        node.setAttribute("loading", "lazy");
       }
     }
   });
@@ -591,9 +613,28 @@ function extractRichBlocksFromSource(source) {
       .map((line) => sanitizeRichInlineHtml(line));
   }
 
-  const blocks = Array.from(
-    temp.querySelectorAll("p, li, blockquote, h2, h3, h4, div"),
-  );
+  const blocks = Array.from(temp.childNodes).flatMap((node) => {
+    if (node.nodeType === Node.TEXT_NODE) {
+      return safeText(node.textContent || "", "")
+        .split(/\n{2,}/)
+        .map((line) => safeText(line, ""))
+        .filter(Boolean);
+    }
+
+    if (node.nodeType !== Node.ELEMENT_NODE) {
+      return [];
+    }
+
+    if (
+      node.matches("p, li, blockquote, h2, h3, h4, div, img, figure")
+    ) {
+      return [node];
+    }
+
+    return Array.from(
+      node.querySelectorAll(":scope > p, :scope > li, :scope > blockquote, :scope > h2, :scope > h3, :scope > h4, :scope > div, :scope > img, :scope > figure"),
+    );
+  });
 
   if (!blocks.length) {
     const fallback = toPlainText(decoded);
@@ -601,9 +642,15 @@ function extractRichBlocksFromSource(source) {
   }
 
   return blocks
-    .map((node) =>
-      sanitizeRichInlineHtml(node.innerHTML || node.textContent || ""),
-    )
+    .map((node) => {
+      if (typeof node === "string") {
+        return sanitizeRichInlineHtml(node);
+      }
+      if (node.tagName === "IMG") {
+        return sanitizeRichInlineHtml(node.outerHTML || "");
+      }
+      return sanitizeRichInlineHtml(node.innerHTML || node.textContent || "");
+    })
     .map((html) => safeText(html, ""))
     .filter(Boolean);
 }
@@ -811,7 +858,13 @@ function mapWpStop(rawStop, index, numberOffset = 0) {
     .map((block) => toPlainText(block))
     .join("\n")
     .trim();
-  if (textPlain && transcriptPlain && textPlain === transcriptPlain) {
+  const transcriptHasMedia = transcriptBlocks.some((block) => /<img\b/i.test(block));
+  if (
+    !transcriptHasMedia &&
+    textPlain &&
+    transcriptPlain &&
+    textPlain === transcriptPlain
+  ) {
     transcriptBlocks = [];
   }
 
@@ -1296,9 +1349,6 @@ function setDetailStop(stop) {
   detailAudio.removeAttribute("src");
   detailPlayBtn.classList.remove("is-playing");
   detailPlayBtn.innerHTML = playIconHtml(DETAIL_AUDIO_ICON_SIZE);
-  if (detailMapBtn) {
-    detailMapBtn.disabled = !stop.mapUrl;
-  }
 
   if (stop.audioUrl) {
     detailAudio.src = stop.audioUrl;
@@ -1306,7 +1356,7 @@ function setDetailStop(stop) {
   } else {
     detailPlayBtn.disabled = true;
   }
-  if (stop.audioUrl || stop.mapUrl) {
+  if (stop.audioUrl) {
     playerDock?.classList.remove("hidden");
   } else {
     playerDock?.classList.add("hidden");
@@ -1800,11 +1850,6 @@ function bindEvents() {
     }
   });
 
-  detailMapBtn?.addEventListener("click", () => {
-    if (!activeStop?.id || !activeStop?.mapUrl) return;
-    openMapPreviewByStopId(activeStop.id);
-  });
-
   detailAudio.addEventListener("ended", () => {
     detailPlayBtn.classList.remove("is-playing");
     detailPlayBtn.innerHTML = playIconHtml(DETAIL_AUDIO_ICON_SIZE);
@@ -1815,14 +1860,6 @@ function bindEvents() {
   });
   detailNextBtn?.addEventListener("click", () => {
     openAdjacentStop(1);
-  });
-
-  bottomMenuBtn?.addEventListener("click", () => {
-    if (stopPicker?.classList.contains("hidden")) {
-      openStopPicker();
-    } else {
-      closeStopPicker();
-    }
   });
 
   stopPickerBackdrop?.addEventListener("click", closeStopPicker);
