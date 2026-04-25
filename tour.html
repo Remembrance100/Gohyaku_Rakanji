@@ -28,7 +28,7 @@
       href="https://fonts.googleapis.com/css2?family=Barlow:wght@500;700;800&family=Manrope:wght@500;700;800&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./assets/css/styles.css?v=20260421b" />
+    <link rel="stylesheet" href="./assets/css/styles.css?v=20260425a" />
   </head>
   <body>
     <!-- Persistent chrome around the tour experience. -->
@@ -203,6 +203,120 @@
       <p>Memorial Tour Guide &middot; SmartSenior</p>
     </footer>
 
-    <script src="./assets/js/script.js?v=20260421b"></script>
+    <!-- Omamori memorial gift screen, shown after the final tour stop. -->
+    <section
+      class="omamori-screen"
+      id="omamoriScreen"
+      aria-label="Memorial gift selection"
+      aria-hidden="true"
+    >
+      <div class="omamori-header">
+        <button
+          class="omamori-close-btn"
+          id="omamoriCloseBtn"
+          type="button"
+          aria-label="ツアーに戻る"
+        >
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+            <line x1="1" y1="1" x2="11" y2="11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            <line x1="11" y1="1" x2="1" y2="11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="omamori-hero">
+        <p class="omamori-eyebrow">記念品</p>
+        <h2 class="omamori-title">お守り<br>Memorial Gift</h2>
+        <p class="omamori-subtitle">ツアーの記念に、お守りGIFをお選びください。</p>
+      </div>
+
+      <div class="omamori-grid">
+        <!-- Red omamori -->
+        <div class="omamori-card omamori-card--red">
+          <img
+            class="omamori-card-preview"
+            src=""
+            data-omamori-mock="red"
+            alt="Red omamori preview"
+            aria-hidden="true"
+          />
+          <div class="omamori-card-body">
+            <div>
+              <p class="omamori-card-name">紅 Omamori</p>
+              <p class="omamori-card-desc">縁結び・健康祈願</p>
+            </div>
+            <button
+              class="omamori-download-btn"
+              type="button"
+              data-omamori="red"
+              aria-label="紅お守りをダウンロード"
+            >
+              <svg width="11" height="11" viewBox="0 0 11 11" fill="none" aria-hidden="true">
+                <path d="M5.5 1v6M2.5 5l3 3 3-3M1 10h9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              保存
+            </button>
+          </div>
+        </div>
+
+        <!-- Green omamori -->
+        <div class="omamori-card omamori-card--green">
+          <img
+            class="omamori-card-preview"
+            src=""
+            data-omamori-mock="green"
+            alt="Green omamori preview"
+            aria-hidden="true"
+          />
+          <div class="omamori-card-body">
+            <div>
+              <p class="omamori-card-name">翠 Omamori</p>
+              <p class="omamori-card-desc">家内安全・商売繁盛</p>
+            </div>
+            <button
+              class="omamori-download-btn"
+              type="button"
+              data-omamori="green"
+              aria-label="翠お守りをダウンロード"
+            >
+              <svg width="11" height="11" viewBox="0 0 11 11" fill="none" aria-hidden="true">
+                <path d="M5.5 1v6M2.5 5l3 3 3-3M1 10h9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              保存
+            </button>
+          </div>
+        </div>
+
+        <!-- Blue omamori -->
+        <div class="omamori-card omamori-card--blue">
+          <img
+            class="omamori-card-preview"
+            src=""
+            data-omamori-mock="blue"
+            alt="Blue omamori preview"
+            aria-hidden="true"
+          />
+          <div class="omamori-card-body">
+            <div>
+              <p class="omamori-card-name">蒼 Omamori</p>
+              <p class="omamori-card-desc">学業成就・旅行安全</p>
+            </div>
+            <button
+              class="omamori-download-btn"
+              type="button"
+              data-omamori="blue"
+              aria-label="蒼お守りをダウンロード"
+            >
+              <svg width="11" height="11" viewBox="0 0 11 11" fill="none" aria-hidden="true">
+                <path d="M5.5 1v6M2.5 5l3 3 3-3M1 10h9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              保存
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <script src="./assets/js/script.js?v=20260425a"></script>
   </body>
 </html>

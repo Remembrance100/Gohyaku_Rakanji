@@ -503,9 +503,10 @@ n body {
 }
 
 .settings-notice-text {
-  font:
-    500 0.75rem / 1.45 "Manrope",
-    sans-serif;
+  font-family: "Manrope", sans-serif;
+  font-weight: 500;
+  font-size: calc(0.75rem * var(--tour-font-scale));
+  line-height: 1.45;
   color: rgba(255, 255, 255, 0.6);
 }
 
@@ -568,9 +569,9 @@ n body {
   border: none;
   background: linear-gradient(135deg, #f6515f, #db3f4c);
   color: #fff;
-  font:
-    800 1.05rem "Barlow",
-    sans-serif;
+  font-family: "Barlow", sans-serif;
+  font-weight: 800;
+  font-size: calc(1.05rem * var(--tour-font-scale));
   letter-spacing: 0.06em;
   text-transform: uppercase;
   cursor: pointer;
