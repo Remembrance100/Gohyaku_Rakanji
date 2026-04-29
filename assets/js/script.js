@@ -54,6 +54,12 @@ const termGalleryDots = document.querySelector("#termGalleryDots");
 
 const omamoriScreen = document.querySelector("#omamoriScreen");
 const omamoriCloseBtn = document.querySelector("#omamoriCloseBtn");
+const mapEndBtn = document.querySelector("#mapEndBtn");
+const omamoriFullscreen = document.querySelector("#omamoriFullscreen");
+const omamoriFullscreenVideo = document.querySelector(
+  "#omamoriFullscreenVideo",
+);
+const omamoriFullscreenDl = document.querySelector("#omamoriFullscreenDl");
 
 const detailAudio = new Audio();
 const isTourPage =
@@ -949,7 +955,7 @@ const MAP_PIN_POSITIONS = {
   6: [75.4, 54.7],
   7: [63.7, 46.9],
   8: [54.2, 50],
-  9: [74.4, 18.9],
+  9: [74.4, 18],
   10: [58.5, 32.4],
   11: [35.8, 26.5],
   12: [34.8, 13.6],
@@ -1392,6 +1398,16 @@ function updateDetailStopNavState() {
   const activeIndex = getActiveStopIndex();
   detailPrevBtn.disabled = activeIndex <= 0;
   detailNextBtn.disabled = activeIndex < 0;
+
+  const isLastStop =
+    activeIndex >= 0 && activeIndex === tourStopsData.length - 1;
+  if (isLastStop) {
+    detailNextBtn.innerHTML = "ガイド終了";
+    detailNextBtn.classList.add("is-end-btn");
+  } else {
+    detailNextBtn.innerHTML = `<svg width="10" height="16" viewBox="0 0 10 16" fill="none" aria-hidden="true"><polyline points="2,2 8,8 2,14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+    detailNextBtn.classList.remove("is-end-btn");
+  }
 }
 
 function openAdjacentStop(step) {
@@ -1411,7 +1427,7 @@ function openOmamori() {
   if (!omamoriScreen) return;
   omamoriScreen.classList.add("is-open");
   omamoriScreen.setAttribute("aria-hidden", "false");
-  renderOmamoriMocks();
+  renderOmamoriVideos();
 }
 
 function closeOmamori() {
@@ -1420,50 +1436,17 @@ function closeOmamori() {
   omamoriScreen.setAttribute("aria-hidden", "true");
 }
 
-const OMAMORI_COLORS = {
-  red:   { r: 180, g: 20,  b: 20  },
-  green: { r: 20,  g: 140, b: 60  },
-  blue:  { r: 30,  g: 80,  b: 200 },
+const OMAMORI_URLS = {
+  blue: "https://stg-apirakanjicom-stgrakanji.kinsta.cloud/wp-content/uploads/2026/04/fortuneate.mp4",
+  gold: "https://stg-apirakanjicom-stgrakanji.kinsta.cloud/wp-content/uploads/2026/04/Money.mp4",
+  pink: "https://stg-apirakanjicom-stgrakanji.kinsta.cloud/wp-content/uploads/2026/04/luck.mp4",
 };
 
-function makeOmamoriGif(color) {
-  const { r, g, b } = OMAMORI_COLORS[color];
-  const size = 120;
-  const buf = new Uint8Array(size * size * 3);
-  for (let y = 0; y < size; y++) {
-    for (let x = 0; x < size; x++) {
-      const i = (y * size + x) * 3;
-      const t = (Math.sin(x * 0.18) + Math.cos(y * 0.18)) * 0.5 + 0.5;
-      buf[i]     = Math.min(255, Math.round(r * (0.5 + t * 0.5)));
-      buf[i + 1] = Math.min(255, Math.round(g * (0.5 + t * 0.5)));
-      buf[i + 2] = Math.min(255, Math.round(b * (0.5 + t * 0.5)));
-    }
-  }
-  const canvas = document.createElement("canvas");
-  canvas.width = size;
-  canvas.height = size;
-  const ctx = canvas.getContext("2d");
-  const imgData = ctx.createImageData(size, size);
-  for (let i = 0; i < size * size; i++) {
-    imgData.data[i * 4]     = buf[i * 3];
-    imgData.data[i * 4 + 1] = buf[i * 3 + 1];
-    imgData.data[i * 4 + 2] = buf[i * 3 + 2];
-    imgData.data[i * 4 + 3] = 255;
-  }
-  ctx.putImageData(imgData, 0, 0);
-  const kanji = { red: "縁", green: "福", blue: "旅" }[color];
-  ctx.font = "bold 52px serif";
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
-  ctx.fillStyle = "rgba(255,255,255,0.85)";
-  ctx.fillText(kanji, size / 2, size / 2);
-  return canvas.toDataURL("image/png");
-}
-
-function renderOmamoriMocks() {
-  omamoriScreen?.querySelectorAll("[data-omamori-mock]").forEach((img) => {
-    if (!img.src || img.src === window.location.href) {
-      img.src = makeOmamoriGif(img.dataset.omamoriMock);
+function renderOmamoriVideos() {
+  omamoriScreen?.querySelectorAll("[data-omamori-video]").forEach((video) => {
+    const key = video.dataset.omamoriVideo;
+    if (OMAMORI_URLS[key] && !video.src) {
+      video.src = OMAMORI_URLS[key];
     }
   });
 }
@@ -1946,16 +1929,29 @@ function bindEvents() {
   stopPickerBackdrop?.addEventListener("click", closeStopPicker);
 
   omamoriCloseBtn?.addEventListener("click", closeOmamori);
+  mapEndBtn?.addEventListener("click", openOmamori);
 
-  omamoriScreen?.querySelectorAll("[data-omamori]").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const color = btn.dataset.omamori;
-      const dataUrl = makeOmamoriGif(color);
-      const a = document.createElement("a");
-      a.href = dataUrl;
-      a.download = `omamori-${color}.png`;
-      a.click();
+  omamoriScreen?.querySelectorAll(".omamori-card").forEach((card) => {
+    card.addEventListener("click", () => {
+      const key = card.dataset.omamoriKey;
+      const url = OMAMORI_URLS[key];
+      if (!url || !omamoriFullscreen || !omamoriFullscreenVideo) return;
+      omamoriFullscreenVideo.src = url;
+      omamoriFullscreenVideo.play().catch(() => {});
+      omamoriFullscreenDl.dataset.omamoriKey = key;
+      omamoriFullscreen.classList.remove("hidden");
     });
+  });
+
+  omamoriFullscreenDl?.addEventListener("click", () => {
+    const key = omamoriFullscreenDl.dataset.omamoriKey;
+    const url = OMAMORI_URLS[key];
+    if (!url) return;
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `omamori-${key}.mp4`;
+    a.target = "_blank";
+    a.click();
   });
 }
 

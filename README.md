@@ -84,3 +84,10 @@
 Several significant pivots came out of this meeting. The biggest one is the switch to one-scroll format — this means the hyperlinked subpage structure is going away, and all detail content needs to be integrated directly into the main text with images inline. The drafts we've been working on will need to be restructured. Want to discuss how to adjust, or wait until the format is confirmed by the programmer?
 message.txt
 5 KB
+住職より
+
+「本日はご参拝いただき、誠にありがとうございます。この地に眠る御霊が、皆様の歩みをいつまでも見守っておられます。どうかお守りを携え、健やかな日々をお過ごしください。」 move this text above the title
+
+- Label the language and text size
+
+- create a input for langauge adjustemnents for teh actual tour

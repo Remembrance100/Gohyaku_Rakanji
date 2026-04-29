@@ -18,14 +18,16 @@ const entryStartBtn = document.querySelector("#entryStartBtn");
 
 const fallbackStopZero = {
   number: "0",
-  title: "800 Years of the Shimazu Family and the story of Japan's Modernization",
-  highlight: "As you walk through the scenery before you, pause, ask questions, and search for answers as you go.",
+  title:
+    "800 Years of the Shimazu Family and the story of Japan's Modernization",
+  highlight:
+    "As you walk through the scenery before you, pause, ask questions, and search for answers as you go.",
   textBlocks: [
     "This journey traces more than 800 years of history.",
-    "Step forward with curiosity and experience the site's living memory."
+    "Step forward with curiosity and experience the site's living memory.",
   ],
   transcriptBlocks: [],
-  videoUrl: ""
+  videoUrl: "",
 };
 
 function disablePwa() {
@@ -33,7 +35,11 @@ function disablePwa() {
   window.addEventListener("load", () => {
     navigator.serviceWorker
       .getRegistrations()
-      .then((registrations) => Promise.all(registrations.map((registration) => registration.unregister())))
+      .then((registrations) =>
+        Promise.all(
+          registrations.map((registration) => registration.unregister()),
+        ),
+      )
       .catch(() => {});
   });
 }
@@ -80,12 +86,12 @@ function replaceTermShortcodes(rawText) {
 
   text = text.replace(
     /\[term\s+key=(['"])(.*?)\1\]?\s*([\s\S]*?)\[\/term\]/gi,
-    (_match, _quote, _key, label) => safeText(label, "")
+    (_match, _quote, _key, label) => safeText(label, ""),
   );
 
   text = text.replace(
     /\[term\s+key=([^\]'" \t\r\n]+)\]?\s*([\s\S]*?)\[\/term\]/gi,
-    (_match, _key, label) => safeText(label, "")
+    (_match, _key, label) => safeText(label, ""),
   );
 
   text = text.replace(/\[\/?term[^\]]*\]/gi, "");
@@ -114,7 +120,7 @@ function sanitizeEntryBlockHtml(rawHtml) {
     "H4",
     "MARK",
     "CODE",
-    "SPAN"
+    "SPAN",
   ]);
 
   Array.from(temp.querySelectorAll("*")).forEach((node) => {
@@ -125,7 +131,10 @@ function sanitizeEntryBlockHtml(rawHtml) {
 
     Array.from(node.attributes).forEach((attr) => {
       const name = attr.name.toLowerCase();
-      if (node.tagName === "A" && (name === "href" || name === "target" || name === "rel")) {
+      if (
+        node.tagName === "A" &&
+        (name === "href" || name === "target" || name === "rel")
+      ) {
         return;
       }
       node.removeAttribute(attr.name);
@@ -172,7 +181,9 @@ function toPlainTextWithBreaks(value) {
   temp.innerHTML = replaceTermShortcodes(input);
 
   temp.querySelectorAll("br").forEach((node) => node.replaceWith("\n"));
-  temp.querySelectorAll("p, li").forEach((node) => node.insertAdjacentText("afterend", "\n"));
+  temp
+    .querySelectorAll("p, li")
+    .forEach((node) => node.insertAdjacentText("afterend", "\n"));
 
   const text = (temp.textContent || "")
     .replace(/\r\n?/g, "\n")
@@ -210,7 +221,8 @@ function normalizeHighlightLines(value) {
     const joinWithoutSpace =
       /[\u3040-\u30ff\u3400-\u9fff]$/.test(previous) &&
       /^[\u3040-\u30ff\u3400-\u9fff]/.test(line);
-    merged[merged.length - 1] = `${previous}${joinWithoutSpace ? "" : " "}${line}`;
+    merged[merged.length - 1] =
+      `${previous}${joinWithoutSpace ? "" : " "}${line}`;
   });
 
   return merged.join("\n");
@@ -281,7 +293,9 @@ function renderHighlightLines(container, value, options = {}) {
 }
 
 function getLocalizedField(rawObj, key, fallback = "") {
-  const lang = (document.documentElement.lang || "en").toLowerCase().startsWith("ja")
+  const lang = (document.documentElement.lang || "en")
+    .toLowerCase()
+    .startsWith("ja")
     ? "ja"
     : "en";
   const direct = safeText(rawObj?.[`${key}_${lang}`], "");
@@ -296,7 +310,10 @@ function normalizeWpImageUrl(url) {
   const input = safeText(url, "");
   if (!input) return "";
   const [base, query = ""] = input.split("?");
-  const upgraded = base.replace(/-\d+x\d+(?=\.(jpe?g|png|webp|gif|avif)$)/i, "");
+  const upgraded = base.replace(
+    /-\d+x\d+(?=\.(jpe?g|png|webp|gif|avif)$)/i,
+    "",
+  );
   return query ? `${upgraded}?${query}` : upgraded;
 }
 
@@ -328,7 +345,7 @@ function collectMediaUrls(rawStop) {
     rawStop?.acf?.thumb,
     rawStop?.acf?.thumbnail,
     rawStop?.mapUrl,
-    rawStop?.map_url
+    rawStop?.map_url,
   ].forEach((value) => {
     if (Array.isArray(value)) {
       value.forEach(push);
@@ -356,7 +373,7 @@ function getStopVideoUrl(rawStop) {
     rawStop?.acf?.intro_video,
     rawStop?.acf?.introVideo,
     rawStop?.acf?.intro_video_url,
-    rawStop?.acf?.introVideoUrl
+    rawStop?.acf?.introVideoUrl,
   ];
 
   return candidates.map((value) => resolveMediaUrl(value)).find(Boolean) || "";
@@ -369,8 +386,12 @@ function extractTextBlocks(rawHtml) {
   const temp = document.createElement("div");
   temp.innerHTML = decoded;
 
-  const blocks = Array.from(temp.querySelectorAll("h2, h3, h4, p, ul, ol, blockquote"))
-    .map((node) => sanitizeEntryBlockHtml(node.outerHTML || node.textContent || ""))
+  const blocks = Array.from(
+    temp.querySelectorAll("h2, h3, h4, p, ul, ol, blockquote"),
+  )
+    .map((node) =>
+      sanitizeEntryBlockHtml(node.outerHTML || node.textContent || ""),
+    )
     .filter(Boolean);
 
   if (blocks.length) return blocks;
@@ -385,19 +406,20 @@ function extractTextBlocks(rawHtml) {
 }
 
 function mapStop(rawStop, index) {
-  const number = safeText(String(rawStop?.number ?? rawStop?.stop_number ?? index), String(index));
-  const title = toPlainText(getLocalizedField(rawStop, "title", `Stop ${number}`));
+  const number = safeText(
+    String(rawStop?.number ?? rawStop?.stop_number ?? index),
+    String(index),
+  );
+  const title = toPlainText(
+    getLocalizedField(rawStop, "title", `Stop ${number}`),
+  );
   const highlightRaw =
     getLocalizedField(rawStop, "highlight2", "") ||
     getLocalizedField(rawStop, "highlight", "") ||
     getLocalizedField(rawStop, "featured", "");
   const paragraphCount = (highlightRaw.match(/<p[\s>]/gi) || []).length;
   const highlight = indentMultilineText(
-    normalizeHighlightLines(
-      toPlainTextWithBreaks(
-        highlightRaw
-      )
-    )
+    normalizeHighlightLines(toPlainTextWithBreaks(highlightRaw)),
   );
 
   const textSource =
@@ -407,19 +429,21 @@ function mapStop(rawStop, index) {
   const transcriptSource = getLocalizedField(rawStop, "transcript", "");
 
   const media = collectMediaUrls(rawStop);
-  const mapUrl = resolveImageUrl(rawStop?.mapUrl) || resolveImageUrl(rawStop?.map_url);
-  const guideImages = (mapUrl ? media.filter(url => url !== mapUrl) : media);
+  const mapUrl =
+    resolveImageUrl(rawStop?.mapUrl) || resolveImageUrl(rawStop?.map_url);
+  const guideImages = mapUrl ? media.filter((url) => url !== mapUrl) : media;
 
   return {
     number,
     title,
     highlight,
     highlightHasList: /<li[\s>]/i.test(highlightRaw),
-    highlightForceBullets: /<li[\s>]|<br\s*\/?>/i.test(highlightRaw) || paragraphCount > 1,
+    highlightForceBullets:
+      /<li[\s>]|<br\s*\/?>/i.test(highlightRaw) || paragraphCount > 1,
     textBlocks: extractTextBlocks(textSource),
     transcriptBlocks: extractTextBlocks(transcriptSource),
     videoUrl: getStopVideoUrl(rawStop),
-    guideImages
+    guideImages,
   };
 }
 
@@ -439,7 +463,9 @@ async function loadStopZero() {
     throw new Error("Invalid entry response");
   }
 
-  const mappedStops = data.stops.map((rawStop, index) => mapStop(rawStop, index));
+  const mappedStops = data.stops.map((rawStop, index) =>
+    mapStop(rawStop, index),
+  );
   return findStopZero(mappedStops);
 }
 
@@ -456,12 +482,15 @@ function renderEntry(stop) {
         ? current.highlight
         : "";
     const hasHighlight = renderHighlightLines(entryHighlight, highlightText, {
-      forceBullets: Boolean(current.highlightForceBullets || current.highlightHasList)
+      forceBullets: Boolean(
+        current.highlightForceBullets || current.highlightHasList,
+      ),
     });
     entryHighlight.classList.toggle("hidden", !hasHighlight);
   }
   if (entryHighlightLabel) {
-    entryHighlightLabel.hidden = !entryHighlight || entryHighlight.classList.contains("hidden");
+    entryHighlightLabel.hidden =
+      !entryHighlight || entryHighlight.classList.contains("hidden");
   }
 
   if (entryText) {
@@ -481,7 +510,9 @@ function renderEntry(stop) {
     });
   }
 
-  const guideImages = Array.isArray(current.guideImages) ? current.guideImages.filter(Boolean) : [];
+  const guideImages = Array.isArray(current.guideImages)
+    ? current.guideImages.filter(Boolean)
+    : [];
   if (entryGuideTrack && entryGuideDots && entryGuideGallery) {
     entryGuideTrack.innerHTML = "";
     entryGuideDots.innerHTML = "";
@@ -499,18 +530,29 @@ function renderEntry(stop) {
         dot.className = "entry-guide-dot" + (i === 0 ? " is-active" : "");
         dot.setAttribute("aria-label", `画像 ${i + 1}`);
         dot.addEventListener("click", () => {
-          entryGuideTrack.scrollTo({ left: entryGuideTrack.offsetWidth * i, behavior: "smooth" });
+          entryGuideTrack.scrollTo({
+            left: entryGuideTrack.offsetWidth * i,
+            behavior: "smooth",
+          });
         });
         entryGuideDots.appendChild(dot);
       });
 
       entryGuideDots.classList.toggle("hidden", guideImages.length < 2);
-      entryGuideTrack.addEventListener("scroll", () => {
-        const idx = Math.round(entryGuideTrack.scrollLeft / entryGuideTrack.offsetWidth);
-        entryGuideDots.querySelectorAll(".entry-guide-dot").forEach((d, i) => {
-          d.classList.toggle("is-active", i === idx);
-        });
-      }, { passive: true });
+      entryGuideTrack.addEventListener(
+        "scroll",
+        () => {
+          const idx = Math.round(
+            entryGuideTrack.scrollLeft / entryGuideTrack.offsetWidth,
+          );
+          entryGuideDots
+            .querySelectorAll(".entry-guide-dot")
+            .forEach((d, i) => {
+              d.classList.toggle("is-active", i === idx);
+            });
+        },
+        { passive: true },
+      );
 
       entryGuideGallery.classList.remove("hidden");
     } else {
@@ -518,7 +560,9 @@ function renderEntry(stop) {
     }
   }
 
-  const videoUrl = resolveMediaUrl(current.videoUrl);
+  const FALLBACK_VIDEO_URL =
+    "https://stg-apirakanjicom-stgrakanji.kinsta.cloud/wp-content/uploads/2026/04/Video_仮02-1.mp4";
+  const videoUrl = resolveMediaUrl(current.videoUrl) || FALLBACK_VIDEO_URL;
 
   if (entryVideo) {
     if (videoUrl) {
@@ -546,13 +590,14 @@ function renderEntry(stop) {
 function updateUnmuteBtn() {
   if (!entryVideo || !entryUnmuteBtn) return;
   const muted = entryVideo.muted;
-  if (entryUnmuteLabel) entryUnmuteLabel.textContent = muted ? "音声オン" : "音声オフ";
+  if (entryUnmuteLabel)
+    entryUnmuteLabel.textContent = muted ? "音声オン" : "音声オフ";
   if (entryUnmuteIcon) {
     entryUnmuteIcon.setAttribute(
       "d",
       muted
         ? "M11 5L6 9H2v6h4l5 4V5zM23 9l-6 6M17 9l6 6"
-        : "M11 5L6 9H2v6h4l5 4V5zM15.54 8.46a5 5 0 010 7.07M19.07 4.93a10 10 0 010 14.14"
+        : "M11 5L6 9H2v6h4l5 4V5zM15.54 8.46a5 5 0 010 7.07M19.07 4.93a10 10 0 010 14.14",
     );
   }
   entryUnmuteBtn.classList.toggle("is-unmuted", !muted);
@@ -571,12 +616,13 @@ const TRANSLATIONS = {
     "font-large": "Large",
     "font-xlarge": "XL",
     "notices-heading": "Visitor Etiquette",
-    "notice-photo": "Photography of graves and memorial tablets is not permitted.",
+    "notice-photo":
+      "Photography of graves and memorial tablets is not permitted.",
     "notice-quiet": "Please keep your voice low throughout the tour.",
     "notice-smoke": "Smoking is not permitted on the grounds.",
     "notice-pets": "Pets are not allowed inside the temple grounds.",
     "notice-plants": "Please do not pick flowers or plants.",
-    "confirm-btn": "Start Tour"
+    "confirm-btn": "Start Tour",
   },
   ja: {
     "lang-heading": "言語",
@@ -591,8 +637,8 @@ const TRANSLATIONS = {
     "notice-smoke": "境内での喫煙は禁止されています。",
     "notice-pets": "ペットの境内への持ち込みはご遠慮ください。",
     "notice-plants": "花や植物を摘まないようにお願いします。",
-    "confirm-btn": "ガイド開始"
-  }
+    "confirm-btn": "ガイド開始",
+  },
 };
 
 const FONT_SCALES = { small: 0.88, normal: 1, large: 1.14, xlarge: 1.3 };
@@ -622,7 +668,10 @@ function applyLang(lang) {
 
 function applyFontScale(size) {
   const scale = FONT_SCALES[size] || 1;
-  document.documentElement.style.setProperty("--tour-font-scale", String(scale));
+  document.documentElement.style.setProperty(
+    "--tour-font-scale",
+    String(scale),
+  );
 }
 
 function initSettings() {
@@ -719,7 +768,9 @@ function bindEvents() {
 function applySettingsBg(stop) {
   const screen = document.getElementById("settingsScreen");
   if (!screen) return;
-  const images = Array.isArray(stop?.guideImages) ? stop.guideImages.filter(Boolean) : [];
+  const images = Array.isArray(stop?.guideImages)
+    ? stop.guideImages.filter(Boolean)
+    : [];
   const url = images[0] || "";
   if (url) {
     screen.style.backgroundImage = `url(${JSON.stringify(url)})`;

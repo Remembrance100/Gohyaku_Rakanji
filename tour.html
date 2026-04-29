@@ -28,7 +28,7 @@
       href="https://fonts.googleapis.com/css2?family=Barlow:wght@500;700;800&family=Manrope:wght@500;700;800&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./assets/css/styles.css?v=20260425a" />
+    <link rel="stylesheet" href="./assets/css/styles.css?v=20260427b" />
   </head>
   <body>
     <!-- Persistent chrome around the tour experience. -->
@@ -67,6 +67,12 @@
               <div class="map-pins" id="mapPins" aria-label="Tour stop buttons"></div>
             </div>
           </div>
+          <button
+            class="map-end-btn"
+            id="mapEndBtn"
+            type="button"
+            aria-label="ガイド終了"
+          >ガイド終了</button>
         </div>
       </section>
 
@@ -224,6 +230,13 @@
         </button>
       </div>
 
+      <div class="omamori-priest">
+        <div class="omamori-priest-bubble">
+          <p class="omamori-priest-role">住職より</p>
+          <p class="omamori-priest-quote">「本日はご参拝いただき、誠にありがとうございます。この地に眠る御霊が、皆様の歩みをいつまでも見守っておられます。どうかお守りを携え、健やかな日々をお過ごしください。」</p>
+        </div>
+      </div>
+
       <div class="omamori-hero">
         <p class="omamori-eyebrow">記念品</p>
         <h2 class="omamori-title">お守り<br>Memorial Gift</h2>
@@ -231,71 +244,17 @@
       </div>
 
       <div class="omamori-grid">
-        <!-- Red omamori -->
-        <div class="omamori-card omamori-card--red">
-          <img
-            class="omamori-card-preview"
-            src=""
-            data-omamori-mock="red"
-            alt="Red omamori preview"
-            aria-hidden="true"
-          />
-          <div class="omamori-card-body">
-            <div>
-              <p class="omamori-card-name">紅 Omamori</p>
-              <p class="omamori-card-desc">縁結び・健康祈願</p>
-            </div>
-            <button
-              class="omamori-download-btn"
-              type="button"
-              data-omamori="red"
-              aria-label="紅お守りをダウンロード"
-            >
-              <svg width="11" height="11" viewBox="0 0 11 11" fill="none" aria-hidden="true">
-                <path d="M5.5 1v6M2.5 5l3 3 3-3M1 10h9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-              保存
-            </button>
-          </div>
-        </div>
-
-        <!-- Green omamori -->
-        <div class="omamori-card omamori-card--green">
-          <img
-            class="omamori-card-preview"
-            src=""
-            data-omamori-mock="green"
-            alt="Green omamori preview"
-            aria-hidden="true"
-          />
-          <div class="omamori-card-body">
-            <div>
-              <p class="omamori-card-name">翠 Omamori</p>
-              <p class="omamori-card-desc">家内安全・商売繁盛</p>
-            </div>
-            <button
-              class="omamori-download-btn"
-              type="button"
-              data-omamori="green"
-              aria-label="翠お守りをダウンロード"
-            >
-              <svg width="11" height="11" viewBox="0 0 11 11" fill="none" aria-hidden="true">
-                <path d="M5.5 1v6M2.5 5l3 3 3-3M1 10h9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-              保存
-            </button>
-          </div>
-        </div>
-
         <!-- Blue omamori -->
-        <div class="omamori-card omamori-card--blue">
-          <img
+        <div class="omamori-card omamori-card--blue" data-omamori-key="blue">
+          <video
             class="omamori-card-preview"
-            src=""
-            data-omamori-mock="blue"
-            alt="Blue omamori preview"
+            data-omamori-video="blue"
+            autoplay
+            muted
+            loop
+            playsinline
             aria-hidden="true"
-          />
+          ></video>
           <div class="omamori-card-body">
             <div>
               <p class="omamori-card-name">蒼 Omamori</p>
@@ -314,9 +273,82 @@
             </button>
           </div>
         </div>
+
+        <!-- Gold omamori -->
+        <div class="omamori-card omamori-card--gold" data-omamori-key="gold">
+          <video
+            class="omamori-card-preview"
+            data-omamori-video="gold"
+            autoplay
+            muted
+            loop
+            playsinline
+            aria-hidden="true"
+          ></video>
+          <div class="omamori-card-body">
+            <div>
+              <p class="omamori-card-name">金 Omamori</p>
+              <p class="omamori-card-desc">商売繁盛・金運祈願</p>
+            </div>
+            <button
+              class="omamori-download-btn"
+              type="button"
+              data-omamori="gold"
+              aria-label="金お守りをダウンロード"
+            >
+              <svg width="11" height="11" viewBox="0 0 11 11" fill="none" aria-hidden="true">
+                <path d="M5.5 1v6M2.5 5l3 3 3-3M1 10h9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              保存
+            </button>
+          </div>
+        </div>
+
+        <!-- Pink omamori -->
+        <div class="omamori-card omamori-card--pink" data-omamori-key="pink">
+          <video
+            class="omamori-card-preview"
+            data-omamori-video="pink"
+            autoplay
+            muted
+            loop
+            playsinline
+            aria-hidden="true"
+          ></video>
+          <div class="omamori-card-body">
+            <div>
+              <p class="omamori-card-name">桃 Omamori</p>
+              <p class="omamori-card-desc">縁結び・健康祈願</p>
+            </div>
+            <button
+              class="omamori-download-btn"
+              type="button"
+              data-omamori="pink"
+              aria-label="桃お守りをダウンロード"
+            >
+              <svg width="11" height="11" viewBox="0 0 11 11" fill="none" aria-hidden="true">
+                <path d="M5.5 1v6M2.5 5l3 3 3-3M1 10h9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              保存
+            </button>
+          </div>
+        </div>
       </div>
     </section>
 
-    <script src="./assets/js/script.js?v=20260425a"></script>
+    <!-- Fullscreen omamori video viewer — no back button, download only. -->
+    <div class="omamori-fullscreen hidden" id="omamoriFullscreen" aria-modal="true" role="dialog" aria-label="お守り動画">
+      <video class="omamori-fullscreen-video" id="omamoriFullscreenVideo" autoplay muted loop playsinline></video>
+      <div class="omamori-fullscreen-actions">
+        <button class="omamori-fullscreen-dl" id="omamoriFullscreenDl" type="button">
+          <svg width="13" height="13" viewBox="0 0 11 11" fill="none" aria-hidden="true">
+            <path d="M5.5 1v6M2.5 5l3 3 3-3M1 10h9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          お守りを保存
+        </button>
+      </div>
+    </div>
+
+    <script src="./assets/js/script.js?v=20260427b"></script>
   </body>
 </html>
