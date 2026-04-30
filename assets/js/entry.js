@@ -306,6 +306,28 @@ function getLocalizedField(rawObj, key, fallback = "") {
   return direct || nested || safeText(rawObj?.[key], fallback);
 }
 
+function getLangKey() {
+  return (document.documentElement.lang || "en").toLowerCase().startsWith("ja")
+    ? "ja"
+    : "en";
+}
+
+function pickLangHalf(raw, lang) {
+  const text = safeText(raw, "");
+  if (!text) return text;
+  // WordPress may convert --- to em/en dashes; try all variants
+  const DELIMS = ["---EN---", "—EN—", "–EN–", "&#8212;EN&#8212;", "&#8211;EN&#8211;"];
+  let idx = -1, delimLen = 0;
+  for (const d of DELIMS) {
+    idx = text.indexOf(d);
+    if (idx !== -1) { delimLen = d.length; break; }
+  }
+  if (idx === -1) return text;
+  const ja = text.slice(0, idx).trim();
+  const en = text.slice(idx + delimLen).trim();
+  return lang === "en" ? en || ja : ja || en;
+}
+
 function normalizeWpImageUrl(url) {
   const input = safeText(url, "");
   if (!input) return "";
@@ -413,10 +435,13 @@ function mapStop(rawStop, index) {
   const title = toPlainText(
     getLocalizedField(rawStop, "title", `Stop ${number}`),
   );
-  const highlightRaw =
+  const lang = getLangKey();
+  const highlightRaw = pickLangHalf(
     getLocalizedField(rawStop, "highlight2", "") ||
     getLocalizedField(rawStop, "highlight", "") ||
-    getLocalizedField(rawStop, "featured", "");
+    getLocalizedField(rawStop, "featured", ""),
+    lang,
+  );
   const paragraphCount = (highlightRaw.match(/<p[\s>]/gi) || []).length;
   const highlight = indentMultilineText(
     normalizeHighlightLines(toPlainTextWithBreaks(highlightRaw)),
@@ -426,7 +451,10 @@ function mapStop(rawStop, index) {
     getLocalizedField(rawStop, "text", "") ||
     getLocalizedField(rawStop, "details_content", "") ||
     getLocalizedField(rawStop, "details", "");
-  const transcriptSource = getLocalizedField(rawStop, "transcript", "");
+  const transcriptSource = pickLangHalf(
+    getLocalizedField(rawStop, "transcript", ""),
+    lang,
+  );
 
   const media = collectMediaUrls(rawStop);
   const mapUrl =
@@ -609,15 +637,16 @@ const PREFS_KEY = "tourPrefs";
 
 const TRANSLATIONS = {
   en: {
-    "lang-heading": "Language",
-    "font-heading": "Text Size",
-    "font-small": "Small",
-    "font-normal": "Normal",
-    "font-large": "Large",
+    "label-language": "Language",
+    "label-fontsize": "Text Size",
+    "font-sample-small": "Aa",
+    "font-sample-normal": "Aa",
+    "font-sample-large": "Aa",
+    "font-small": "S",
+    "font-normal": "M",
+    "font-large": "L",
     "font-xlarge": "XL",
-    "notices-heading": "Visitor Etiquette",
-    "notice-photo":
-      "Photography of graves and memorial tablets is not permitted.",
+    "notice-photo": "Photography of graves and memorial tablets is not permitted.",
     "notice-quiet": "Please keep your voice low throughout the tour.",
     "notice-smoke": "Smoking is not permitted on the grounds.",
     "notice-pets": "Pets are not allowed inside the temple grounds.",
@@ -625,13 +654,15 @@ const TRANSLATIONS = {
     "confirm-btn": "Start Tour",
   },
   ja: {
-    "lang-heading": "言語",
-    "font-heading": "文字サイズ",
+    "label-language": "言語",
+    "label-fontsize": "文字サイズ",
+    "font-sample-small": "あ",
+    "font-sample-normal": "あ",
+    "font-sample-large": "あ",
     "font-small": "小",
-    "font-normal": "標準",
+    "font-normal": "中",
     "font-large": "大",
     "font-xlarge": "特大",
-    "notices-heading": "ご注意",
     "notice-photo": "墓石や位牌の撮影はご遠慮ください。",
     "notice-quiet": "見学中は静かにお話しください。",
     "notice-smoke": "境内での喫煙は禁止されています。",
@@ -674,7 +705,7 @@ function applyFontScale(size) {
   );
 }
 
-function initSettings() {
+function initSettings(onLangChange) {
   const screen = document.getElementById("settingsScreen");
   const confirmBtn = document.getElementById("settingsConfirmBtn");
   const langGrid = document.getElementById("settingsLangGrid");
@@ -717,6 +748,7 @@ function initSettings() {
     selectedLang = btn.dataset.lang;
     applyLang(selectedLang);
     syncLangBtns();
+    onLangChange?.(selectedLang);
   });
 
   // Font size buttons
@@ -752,7 +784,7 @@ function bindEvents() {
   entryStartBtn?.addEventListener("click", () => {
     entryVideo?.pause();
     const prefs = loadPrefs();
-    const lang = prefs.lang || "en";
+    const lang = prefs.lang || "ja";
     const targetUrl = new URL("./tour.html", window.location.href);
     targetUrl.searchParams.set("lang", lang);
     window.location.href = targetUrl.toString();
@@ -780,12 +812,32 @@ function applySettingsBg(stop) {
 }
 
 async function init() {
-  initSettings();
+  let rawStopZeroData = null;
+
+  function rerender() {
+    const stop = rawStopZeroData
+      ? mapStop(rawStopZeroData, 0)
+      : fallbackStopZero;
+    renderEntry(stop);
+  }
+
+  initSettings(rerender);
   bindEvents();
 
   try {
-    const stopZero = await loadStopZero();
-    applySettingsBg(stopZero);
+    const response = await fetch(DATA_URL);
+    if (!response.ok) throw new Error(`Failed: ${response.status}`);
+    const data = await response.json();
+    if (!data || !Array.isArray(data.stops)) throw new Error("Invalid data");
+
+    const rawStop = data.stops.find((s) => {
+      const num = String(s?.number ?? s?.acf?.number ?? "").trim();
+      return num === "0";
+    }) || data.stops[0];
+
+    rawStopZeroData = rawStop;
+    const stopZero = rawStop ? mapStop(rawStop, 0) : null;
+    applySettingsBg(stopZero || fallbackStopZero);
     renderEntry(stopZero || fallbackStopZero);
   } catch (error) {
     console.error(error);

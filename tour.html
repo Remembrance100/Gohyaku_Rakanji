@@ -72,7 +72,7 @@
             id="mapEndBtn"
             type="button"
             aria-label="ガイド終了"
-          >ガイド終了</button>
+          data-t="map-end-btn">ガイド終了</button>
         </div>
       </section>
 
@@ -103,7 +103,7 @@
             </h3>
           </article>
 
-          <p class="detail-highlight-label hidden" id="detailHighlightLabel">ハイライト</p>
+          <p class="detail-highlight-label hidden" id="detailHighlightLabel" data-t="highlight-label">ハイライト</p>
           <div class="detail-stop-highlight hidden" id="detailHighlight"></div>
 
           <div class="detail-text" id="detailText"></div>
@@ -113,7 +113,7 @@
           </div>
 
           <section class="detail-transcript-block" id="detailTranscriptBlock" hidden>
-            <h4>音声ガイド</h4>
+            <h4 data-t="audio-guide-heading">音声ガイド</h4>
             <div class="detail-transcript" id="detailTranscript"></div>
           </section>
 
@@ -137,7 +137,7 @@
         <div class="stop-picker-backdrop" id="stopPickerBackdrop"></div>
         <div class="stop-picker-panel">
           <div class="stop-picker-handle" aria-hidden="true"></div>
-          <h3 class="stop-picker-heading">全スポット</h3>
+          <h3 class="stop-picker-heading" data-t="all-stops-heading">全スポット</h3>
           <div class="stop-picker-items" id="stopPickerItems"></div>
         </div>
       </div>
@@ -232,15 +232,15 @@
 
       <div class="omamori-priest">
         <div class="omamori-priest-bubble">
-          <p class="omamori-priest-role">住職より</p>
-          <p class="omamori-priest-quote">「本日はご参拝いただき、誠にありがとうございます。この地に眠る御霊が、皆様の歩みをいつまでも見守っておられます。どうかお守りを携え、健やかな日々をお過ごしください。」</p>
+          <p class="omamori-priest-role" data-t="omamori-priest-role">住職より</p>
+          <p class="omamori-priest-quote" data-t="omamori-priest-quote">「本日はご参拝いただき、誠にありがとうございます。この地に眠る御霊が、皆様の歩みをいつまでも見守っておられます。どうかお守りを携え、健やかな日々をお過ごしください。」</p>
         </div>
       </div>
 
       <div class="omamori-hero">
-        <p class="omamori-eyebrow">記念品</p>
-        <h2 class="omamori-title">お守り<br>Memorial Gift</h2>
-        <p class="omamori-subtitle">ツアーの記念に、お守りGIFをお選びください。</p>
+        <p class="omamori-eyebrow" data-t="omamori-eyebrow">記念品</p>
+        <h2 class="omamori-title" data-t="omamori-title">お守り</h2>
+        <p class="omamori-subtitle" data-t="omamori-subtitle">ツアーの記念に、お守りGIFをお選びください。</p>
       </div>
 
       <div class="omamori-grid">
@@ -257,8 +257,8 @@
           ></video>
           <div class="omamori-card-body">
             <div>
-              <p class="omamori-card-name">蒼 Omamori</p>
-              <p class="omamori-card-desc">学業成就・旅行安全</p>
+              <p class="omamori-card-name" data-t="omamori-blue-name">蒼 Omamori</p>
+              <p class="omamori-card-desc" data-t="omamori-blue-desc">学業成就・旅行安全</p>
             </div>
             <button
               class="omamori-download-btn"
@@ -269,7 +269,7 @@
               <svg width="11" height="11" viewBox="0 0 11 11" fill="none" aria-hidden="true">
                 <path d="M5.5 1v6M2.5 5l3 3 3-3M1 10h9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
-              保存
+              <span data-t="omamori-save-btn">保存</span>
             </button>
           </div>
         </div>
@@ -287,8 +287,8 @@
           ></video>
           <div class="omamori-card-body">
             <div>
-              <p class="omamori-card-name">金 Omamori</p>
-              <p class="omamori-card-desc">商売繁盛・金運祈願</p>
+              <p class="omamori-card-name" data-t="omamori-gold-name">金 Omamori</p>
+              <p class="omamori-card-desc" data-t="omamori-gold-desc">商売繁盛・金運祈願</p>
             </div>
             <button
               class="omamori-download-btn"
@@ -299,7 +299,7 @@
               <svg width="11" height="11" viewBox="0 0 11 11" fill="none" aria-hidden="true">
                 <path d="M5.5 1v6M2.5 5l3 3 3-3M1 10h9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
-              保存
+              <span data-t="omamori-save-btn">保存</span>
             </button>
           </div>
         </div>
@@ -317,8 +317,8 @@
           ></video>
           <div class="omamori-card-body">
             <div>
-              <p class="omamori-card-name">桃 Omamori</p>
-              <p class="omamori-card-desc">縁結び・健康祈願</p>
+              <p class="omamori-card-name" data-t="omamori-pink-name">桃 Omamori</p>
+              <p class="omamori-card-desc" data-t="omamori-pink-desc">縁結び・健康祈願</p>
             </div>
             <button
               class="omamori-download-btn"
@@ -329,7 +329,7 @@
               <svg width="11" height="11" viewBox="0 0 11 11" fill="none" aria-hidden="true">
                 <path d="M5.5 1v6M2.5 5l3 3 3-3M1 10h9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
-              保存
+              <span data-t="omamori-save-btn">保存</span>
             </button>
           </div>
         </div>
@@ -344,11 +344,11 @@
           <svg width="13" height="13" viewBox="0 0 11 11" fill="none" aria-hidden="true">
             <path d="M5.5 1v6M2.5 5l3 3 3-3M1 10h9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
-          お守りを保存
+          <span data-t="omamori-fullscreen-save">お守りを保存</span>
         </button>
       </div>
     </div>
 
-    <script src="./assets/js/script.js?v=20260427b"></script>
+    <script src="./assets/js/script.js?v=20260429f"></script>
   </body>
 </html>

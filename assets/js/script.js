@@ -403,11 +403,66 @@ function getRequestedLang() {
   if (langParam.startsWith("en")) return "en";
 
   const savedLang = safeText(loadPrefs().lang, "").toLowerCase();
-  return savedLang.startsWith("ja") ? "ja" : "en";
+  return savedLang.startsWith("en") ? "en" : "ja";
+}
+
+const UI_STRINGS = {
+  ja: {
+    "end-tour-btn": "ガイド終了",
+    "map-preview-title": "地図",
+    "highlight-label": "ハイライト",
+    "audio-guide-heading": "音声ガイド",
+    "all-stops-heading": "全スポット",
+    "map-end-btn": "ガイド終了",
+    "omamori-priest-role": "住職より",
+    "omamori-priest-quote": "「本日はご参拝いただき、誠にありがとうございます。この地に眠る御霊が、皆様の歩みをいつまでも見守っておられます。どうかお守りを携え、健やかな日々をお過ごしください。」",
+    "omamori-eyebrow": "記念品",
+    "omamori-title": "お守り",
+    "omamori-subtitle": "ツアーの記念に、お守りGIFをお選びください。",
+    "omamori-blue-name": "蒼 Omamori",
+    "omamori-blue-desc": "学業成就・旅行安全",
+    "omamori-gold-name": "金 Omamori",
+    "omamori-gold-desc": "商売繁盛・金運祈願",
+    "omamori-pink-name": "桃 Omamori",
+    "omamori-pink-desc": "縁結び・健康祈願",
+    "omamori-save-btn": "保存",
+    "omamori-fullscreen-save": "お守りを保存",
+  },
+  en: {
+    "end-tour-btn": "End Tour",
+    "map-preview-title": "Map",
+    "highlight-label": "Highlights",
+    "audio-guide-heading": "Audio Guide",
+    "all-stops-heading": "All Stops",
+    "map-end-btn": "End Tour",
+    "omamori-priest-role": "From the Head Priest",
+    "omamori-priest-quote": "\"Thank you for visiting today. May the souls resting here watch over your journey always. Please carry this omamori with you and live each day in good health.\"",
+    "omamori-eyebrow": "Memorial Gift",
+    "omamori-title": "Omamori",
+    "omamori-subtitle": "Choose an omamori GIF as a memento of your tour.",
+    "omamori-blue-name": "Ao Omamori",
+    "omamori-blue-desc": "Academic success · Safe travels",
+    "omamori-gold-name": "Kin Omamori",
+    "omamori-gold-desc": "Business fortune · Prosperity",
+    "omamori-pink-name": "Momo Omamori",
+    "omamori-pink-desc": "Good relationships · Health",
+    "omamori-save-btn": "Save",
+    "omamori-fullscreen-save": "Save Omamori",
+  },
+};
+
+function applyUiLang(lang) {
+  const t = UI_STRINGS[lang] || UI_STRINGS.ja;
+  document.querySelectorAll("[data-t]").forEach((el) => {
+    const key = el.getAttribute("data-t");
+    if (t[key] !== undefined) el.textContent = t[key];
+  });
 }
 
 function applySelectedLanguage() {
-  document.documentElement.lang = getRequestedLang();
+  const lang = getRequestedLang();
+  document.documentElement.lang = lang;
+  applyUiLang(lang);
 }
 
 function applyFontScale() {
@@ -427,6 +482,22 @@ function getLocalizedField(rawObj, key, fallback = "") {
       ? safeText(rawObj.translations[lang][key], "")
       : "";
   return direct || nested || safeText(rawObj?.[key], fallback);
+}
+
+function pickLangHalf(raw, lang) {
+  const text = safeText(raw, "");
+  if (!text) return text;
+  // WordPress may convert --- to em/en dashes; try all variants
+  const DELIMS = ["---EN---", "—EN—", "–EN–", "&#8212;EN&#8212;", "&#8211;EN&#8211;"];
+  let idx = -1, delimLen = 0;
+  for (const d of DELIMS) {
+    idx = text.indexOf(d);
+    if (idx !== -1) { delimLen = d.length; break; }
+  }
+  if (idx === -1) return text;
+  const ja = text.slice(0, idx).trim();
+  const en = text.slice(idx + delimLen).trim();
+  return lang === "en" ? en || ja : ja || en;
 }
 
 function normalizeTermKey(value) {
@@ -847,17 +918,23 @@ function mapWpStop(rawStop, index, numberOffset = 0) {
     getLocalizedField(rawStop, "title", `Stop ${number}`),
   );
   const questionRaw = getLocalizedField(rawStop, "question", "");
-  const highlightRaw =
+  const lang = getLangKey();
+  const highlightRaw = pickLangHalf(
     getLocalizedField(rawStop, "highlight2", "") ||
     getLocalizedField(rawStop, "highlight", "") ||
-    getLocalizedField(rawStop, "featured", "");
+    getLocalizedField(rawStop, "featured", ""),
+    lang,
+  );
   const paragraphCount = (highlightRaw.match(/<p[\s>]/gi) || []).length;
 
   const textSource =
     getLocalizedField(rawStop, "text", "") ||
     getLocalizedField(rawStop, "details_content", "") ||
     getLocalizedField(rawStop, "details", "");
-  const transcriptSource = getLocalizedField(rawStop, "transcript", "");
+  const transcriptSource = pickLangHalf(
+    getLocalizedField(rawStop, "transcript", ""),
+    lang,
+  );
 
   const textBlocks = extractRichBlocksFromSource(textSource);
   let transcriptBlocks = extractRichBlocksFromSource(transcriptSource);
@@ -1402,7 +1479,7 @@ function updateDetailStopNavState() {
   const isLastStop =
     activeIndex >= 0 && activeIndex === tourStopsData.length - 1;
   if (isLastStop) {
-    detailNextBtn.innerHTML = "ガイド終了";
+    detailNextBtn.innerHTML = (UI_STRINGS[getLangKey()] || UI_STRINGS.ja)["end-tour-btn"];
     detailNextBtn.classList.add("is-end-btn");
   } else {
     detailNextBtn.innerHTML = `<svg width="10" height="16" viewBox="0 0 10 16" fill="none" aria-hidden="true"><polyline points="2,2 8,8 2,14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
@@ -1593,7 +1670,7 @@ function openMapPreviewByStopId(stopId) {
   if (!stop || !stop.mapUrl || !mapPreviewImage || !mapPreviewModal) return;
 
   if (mapPreviewTitle) {
-    mapPreviewTitle.textContent = "地図";
+    mapPreviewTitle.textContent = (UI_STRINGS[getLangKey()] || UI_STRINGS.ja)["map-preview-title"];
   }
   mapPreviewImage.src = stop.mapUrl;
   mapPreviewImage.alt = `${stop.title} map preview`;
@@ -1943,15 +2020,32 @@ function bindEvents() {
     });
   });
 
-  omamoriFullscreenDl?.addEventListener("click", () => {
+  omamoriFullscreenDl?.addEventListener("click", async () => {
     const key = omamoriFullscreenDl.dataset.omamoriKey;
     const url = OMAMORI_URLS[key];
     if (!url) return;
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `omamori-${key}.mp4`;
-    a.target = "_blank";
-    a.click();
+    const filename = `omamori-${key}.mp4`;
+    try {
+      const res = await fetch(url);
+      const blob = await res.blob();
+      const file = new File([blob], filename, { type: "video/mp4" });
+      // iOS Safari: use share sheet so user can save to Files/Photos
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({ files: [file], title: filename });
+        return;
+      }
+      // Desktop / Android: blob download
+      const objectUrl = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = objectUrl;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(objectUrl), 10000);
+    } catch {
+      window.location.href = url;
+    }
   });
 }
 

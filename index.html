@@ -37,7 +37,7 @@
       href="https://fonts.googleapis.com/css2?family=Barlow:wght@500;700;800&family=Manrope:wght@500;700;800&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./assets/css/entry.css?v=20260426a" />
+    <link rel="stylesheet" href="./assets/css/entry.css?v=20260428a" />
   </head>
   <body>
     <!-- Settings screen (shown first) -->
@@ -50,6 +50,7 @@
     >
       <div class="settings-inner">
         <div class="settings-card">
+          <p class="settings-section-label" data-t="label-language">言語</p>
           <div
             class="settings-lang-grid"
             id="settingsLangGrid"
@@ -76,18 +77,19 @@
             </button>
           </div>
 
+          <p class="settings-section-label" data-t="label-fontsize">文字サイズ</p>
           <div class="settings-font-row" role="group" aria-label="文字サイズ">
             <button class="settings-font-btn" type="button" data-size="small" aria-pressed="false">
-              <span class="settings-font-sample">あ</span>
-              <span class="settings-font-label">小</span>
+              <span class="settings-font-sample" data-t="font-sample-small">あ</span>
+              <span class="settings-font-label" data-t="font-small">小</span>
             </button>
             <button class="settings-font-btn" type="button" data-size="normal" aria-pressed="false">
-              <span class="settings-font-sample">あ</span>
-              <span class="settings-font-label">中</span>
+              <span class="settings-font-sample" data-t="font-sample-normal">あ</span>
+              <span class="settings-font-label" data-t="font-normal">中</span>
             </button>
             <button class="settings-font-btn is-active" type="button" data-size="large" aria-pressed="true">
-              <span class="settings-font-sample">あ</span>
-              <span class="settings-font-label">大</span>
+              <span class="settings-font-sample" data-t="font-sample-large">あ</span>
+              <span class="settings-font-label" data-t="font-large">大</span>
             </button>
           </div>
 
@@ -235,6 +237,6 @@
       </footer>
     </main>
 
-    <script src="./assets/js/entry.js?v=20260426c"></script>
+    <script src="./assets/js/entry.js?v=20260429e"></script>
   </body>
 </html>
