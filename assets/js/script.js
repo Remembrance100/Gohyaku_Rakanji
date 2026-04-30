@@ -382,8 +382,11 @@ function replaceTermShortcodes(rawText) {
 }
 
 function getLangKey() {
-  const lang = (document.documentElement.lang || "en").toLowerCase();
-  return lang.startsWith("ja") ? "ja" : "en";
+  const lang = (document.documentElement.lang || "ja").toLowerCase();
+  if (lang.startsWith("ja")) return "ja";
+  if (lang.startsWith("ko")) return "ko";
+  if (lang.startsWith("zh")) return "zh";
+  return "en";
 }
 
 const PREFS_KEY = "tourPrefs";
@@ -401,9 +404,14 @@ function getRequestedLang() {
   const langParam = safeText(params.get("lang"), "").toLowerCase();
   if (langParam.startsWith("ja")) return "ja";
   if (langParam.startsWith("en")) return "en";
+  if (langParam.startsWith("ko")) return "ko";
+  if (langParam.startsWith("zh")) return "zh";
 
   const savedLang = safeText(loadPrefs().lang, "").toLowerCase();
-  return savedLang.startsWith("en") ? "en" : "ja";
+  if (savedLang.startsWith("en")) return "en";
+  if (savedLang.startsWith("ko")) return "ko";
+  if (savedLang.startsWith("zh")) return "zh";
+  return "ja";
 }
 
 const UI_STRINGS = {
@@ -449,6 +457,48 @@ const UI_STRINGS = {
     "omamori-save-btn": "Save",
     "omamori-fullscreen-save": "Save Omamori",
   },
+  ko: {
+    "end-tour-btn": "투어 종료",
+    "map-preview-title": "지도",
+    "highlight-label": "하이라이트",
+    "audio-guide-heading": "오디오 가이드",
+    "all-stops-heading": "전체 스팟",
+    "map-end-btn": "투어 종료",
+    "omamori-priest-role": "주지 스님의 말씀",
+    "omamori-priest-quote": "「오늘 참배해 주셔서 진심으로 감사드립니다. 이곳에 잠든 영혼들이 여러분의 발걸음을 언제나 지켜보고 있습니다. 부디 오마모리를 간직하시고 건강한 나날을 보내시기 바랍니다.」",
+    "omamori-eyebrow": "기념품",
+    "omamori-title": "오마모리",
+    "omamori-subtitle": "투어 기념으로 오마모리 GIF를 선택해 주세요.",
+    "omamori-blue-name": "파랑 오마모리",
+    "omamori-blue-desc": "학업 성취 · 여행 안전",
+    "omamori-gold-name": "금 오마모리",
+    "omamori-gold-desc": "사업 번창 · 금운 기원",
+    "omamori-pink-name": "분홍 오마모리",
+    "omamori-pink-desc": "인연 · 건강 기원",
+    "omamori-save-btn": "저장",
+    "omamori-fullscreen-save": "오마모리 저장",
+  },
+  zh: {
+    "end-tour-btn": "结束导览",
+    "map-preview-title": "地图",
+    "highlight-label": "亮点",
+    "audio-guide-heading": "语音导览",
+    "all-stops-heading": "全部景点",
+    "map-end-btn": "结束导览",
+    "omamori-priest-role": "住持寄语",
+    "omamori-priest-quote": "「感谢您今日的到访。长眠于此的灵魂将永远守护您的前行。请携带御守，祝您每天健康平安。」",
+    "omamori-eyebrow": "纪念礼品",
+    "omamori-title": "御守",
+    "omamori-subtitle": "请选择一款御守GIF作为本次导览的纪念。",
+    "omamori-blue-name": "蓝色御守",
+    "omamori-blue-desc": "学业进步 · 旅途平安",
+    "omamori-gold-name": "金色御守",
+    "omamori-gold-desc": "生意兴隆 · 财运亨通",
+    "omamori-pink-name": "粉色御守",
+    "omamori-pink-desc": "良缘 · 健康祈愿",
+    "omamori-save-btn": "保存",
+    "omamori-fullscreen-save": "保存御守",
+  },
 };
 
 function applyUiLang(lang) {
@@ -487,17 +537,51 @@ function getLocalizedField(rawObj, key, fallback = "") {
 function pickLangHalf(raw, lang) {
   const text = safeText(raw, "");
   if (!text) return text;
-  // WordPress may convert --- to em/en dashes; try all variants
-  const DELIMS = ["---EN---", "—EN—", "–EN–", "&#8212;EN&#8212;", "&#8211;EN&#8211;"];
-  let idx = -1, delimLen = 0;
-  for (const d of DELIMS) {
-    idx = text.indexOf(d);
-    if (idx !== -1) { delimLen = d.length; break; }
+
+  // Strip surrounding <p>…</p> tags that WordPress wraps bare delimiter lines in,
+  // then match all dash/entity variants WordPress may produce from --- sequences.
+  const SECTION_DELIMS = {
+    en: ["<p>&#8212;EN&#8212;</p>", "<p>&#8211;EN&#8211;</p>",
+         "---EN---", "—EN—", "–EN–", "&mdash;EN&mdash;", "&ndash;EN&ndash;",
+         "<p>---EN---</p>", "<p>—EN—</p>", "<p>–EN–</p>",
+         "<p>&mdash;EN&mdash;</p>", "<p>&ndash;EN&ndash;</p>"],
+    ko: ["<p>&#8212;KO&#8212;</p>", "<p>&#8211;KO&#8211;</p>",
+         "---KO---", "—KO—", "–KO–", "&mdash;KO&mdash;", "&ndash;KO&ndash;",
+         "<p>---KO---</p>", "<p>—KO—</p>", "<p>–KO–</p>",
+         "<p>&mdash;KO&mdash;</p>", "<p>&ndash;KO&ndash;</p>"],
+    zh: ["<p>&#8212;ZH&#8212;</p>", "<p>&#8211;ZH&#8211;</p>",
+         "---ZH---", "—ZH—", "–ZH–", "&mdash;ZH&mdash;", "&ndash;ZH&ndash;",
+         "<p>---ZH---</p>", "<p>—ZH—</p>", "<p>–ZH–</p>",
+         "<p>&mdash;ZH&mdash;</p>", "<p>&ndash;ZH&ndash;</p>"],
+  };
+
+  function findDelim(variants) {
+    for (const d of variants) {
+      const idx = text.indexOf(d);
+      if (idx !== -1) return { idx, len: d.length };
+    }
+    return null;
   }
-  if (idx === -1) return text;
-  const ja = text.slice(0, idx).trim();
-  const en = text.slice(idx + delimLen).trim();
-  return lang === "en" ? en || ja : ja || en;
+
+  const enPos = findDelim(SECTION_DELIMS.en);
+  const koPos = findDelim(SECTION_DELIMS.ko);
+  const zhPos = findDelim(SECTION_DELIMS.zh);
+
+  if (!enPos && !koPos && !zhPos) return text;
+
+  const ja = enPos ? text.slice(0, enPos.idx).trim() : text.trim();
+  const en = enPos
+    ? text.slice(enPos.idx + enPos.len, koPos ? koPos.idx : zhPos ? zhPos.idx : text.length).trim()
+    : "";
+  const ko = koPos
+    ? text.slice(koPos.idx + koPos.len, zhPos ? zhPos.idx : text.length).trim()
+    : "";
+  const zh = zhPos ? text.slice(zhPos.idx + zhPos.len).trim() : "";
+
+  if (lang === "en") return en || ja;
+  if (lang === "ko") return ko || ja;
+  if (lang === "zh") return zh || ja;
+  return ja;
 }
 
 function normalizeTermKey(value) {
@@ -927,10 +1011,12 @@ function mapWpStop(rawStop, index, numberOffset = 0) {
   );
   const paragraphCount = (highlightRaw.match(/<p[\s>]/gi) || []).length;
 
-  const textSource =
+  const textSource = pickLangHalf(
     getLocalizedField(rawStop, "text", "") ||
     getLocalizedField(rawStop, "details_content", "") ||
-    getLocalizedField(rawStop, "details", "");
+    getLocalizedField(rawStop, "details", ""),
+    lang,
+  );
   const transcriptSource = pickLangHalf(
     getLocalizedField(rawStop, "transcript", ""),
     lang,

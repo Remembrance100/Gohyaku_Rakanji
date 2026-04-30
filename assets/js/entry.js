@@ -307,25 +307,59 @@ function getLocalizedField(rawObj, key, fallback = "") {
 }
 
 function getLangKey() {
-  return (document.documentElement.lang || "en").toLowerCase().startsWith("ja")
-    ? "ja"
-    : "en";
+  const lang = (document.documentElement.lang || "ja").toLowerCase();
+  if (lang.startsWith("ja")) return "ja";
+  if (lang.startsWith("ko")) return "ko";
+  if (lang.startsWith("zh")) return "zh";
+  return "en";
 }
 
 function pickLangHalf(raw, lang) {
   const text = safeText(raw, "");
   if (!text) return text;
-  // WordPress may convert --- to em/en dashes; try all variants
-  const DELIMS = ["---EN---", "—EN—", "–EN–", "&#8212;EN&#8212;", "&#8211;EN&#8211;"];
-  let idx = -1, delimLen = 0;
-  for (const d of DELIMS) {
-    idx = text.indexOf(d);
-    if (idx !== -1) { delimLen = d.length; break; }
+
+  const SECTION_DELIMS = {
+    en: ["<p>&#8212;EN&#8212;</p>", "<p>&#8211;EN&#8211;</p>",
+         "---EN---", "—EN—", "–EN–", "&mdash;EN&mdash;", "&ndash;EN&ndash;",
+         "<p>---EN---</p>", "<p>—EN—</p>", "<p>–EN–</p>",
+         "<p>&mdash;EN&mdash;</p>", "<p>&ndash;EN&ndash;</p>"],
+    ko: ["<p>&#8212;KO&#8212;</p>", "<p>&#8211;KO&#8211;</p>",
+         "---KO---", "—KO—", "–KO–", "&mdash;KO&mdash;", "&ndash;KO&ndash;",
+         "<p>---KO---</p>", "<p>—KO—</p>", "<p>–KO–</p>",
+         "<p>&mdash;KO&mdash;</p>", "<p>&ndash;KO&ndash;</p>"],
+    zh: ["<p>&#8212;ZH&#8212;</p>", "<p>&#8211;ZH&#8211;</p>",
+         "---ZH---", "—ZH—", "–ZH–", "&mdash;ZH&mdash;", "&ndash;ZH&ndash;",
+         "<p>---ZH---</p>", "<p>—ZH—</p>", "<p>–ZH–</p>",
+         "<p>&mdash;ZH&mdash;</p>", "<p>&ndash;ZH&ndash;</p>"],
+  };
+
+  function findDelim(variants) {
+    for (const d of variants) {
+      const idx = text.indexOf(d);
+      if (idx !== -1) return { idx, len: d.length };
+    }
+    return null;
   }
-  if (idx === -1) return text;
-  const ja = text.slice(0, idx).trim();
-  const en = text.slice(idx + delimLen).trim();
-  return lang === "en" ? en || ja : ja || en;
+
+  const enPos = findDelim(SECTION_DELIMS.en);
+  const koPos = findDelim(SECTION_DELIMS.ko);
+  const zhPos = findDelim(SECTION_DELIMS.zh);
+
+  if (!enPos && !koPos && !zhPos) return text;
+
+  const ja = enPos ? text.slice(0, enPos.idx).trim() : text.trim();
+  const en = enPos
+    ? text.slice(enPos.idx + enPos.len, koPos ? koPos.idx : zhPos ? zhPos.idx : text.length).trim()
+    : "";
+  const ko = koPos
+    ? text.slice(koPos.idx + koPos.len, zhPos ? zhPos.idx : text.length).trim()
+    : "";
+  const zh = zhPos ? text.slice(zhPos.idx + zhPos.len).trim() : "";
+
+  if (lang === "en") return en || ja;
+  if (lang === "ko") return ko || ja;
+  if (lang === "zh") return zh || ja;
+  return ja;
 }
 
 function normalizeWpImageUrl(url) {
@@ -447,10 +481,12 @@ function mapStop(rawStop, index) {
     normalizeHighlightLines(toPlainTextWithBreaks(highlightRaw)),
   );
 
-  const textSource =
+  const textSource = pickLangHalf(
     getLocalizedField(rawStop, "text", "") ||
     getLocalizedField(rawStop, "details_content", "") ||
-    getLocalizedField(rawStop, "details", "");
+    getLocalizedField(rawStop, "details", ""),
+    lang,
+  );
   const transcriptSource = pickLangHalf(
     getLocalizedField(rawStop, "transcript", ""),
     lang,
@@ -669,6 +705,40 @@ const TRANSLATIONS = {
     "notice-pets": "ペットの境内への持ち込みはご遠慮ください。",
     "notice-plants": "花や植物を摘まないようにお願いします。",
     "confirm-btn": "ガイド開始",
+  },
+  ko: {
+    "label-language": "언어",
+    "label-fontsize": "글자 크기",
+    "font-sample-small": "가",
+    "font-sample-normal": "가",
+    "font-sample-large": "가",
+    "font-small": "소",
+    "font-normal": "중",
+    "font-large": "대",
+    "font-xlarge": "특대",
+    "notice-photo": "묘비나 위패 촬영은 삼가 주세요.",
+    "notice-quiet": "견학 중에는 조용히 대화해 주세요.",
+    "notice-smoke": "경내 흡연은 금지되어 있습니다.",
+    "notice-pets": "반려동물의 경내 동반은 삼가 주세요.",
+    "notice-plants": "꽃이나 식물을 꺾지 마세요.",
+    "confirm-btn": "가이드 시작",
+  },
+  zh: {
+    "label-language": "语言",
+    "label-fontsize": "文字大小",
+    "font-sample-small": "文",
+    "font-sample-normal": "文",
+    "font-sample-large": "文",
+    "font-small": "小",
+    "font-normal": "中",
+    "font-large": "大",
+    "font-xlarge": "特大",
+    "notice-photo": "请勿拍摄墓碑或灵牌。",
+    "notice-quiet": "参观期间请保持安静。",
+    "notice-smoke": "境内禁止吸烟。",
+    "notice-pets": "请勿携带宠物进入境内。",
+    "notice-plants": "请勿摘取花草植物。",
+    "confirm-btn": "开始导览",
   },
 };
 
