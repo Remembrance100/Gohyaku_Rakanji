@@ -320,14 +320,17 @@ function pickLangHalf(raw, lang) {
 
   const SECTION_DELIMS = {
     en: ["<p>&#8212;EN&#8212;</p>", "<p>&#8211;EN&#8211;</p>",
+         "&#8212;EN&#8212;", "&#8211;EN&#8211;",
          "---EN---", "—EN—", "–EN–", "&mdash;EN&mdash;", "&ndash;EN&ndash;",
          "<p>---EN---</p>", "<p>—EN—</p>", "<p>–EN–</p>",
          "<p>&mdash;EN&mdash;</p>", "<p>&ndash;EN&ndash;</p>"],
     ko: ["<p>&#8212;KO&#8212;</p>", "<p>&#8211;KO&#8211;</p>",
+         "&#8212;KO&#8212;", "&#8211;KO&#8211;",
          "---KO---", "—KO—", "–KO–", "&mdash;KO&mdash;", "&ndash;KO&ndash;",
          "<p>---KO---</p>", "<p>—KO—</p>", "<p>–KO–</p>",
          "<p>&mdash;KO&mdash;</p>", "<p>&ndash;KO&ndash;</p>"],
     zh: ["<p>&#8212;ZH&#8212;</p>", "<p>&#8211;ZH&#8211;</p>",
+         "&#8212;ZH&#8212;", "&#8211;ZH&#8211;",
          "---ZH---", "—ZH—", "–ZH–", "&mdash;ZH&mdash;", "&ndash;ZH&ndash;",
          "<p>---ZH---</p>", "<p>—ZH—</p>", "<p>–ZH–</p>",
          "<p>&mdash;ZH&mdash;</p>", "<p>&ndash;ZH&ndash;</p>"],
@@ -466,10 +469,10 @@ function mapStop(rawStop, index) {
     String(rawStop?.number ?? rawStop?.stop_number ?? index),
     String(index),
   );
-  const title = toPlainText(
-    getLocalizedField(rawStop, "title", `Stop ${number}`),
-  );
   const lang = getLangKey();
+  const title = toPlainText(
+    pickLangHalf(getLocalizedField(rawStop, "title", `Stop ${number}`), lang),
+  );
   const highlightRaw = pickLangHalf(
     getLocalizedField(rawStop, "highlight2", "") ||
     getLocalizedField(rawStop, "highlight", "") ||
