@@ -1604,7 +1604,7 @@ function closeOmamori() {
 
 const OMAMORI_URLS = {
   blue: "https://stg-apirakanjicom-stgrakanji.kinsta.cloud/wp-content/uploads/2026/04/fortuneate.mp4",
-  gold: "https://stg-apirakanjicom-stgrakanji.kinsta.cloud/wp-content/uploads/2026/04/Money.mp4",
+  gold: "https://stg-apirakanjicom-stgrakanji.kinsta.cloud/wp-content/uploads/2026/05/money-2.mp4",
   pink: "https://stg-apirakanjicom-stgrakanji.kinsta.cloud/wp-content/uploads/2026/04/luck.mp4",
 };
 
