@@ -37,7 +37,7 @@
       href="https://fonts.googleapis.com/css2?family=Barlow:wght@500;700;800&family=Manrope:wght@500;700;800&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./assets/css/entry.css?v=20260428a" />
+    <link rel="stylesheet" href="./assets/css/entry.css?v=20260520a" />
   </head>
   <body>
     <!-- Settings screen (shown first) -->
@@ -63,7 +63,6 @@
               data-lang="ja"
               aria-pressed="true"
             >
-              <span class="settings-lang-flag">🇯🇵</span>
               <span class="settings-lang-name">日本語</span>
             </button>
             <button
@@ -72,7 +71,6 @@
               data-lang="en"
               aria-pressed="false"
             >
-              <span class="settings-lang-flag">🇬🇧</span>
               <span class="settings-lang-name">English</span>
             </button>
             <button
@@ -81,7 +79,6 @@
               data-lang="ko"
               aria-pressed="false"
             >
-              <span class="settings-lang-flag">🇰🇷</span>
               <span class="settings-lang-name">한국어</span>
             </button>
             <button
@@ -90,22 +87,21 @@
               data-lang="zh"
               aria-pressed="false"
             >
-              <span class="settings-lang-flag">🇨🇳</span>
               <span class="settings-lang-name">中文</span>
             </button>
           </div>
 
           <p class="settings-section-label" data-t="label-fontsize">文字サイズ</p>
           <div class="settings-font-row" role="group" aria-label="文字サイズ">
-            <button class="settings-font-btn" type="button" data-size="small" aria-pressed="false">
-              <span class="settings-font-sample" data-t="font-sample-small">あ</span>
+            <button class="settings-font-btn" type="button" data-size="large" aria-pressed="false">
+              <span class="settings-font-sample" data-t="font-sample-large">あ</span>
               <span class="settings-font-label" data-t="font-small">小</span>
             </button>
-            <button class="settings-font-btn" type="button" data-size="normal" aria-pressed="false">
-              <span class="settings-font-sample" data-t="font-sample-normal">あ</span>
+            <button class="settings-font-btn is-active" type="button" data-size="xlarge" aria-pressed="true">
+              <span class="settings-font-sample" data-t="font-sample-large">あ</span>
               <span class="settings-font-label" data-t="font-normal">中</span>
             </button>
-            <button class="settings-font-btn is-active" type="button" data-size="large" aria-pressed="true">
+            <button class="settings-font-btn" type="button" data-size="xxlarge" aria-pressed="false">
               <span class="settings-font-sample" data-t="font-sample-large">あ</span>
               <span class="settings-font-label" data-t="font-large">大</span>
             </button>
@@ -117,8 +113,8 @@
               <span class="settings-notice-text" data-t="notice-photo">羅漢像や位牌の撮影はご遠慮ください。</span>
             </li>
             <li class="settings-notice-item">
-              <span class="settings-notice-icon" aria-hidden="true">🤫</span>
-              <span class="settings-notice-text" data-t="notice-quiet">見学中は周りにご迷惑にならないよう、静かにお話しください。</span>
+              <span class="settings-notice-icon" aria-hidden="true">🔊</span>
+              <span class="settings-notice-text" data-t="notice-quiet">音声ガイドの音量にご注意いただき、周りの方のご迷惑にならないようご配慮ください。</span>
             </li>
             <li class="settings-notice-item">
               <span class="settings-notice-icon" aria-hidden="true">🚭</span>

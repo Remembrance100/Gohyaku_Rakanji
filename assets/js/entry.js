@@ -636,6 +636,7 @@ function renderEntry(stop) {
       entryVideo.src = videoUrl;
       entryVideo.controls = false;
       entryVideo.muted = true;
+      entryVideo.volume = 0.35;
       entryVideo.autoplay = true;
       entryVideo.loop = true;
       entryVideo.removeAttribute("poster");
@@ -685,8 +686,9 @@ const TRANSLATIONS = {
     "font-normal": "M",
     "font-large": "L",
     "font-xlarge": "XL",
+    "font-xxlarge": "XXL",
     "notice-photo": "Please refrain from photographing Rakan statues and memorial tablets.",
-    "notice-quiet": "Please speak quietly so as not to disturb others during your visit.",
+    "notice-quiet": "Please be mindful of the audio guide volume so as not to disturb those around you.",
     "notice-smoke": "Smoking is not permitted on the grounds.",
     "notice-offering": "Please place offerings in the offering box, not on top of the statues.",
     "notice-pets": "Pets are not allowed inside the temple grounds.",
@@ -702,8 +704,9 @@ const TRANSLATIONS = {
     "font-normal": "中",
     "font-large": "大",
     "font-xlarge": "特大",
+    "font-xxlarge": "最大",
     "notice-photo": "羅漢像や位牌の撮影はご遠慮ください。",
-    "notice-quiet": "見学中は周りにご迷惑にならないよう、静かにお話しください。",
+    "notice-quiet": "音声ガイドの音量にご注意いただき、周りの方のご迷惑にならないようご配慮ください。",
     "notice-smoke": "境内での喫煙は禁止されています。",
     "notice-offering": "お賽銭はお賽銭箱にお入れください、像の上に置かないでください。",
     "notice-pets": "ペットの境内への持ち込みはご遠慮ください。",
@@ -719,8 +722,9 @@ const TRANSLATIONS = {
     "font-normal": "중",
     "font-large": "대",
     "font-xlarge": "특대",
+    "font-xxlarge": "최대",
     "notice-photo": "나한상이나 위패 촬영은 삼가 주세요.",
-    "notice-quiet": "견학 중에는 주위에 방해가 되지 않도록 조용히 대화해 주세요.",
+    "notice-quiet": "오디오 가이드 볼륨에 주의하여 주변 분들께 불편을 드리지 않도록 배려해 주세요.",
     "notice-smoke": "경내 흡연은 금지되어 있습니다.",
     "notice-offering": "헌금은 헌금함에 넣어 주세요. 상 위에 올려놓지 마세요.",
     "notice-pets": "반려동물의 경내 동반은 삼가 주세요.",
@@ -736,8 +740,9 @@ const TRANSLATIONS = {
     "font-normal": "中",
     "font-large": "大",
     "font-xlarge": "特大",
+    "font-xxlarge": "最大",
     "notice-photo": "请勿拍摄罗汉像或灵牌。",
-    "notice-quiet": "参观期间请注意周围，保持安静交谈。",
+    "notice-quiet": "请注意音频导览的音量，以免打扰周围的其他游客。",
     "notice-smoke": "境内禁止吸烟。",
     "notice-offering": "请将香钱放入功德箱，勿置于像上。",
     "notice-pets": "请勿携带宠物进入境内。",
@@ -745,7 +750,7 @@ const TRANSLATIONS = {
   },
 };
 
-const FONT_SCALES = { small: 0.88, normal: 1, large: 1.14, xlarge: 1.3 };
+const FONT_SCALES = { small: 0.88, normal: 1, large: 1.14, xlarge: 1.3, xxlarge: 1.5 };
 
 function loadPrefs() {
   try {
@@ -788,7 +793,9 @@ function initSettings(onLangChange) {
 
   const prefs = loadPrefs();
   let selectedLang = prefs.lang || "ja";
-  let selectedSize = prefs.size || "large";
+  // Remap old sizes that no longer exist as buttons to the nearest valid option
+  const sizeRemap = { small: "large", normal: "large" };
+  let selectedSize = sizeRemap[prefs.size] || prefs.size || "xlarge";
 
   // Apply saved prefs immediately
   applyLang(selectedLang);

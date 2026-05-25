@@ -4,6 +4,7 @@
   --ink-soft: rgba(255, 255, 255, 0.45);
   --line: rgba(255, 255, 255, 0.1);
   --tour-font-scale: 1;
+  --tour-text-size: calc(1rem * var(--tour-font-scale));
 }
 
 *,
@@ -25,6 +26,7 @@ body {
 
 body {
   font-family: "Manrope", sans-serif;
+  font-size: var(--tour-text-size);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -75,7 +77,7 @@ body {
 
 .site-brand-name {
   font:
-    700 0.78rem "Barlow",
+    700 var(--tour-text-size) "Barlow",
     sans-serif;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -84,7 +86,7 @@ body {
 
 .site-badge {
   font:
-    700 0.72rem "Barlow",
+    700 var(--tour-text-size) "Barlow",
     sans-serif;
   letter-spacing: 0.09em;
   text-transform: uppercase;
@@ -99,7 +101,7 @@ body {
   padding: 0.55rem 0.25rem 0;
   border-top: 1px solid rgba(255, 255, 255, 0.05);
   font:
-    500 0.72rem "Barlow",
+    500 var(--tour-text-size) "Barlow",
     sans-serif;
   letter-spacing: 0.05em;
   text-align: center;
@@ -219,7 +221,7 @@ body {
   border: none;
   background: linear-gradient(135deg, #f6515f, #db3f4c);
   color: #fff;
-  font: 800 0.78rem "Barlow", sans-serif;
+  font: 800 var(--tour-text-size) "Barlow", sans-serif;
   letter-spacing: 0.06em;
   cursor: pointer;
   box-shadow: 0 4px 14px rgba(219, 63, 76, 0.45);
@@ -247,7 +249,7 @@ body {
   background: linear-gradient(135deg, #f6515f, #db3f4c);
   color: #fff;
   font:
-    800 0.72rem "Barlow",
+    800 var(--tour-text-size) "Barlow",
     sans-serif;
   cursor: pointer;
   display: flex;
@@ -450,7 +452,7 @@ body {
   padding-right: 0;
   border-right: none;
   font:
-    800 clamp(2rem, 1.8rem + 1vw, 2.5rem) "Barlow",
+    800 var(--tour-text-size) "Barlow",
     sans-serif;
   line-height: 1;
   color: #f2f2f2;
@@ -460,7 +462,7 @@ body {
   margin: 0;
   border-left: 4px solid #ffffff;
   padding-left: 0.85rem;
-  font-size: clamp(1.55rem, 1.1rem + 1.4vw, 2.4rem);
+  font-size: var(--tour-text-size);
   line-height: 1.2;
   font-weight: 800;
   text-wrap: pretty;
@@ -482,7 +484,7 @@ body {
 .detail-question-block h3 {
   margin: 0;
   font:
-    400 clamp(1.02rem, 0.9rem + 0.55vw, 1.3rem) / 1.35 "Manrope",
+    400 var(--tour-text-size) / 1.35 "Manrope",
     sans-serif;
   text-wrap: balance;
   border-left: none;
@@ -493,7 +495,7 @@ body {
 .detail-highlight-label {
   margin: 0;
   font:
-    700 0.72rem "Barlow",
+    700 var(--tour-text-size) "Barlow",
     sans-serif;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -503,7 +505,7 @@ body {
 .detail-stop-highlight {
   margin: 0;
   font:
-    500 clamp(0.92rem, 0.84rem + 0.35vw, 1.05rem) / 1.62 "Manrope",
+    500 var(--tour-text-size) / 1.62 "Manrope",
     sans-serif;
   border-left: 2px solid #ffffff;
   padding: 0.12rem 0 0.12rem 0.58rem;
@@ -534,9 +536,7 @@ body {
 .detail-text .detail-highlight-lead {
   border-left: 4px solid #ffffff;
   font-weight: 400;
-  font-size: calc(
-    clamp(1rem, 0.9rem + 0.4vw, 1.22rem) * var(--tour-font-scale)
-  );
+  font-size: var(--tour-text-size);
   padding-left: 0.85rem;
   line-height: 1.45;
 }
@@ -544,9 +544,7 @@ body {
 .detail-text {
   display: grid;
   gap: 1rem;
-  font-size: calc(
-    clamp(1.28rem, 0.98rem + 0.8vw, 1.92rem) * var(--tour-font-scale)
-  );
+  font-size: var(--tour-text-size);
   line-height: 1.5;
   font-weight: 700;
   color: #f2f2f2;
@@ -565,7 +563,7 @@ body {
 .detail-transcript-block h4 {
   margin: 0 0 0.5rem;
   font:
-    800 0.95rem "Barlow",
+    800 var(--tour-text-size) "Barlow",
     sans-serif;
   letter-spacing: 0.07em;
   text-transform: uppercase;
@@ -579,9 +577,7 @@ body {
 
 .detail-transcript p {
   margin: 0;
-  font-size: calc(
-    clamp(1rem, 0.9rem + 0.3vw, 1.15rem) * var(--tour-font-scale)
-  );
+  font-size: var(--tour-text-size);
   line-height: 1.5;
   color: rgba(255, 255, 255, 0.65);
 }
@@ -637,7 +633,7 @@ body {
 .overlay-modal-head h3 {
   margin: 0;
   font:
-    700 1rem "Barlow",
+    700 var(--tour-text-size) "Barlow",
     sans-serif;
   letter-spacing: 0.04em;
   color: #f2f2f2;
@@ -648,7 +644,7 @@ body {
   background: transparent;
   color: rgba(255, 255, 255, 0.7);
   font:
-    700 1.1rem/1 "Barlow",
+    700 var(--tour-text-size) / 1 "Barlow",
     sans-serif;
   width: 30px;
   height: 30px;
@@ -708,7 +704,7 @@ body {
   min-width: 34px;
   padding: 0 0.55rem;
   font:
-    700 0.85rem "Barlow",
+    700 var(--tour-text-size) "Barlow",
     sans-serif;
   letter-spacing: 0.02em;
   cursor: pointer;
@@ -736,7 +732,7 @@ body {
 
 .term-gallery-count {
   font:
-    700 0.82rem "Barlow",
+    700 var(--tour-text-size) "Barlow",
     sans-serif;
   letter-spacing: 0.03em;
   color: var(--ink-soft);
@@ -833,7 +829,7 @@ body {
   margin: 0;
   padding: 0;
   line-height: 1.55;
-  font-size: 1rem;
+  font-size: var(--tour-text-size);
   white-space: normal;
   color: #e8e8e8;
 }
@@ -875,7 +871,7 @@ body {
 
 .detail-audio-label {
   font:
-    700 0.72rem "Barlow",
+    700 var(--tour-text-size) "Barlow",
     sans-serif;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -913,7 +909,7 @@ body {
 
 .player-card p {
   margin: 0;
-  font-size: clamp(1.13rem, 0.95rem + 0.5vw, 1.5rem);
+  font-size: var(--tour-text-size);
   line-height: 1.25;
   font-weight: 800;
   color: #f2f2f2;
@@ -976,7 +972,7 @@ body {
   justify-content: center;
   padding: 0 0.8rem;
   font:
-    700 0.72rem "Barlow",
+    700 var(--tour-text-size) "Barlow",
     sans-serif;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -1027,7 +1023,7 @@ body {
 
 .detail-stop-nav-arrow {
   font:
-    700 1.5rem/1 "Barlow",
+    700 var(--tour-text-size) / 1 "Barlow",
     sans-serif;
   line-height: 1;
 }
@@ -1082,7 +1078,7 @@ body {
 .bottom-nav-btn.is-end-btn {
   width: auto;
   padding: 0 1.1rem;
-  font: 800 0.78rem "Barlow", sans-serif;
+  font: 800 var(--tour-text-size) "Barlow", sans-serif;
   letter-spacing: 0.06em;
   background: linear-gradient(135deg, #f6515f, #db3f4c);
   border-color: transparent;
@@ -1151,7 +1147,7 @@ body {
   margin: 0;
   padding: 0.65rem 1rem 0.55rem;
   font:
-    800 0.72rem "Barlow",
+    800 var(--tour-text-size) "Barlow",
     sans-serif;
   letter-spacing: 0.13em;
   text-transform: uppercase;
@@ -1198,7 +1194,7 @@ body {
 
 .stop-picker-num {
   font:
-    800 0.85rem "Barlow",
+    800 var(--tour-text-size) "Barlow",
     sans-serif;
   color: rgba(255, 255, 255, 0.32);
   min-width: 30px;
@@ -1207,7 +1203,7 @@ body {
 
 .stop-picker-title {
   font:
-    500 0.92rem / 1.38 "Manrope",
+    500 var(--tour-text-size) / 1.38 "Manrope",
     sans-serif;
   color: #e8e8e8;
   text-wrap: pretty;
@@ -1433,7 +1429,7 @@ button:active {
   }
 
   .detail-stop-highlight {
-    font-size: 0.96rem;
+    font-size: var(--tour-text-size);
     line-height: 1.6;
   }
 
@@ -1530,7 +1526,7 @@ button:active {
 .omamori-eyebrow {
   margin: 0;
   font:
-    700 0.68rem "Barlow",
+    700 var(--tour-text-size) "Barlow",
     sans-serif;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -1540,7 +1536,7 @@ button:active {
 .omamori-title {
   margin: 0;
   font:
-    800 1.55rem / 1.2 "Barlow",
+    800 var(--tour-text-size) / 1.2 "Barlow",
     sans-serif;
   color: #f4f4f4;
 }
@@ -1548,7 +1544,7 @@ button:active {
 .omamori-subtitle {
   margin: 0.1rem 0 0;
   font:
-    500 0.85rem / 1.55 "Manrope",
+    500 var(--tour-text-size) / 1.55 "Manrope",
     sans-serif;
   color: rgba(255, 255, 255, 0.5);
 }
@@ -1570,7 +1566,7 @@ button:active {
 
 .omamori-priest-role {
   margin: 0;
-  font: 700 0.65rem "Barlow", sans-serif;
+  font: 700 var(--tour-text-size) "Barlow", sans-serif;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: #f6515f;
@@ -1578,7 +1574,7 @@ button:active {
 
 .omamori-priest-quote {
   margin: 0;
-  font: 500 0.8rem / 1.65 "Manrope", sans-serif;
+  font: 500 var(--tour-text-size) / 1.65 "Manrope", sans-serif;
   color: rgba(255, 255, 255, 0.72);
 }
 
@@ -1618,7 +1614,7 @@ button:active {
 .omamori-card-name {
   margin: 0;
   font:
-    800 0.95rem "Barlow",
+    800 var(--tour-text-size) "Barlow",
     sans-serif;
   color: #f0f0f0;
 }
@@ -1626,7 +1622,7 @@ button:active {
 .omamori-card-desc {
   margin: 0;
   font:
-    500 0.76rem / 1.45 "Manrope",
+    500 var(--tour-text-size) / 1.45 "Manrope",
     sans-serif;
   color: rgba(255, 255, 255, 0.5);
 }
@@ -1640,7 +1636,7 @@ button:active {
   border-radius: 999px;
   border: none;
   font:
-    700 0.72rem "Barlow",
+    700 var(--tour-text-size) "Barlow",
     sans-serif;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -1737,7 +1733,7 @@ button:active {
   border: none;
   background: linear-gradient(135deg, #f6515f, #db3f4c);
   color: #fff;
-  font: 800 0.95rem "Barlow", sans-serif;
+  font: 800 var(--tour-text-size) "Barlow", sans-serif;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   cursor: pointer;

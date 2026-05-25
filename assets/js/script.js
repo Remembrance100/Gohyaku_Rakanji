@@ -516,8 +516,10 @@ function applySelectedLanguage() {
 }
 
 function applyFontScale() {
-  const scales = { small: 0.88, normal: 1, large: 1.14, xlarge: 1.3 };
-  const size = loadPrefs().size || "large";
+  const scales = { small: 0.88, normal: 1, large: 1.14, xlarge: 1.3, xxlarge: 1.5 };
+  const sizeRemap = { small: "large", normal: "large" };
+  const raw = loadPrefs().size || "xlarge";
+  const size = sizeRemap[raw] || raw;
   document.documentElement.style.setProperty(
     "--tour-font-scale",
     String(scales[size] || 1),
