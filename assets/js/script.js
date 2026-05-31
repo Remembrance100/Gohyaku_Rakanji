@@ -27,6 +27,9 @@ const detailContent = document.querySelector("#detailContent");
 const detailStrip = document.querySelector(".detail-strip");
 const detailPlayBtn = document.querySelector("#detailPlayBtn");
 const playerDock = document.querySelector("#detailAudioInline");
+const audioScrubber = document.querySelector("#audioScrubber");
+const audioTimeCurrent = document.querySelector("#audioTimeCurrent");
+const audioTimeDuration = document.querySelector("#audioTimeDuration");
 const detailHighlight = document.querySelector("#detailHighlight");
 const detailPrevBtn = document.querySelector("#detailPrevBtn");
 const detailNextBtn = document.querySelector("#detailNextBtn");
@@ -54,6 +57,10 @@ const termGalleryDots = document.querySelector("#termGalleryDots");
 
 const omamoriScreen = document.querySelector("#omamoriScreen");
 const omamoriCloseBtn = document.querySelector("#omamoriCloseBtn");
+const omamoriMsgVideo = document.querySelector("#omamoriMsgVideo");
+const omamoriMsgUnmute = document.querySelector("#omamoriMsgUnmute");
+const omamoriMsgUnmuteIcon = document.querySelector("#omamoriMsgUnmuteIcon");
+const omamoriMsgDots = document.querySelector("#omamoriMsgDots");
 const mapEndBtn = document.querySelector("#mapEndBtn");
 const omamoriFullscreen = document.querySelector("#omamoriFullscreen");
 const omamoriFullscreenVideo = document.querySelector(
@@ -104,6 +111,13 @@ function disablePwa() {
       )
       .catch(() => {});
   });
+}
+
+function formatTime(secs) {
+  if (!isFinite(secs) || secs < 0) return "0:00";
+  const m = Math.floor(secs / 60);
+  const s = Math.floor(secs % 60);
+  return `${m}:${s.toString().padStart(2, "0")}`;
 }
 
 function playIconHtml(size = 10) {
@@ -435,6 +449,13 @@ const UI_STRINGS = {
     "omamori-pink-desc": "縁結び・健康祈願",
     "omamori-save-btn": "保存",
     "omamori-fullscreen-save": "お守りを保存",
+    "coach-1": "番号の付いたピンをタップすると、各スポットの詳細と音声ガイドが表示されます。",
+    "coach-2": "このボタンをタップすると言語や設定を変更できます。",
+    "coach-3": "再生ボタンをタップすると音声ガイドが始まります。バーをドラッグして位置を調整できます。",
+    "coach-4": "この矢印ボタンで前後のスポットに移動できます。",
+    "coach-next": "次へ",
+    "coach-done": "始める",
+    "coach-skip": "スキップ",
   },
   en: {
     "end-tour-btn": "End Tour",
@@ -456,6 +477,13 @@ const UI_STRINGS = {
     "omamori-pink-desc": "Good relationships · Health",
     "omamori-save-btn": "Save",
     "omamori-fullscreen-save": "Save Omamori",
+    "coach-1": "Tap a numbered pin to open that stop's details and audio guide.",
+    "coach-2": "Tap this button to change the language or adjust settings.",
+    "coach-3": "Tap the play button to start the audio guide. Drag the bar to jump to any point.",
+    "coach-4": "Use these arrows to move to the previous or next stop.",
+    "coach-next": "Next",
+    "coach-done": "Let's go",
+    "coach-skip": "Skip",
   },
   ko: {
     "end-tour-btn": "투어 종료",
@@ -477,6 +505,13 @@ const UI_STRINGS = {
     "omamori-pink-desc": "인연 · 건강 기원",
     "omamori-save-btn": "저장",
     "omamori-fullscreen-save": "오마모리 저장",
+    "coach-1": "번호가 붙은 핀을 탭하면 해당 스팟의 상세 정보와 오디오 가이드를 볼 수 있습니다.",
+    "coach-2": "이 버튼을 탭하면 언어나 설정을 변경할 수 있습니다.",
+    "coach-3": "재생 버튼을 탭하면 오디오 가이드가 시작됩니다. 바를 드래그하여 위치를 조정할 수 있습니다.",
+    "coach-4": "이 화살표로 이전 또는 다음 스팟으로 이동할 수 있습니다.",
+    "coach-next": "다음",
+    "coach-done": "시작하기",
+    "coach-skip": "건너뛰기",
   },
   zh: {
     "end-tour-btn": "结束导览",
@@ -498,6 +533,13 @@ const UI_STRINGS = {
     "omamori-pink-desc": "良缘 · 健康祈愿",
     "omamori-save-btn": "保存",
     "omamori-fullscreen-save": "保存御守",
+    "coach-1": "点击编号标记可查看该景点的详情和语音导览。",
+    "coach-2": "点击此按钮可更改语言或调整设置。",
+    "coach-3": "点击播放按钮开始语音导览。拖动进度条可跳转到任意位置。",
+    "coach-4": "使用这些箭头可切换到上一个或下一个景点。",
+    "coach-next": "下一步",
+    "coach-done": "出发",
+    "coach-skip": "跳过",
   },
 };
 
@@ -1231,6 +1273,18 @@ function setMapImageUrl(url) {
     syncMapInnerSize();
   }
   window.addEventListener("resize", syncMapInnerSize);
+
+  window.addEventListener("popstate", (e) => {
+    if (appShell.classList.contains("is-detail")) {
+      appShell.classList.remove("is-detail");
+      closeStopPicker();
+      detailAudio.pause();
+      detailPlayBtn.classList.remove("is-playing");
+      detailPlayBtn.innerHTML = playIconHtml(DETAIL_AUDIO_ICON_SIZE);
+      Array.from(detailHeroTrack?.querySelectorAll("video") || []).forEach((v) => v.pause());
+      stopHeroSlideshow();
+    }
+  });
 }
 
 function stopHeroSlideshow() {
@@ -1596,12 +1650,14 @@ function openOmamori() {
   omamoriScreen.classList.add("is-open");
   omamoriScreen.setAttribute("aria-hidden", "false");
   renderOmamoriVideos();
+  initMsgPlayer();
 }
 
 function closeOmamori() {
   if (!omamoriScreen) return;
   omamoriScreen.classList.remove("is-open");
   omamoriScreen.setAttribute("aria-hidden", "true");
+  resetMsgPlayer();
 }
 
 const OMAMORI_URLS = {
@@ -1619,12 +1675,75 @@ function renderOmamoriVideos() {
   });
 }
 
+// ─── Priest message video player ─────────────────────────────────────────────
+
+const MSG_VIDEOS = [
+  "https://stg-apirakanjicom-stgrakanji.kinsta.cloud/wp-content/uploads/2026/05/1.mp4",
+  "https://stg-apirakanjicom-stgrakanji.kinsta.cloud/wp-content/uploads/2026/05/2_1.mp4",
+  "https://stg-apirakanjicom-stgrakanji.kinsta.cloud/wp-content/uploads/2026/05/3.mp4",
+];
+
+let msgVideoIndex = 0;
+let msgPlayerInit = false;
+
+function initMsgPlayer() {
+  if (msgPlayerInit || !omamoriMsgVideo) return;
+  msgPlayerInit = true;
+
+  function loadVideo(idx) {
+    msgVideoIndex = idx;
+    omamoriMsgVideo.src = MSG_VIDEOS[idx];
+    omamoriMsgVideo.load();
+    omamoriMsgVideo.play().catch(() => {});
+    omamoriMsgDots?.querySelectorAll(".omamori-msg-dot").forEach((dot) => {
+      dot.classList.toggle("is-active", Number(dot.dataset.idx) === idx);
+    });
+  }
+
+  omamoriMsgVideo.addEventListener("ended", () => {
+    const next = msgVideoIndex + 1;
+    if (next < MSG_VIDEOS.length) loadVideo(next);
+  });
+
+  omamoriMsgUnmute?.addEventListener("click", () => {
+    omamoriMsgVideo.muted = !omamoriMsgVideo.muted;
+    const muted = omamoriMsgVideo.muted;
+    omamoriMsgUnmuteIcon?.setAttribute(
+      "d",
+      muted
+        ? "M11 5L6 9H2v6h4l5 4V5zM23 9l-6 6M17 9l6 6"
+        : "M11 5L6 9H2v6h4l5 4V5zM15.54 8.46a5 5 0 010 7.07M19.07 4.93a10 10 0 010 14.14"
+    );
+  });
+
+  omamoriMsgDots?.addEventListener("click", (e) => {
+    const dot = e.target.closest(".omamori-msg-dot");
+    if (!dot) return;
+    loadVideo(Number(dot.dataset.idx));
+  });
+
+  loadVideo(0);
+}
+
+function resetMsgPlayer() {
+  msgPlayerInit = false;
+  msgVideoIndex = 0;
+  if (omamoriMsgVideo) {
+    omamoriMsgVideo.pause();
+    omamoriMsgVideo.src = "";
+  }
+  omamoriMsgDots?.querySelectorAll(".omamori-msg-dot").forEach((dot) => {
+    dot.classList.toggle("is-active", dot.dataset.idx === "0");
+  });
+}
+
 function openDetailById(stopId) {
   const stop = tourStopsData.find((item) => item.id === stopId);
   if (!stop) return;
   setDetailStop(stop);
   appShell.classList.add("is-detail");
   detailView.scrollTo({ top: 0, behavior: "smooth" });
+  history.pushState({ stopId }, "", `?stop=${stop.number}`);
 }
 
 function updateMapZoomLabel() {
@@ -1956,6 +2075,7 @@ function closeDetail() {
     },
   );
   stopHeroSlideshow();
+  if (history.state?.stopId) history.back();
 }
 
 function buildStopPicker() {
@@ -2087,6 +2207,26 @@ function bindEvents() {
     detailPlayBtn.innerHTML = playIconHtml(DETAIL_AUDIO_ICON_SIZE);
   });
 
+  detailAudio.addEventListener("timeupdate", () => {
+    if (!audioScrubber || !audioTimeCurrent) return;
+    const pct = detailAudio.duration ? (detailAudio.currentTime / detailAudio.duration) * 100 : 0;
+    audioScrubber.value = pct;
+    audioScrubber.style.backgroundSize = `${pct}% 100%`;
+    audioTimeCurrent.textContent = formatTime(detailAudio.currentTime);
+  });
+
+  detailAudio.addEventListener("loadedmetadata", () => {
+    if (audioTimeDuration) audioTimeDuration.textContent = formatTime(detailAudio.duration);
+    if (audioScrubber) { audioScrubber.value = 0; audioScrubber.style.backgroundSize = "0% 100%"; }
+    if (audioTimeCurrent) audioTimeCurrent.textContent = "0:00";
+  });
+
+  audioScrubber?.addEventListener("input", () => {
+    if (!detailAudio.duration) return;
+    detailAudio.currentTime = (audioScrubber.value / 100) * detailAudio.duration;
+    audioScrubber.style.backgroundSize = `${audioScrubber.value}% 100%`;
+  });
+
   detailPrevBtn?.addEventListener("click", () => {
     openAdjacentStop(-1);
   });
@@ -2174,5 +2314,162 @@ async function init() {
   appLoadingOverlay?.classList.add("hidden");
 }
 
+// ─── Coach marks ─────────────────────────────────────────────
+
+const COACH_KEY = "tourCoachSeen";
+
+function runCoachMarks() {
+  // if (localStorage.getItem(COACH_KEY)) return;
+
+  const overlay = document.querySelector("#coachOverlay");
+  const spotlight = document.querySelector("#coachSpotlight");
+  const bubble = document.querySelector("#coachBubble");
+  const coachText = document.querySelector("#coachText");
+  const coachStep = document.querySelector("#coachStep");
+  const nextBtn = document.querySelector("#coachNextBtn");
+  if (!overlay || !spotlight || !bubble || !nextBtn) return;
+
+  const lang = getRequestedLang();
+  const t = UI_STRINGS[lang] || UI_STRINGS.ja;
+
+  // 4 steps: map pin → globe/settings button → audio play button → prev/next nav
+  // Steps 1–2 show on the map screen. Steps 3–4 show after auto-opening the first stop.
+  const STEPS = [
+    {
+      targetFn: () => document.querySelector(".map-pin"),
+      text: t["coach-1"],
+      pad: 14,
+    },
+    {
+      targetFn: () => document.querySelector(".map-settings-btn"),
+      text: t["coach-2"],
+      pad: 14,
+    },
+    {
+      targetFn: () => document.querySelector("#detailPlayBtn"),
+      text: t["coach-3"],
+      pad: 16,
+      openDetail: true,
+    },
+  ];
+
+  let step = 0;
+
+  function positionSpotlight(el, pad, rect) {
+    const r = el.getBoundingClientRect();
+    if (rect) {
+      spotlight.style.width = `${r.width + pad * 2}px`;
+      spotlight.style.height = `${r.height + pad * 2}px`;
+      spotlight.style.left = `${r.left - pad}px`;
+      spotlight.style.top = `${r.top - pad}px`;
+      spotlight.style.borderRadius = "18px";
+    } else {
+      const cx = r.left + r.width / 2;
+      const cy = r.top + r.height / 2;
+      const radius = Math.max(r.width, r.height) / 2 + pad;
+      const size = radius * 2;
+      spotlight.style.width = `${size}px`;
+      spotlight.style.height = `${size}px`;
+      spotlight.style.left = `${cx - radius}px`;
+      spotlight.style.top = `${cy - radius}px`;
+      spotlight.style.borderRadius = "50%";
+    }
+    spotlight.classList.add("is-pulsing");
+
+    const elBottom = r.top + r.height + pad;
+    const elTop = r.top - pad;
+    const bubbleH = 140;
+    const spaceBelow = window.innerHeight - (elBottom + 16);
+    if (spaceBelow > bubbleH) {
+      bubble.style.top = `${elBottom + 16}px`;
+      bubble.style.bottom = "auto";
+      bubble.className = "coach-bubble arrow-up";
+    } else {
+      bubble.style.bottom = `${window.innerHeight - (elTop - 16)}px`;
+      bubble.style.top = "auto";
+      bubble.className = "coach-bubble arrow-down";
+    }
+  }
+
+  function showStep(i) {
+    const s = STEPS[i];
+
+    // This step needs the detail view open
+    if (s.openDetail && !appShell.classList.contains("is-detail")) {
+      const firstStop = tourStopsData.find((st) => st.number === 1) || tourStopsData[0];
+      if (firstStop) openDetailById(firstStop.id);
+      setTimeout(() => showStep(i), 800);
+      return;
+    }
+
+    // If the detail view is open but this step is a map-only step, close detail first
+    if (!s.openDetail && appShell.classList.contains("is-detail")) {
+      appShell.classList.remove("is-detail");
+      detailAudio.pause();
+      detailPlayBtn.classList.remove("is-playing");
+      detailPlayBtn.innerHTML = playIconHtml(DETAIL_AUDIO_ICON_SIZE);
+      setTimeout(() => showStep(i), 480);
+      return;
+    }
+
+    // Scroll audio player into view before spotlighting it
+    if (s.openDetail) {
+      const audioEl = document.querySelector("#detailAudioInline");
+      if (audioEl) audioEl.scrollIntoView({ behavior: "smooth", block: "center" });
+      setTimeout(() => renderStep(i), 500);
+      return;
+    }
+
+    renderStep(i);
+  }
+
+  function renderStep(i) {
+    const s = STEPS[i];
+    const isLast = i === STEPS.length - 1;
+
+    coachText.textContent = s.text;
+    coachStep.textContent = `${i + 1} / ${STEPS.length}`;
+    nextBtn.style.display = "";
+    nextBtn.textContent = isLast ? t["coach-done"] : t["coach-next"];
+
+    const el = s.targetFn ? s.targetFn() : null;
+    if (!el) { finishCoach(); return; }
+    positionSpotlight(el, s.pad, s.rect);
+
+    overlay.classList.remove("hidden");
+    overlay.classList.add("is-active");
+  }
+
+  function finishCoach() {
+    overlay.classList.add("hidden");
+    overlay.classList.remove("is-active");
+    if (appShell.classList.contains("is-detail")) {
+      appShell.classList.remove("is-detail");
+      detailAudio.pause();
+      detailPlayBtn.classList.remove("is-playing");
+      detailPlayBtn.innerHTML = playIconHtml(DETAIL_AUDIO_ICON_SIZE);
+    }
+    localStorage.setItem(COACH_KEY, "1");
+  }
+
+  nextBtn.addEventListener("click", () => {
+    step++;
+    if (step >= STEPS.length) { finishCoach(); return; }
+    showStep(step);
+  });
+
+  overlay.addEventListener("click", (e) => {
+    if (e.target === overlay) { finishCoach(); }
+  });
+
+  // Start after map loads
+  const startCoach = () => showStep(0);
+  if (mapImage && !mapImage.complete) {
+    mapImage.addEventListener("load", startCoach, { once: true });
+  } else {
+    setTimeout(startCoach, 400);
+  }
+}
+
 disablePwa();
-init();
+init().then(() => runCoachMarks());

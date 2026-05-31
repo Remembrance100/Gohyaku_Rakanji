@@ -225,31 +225,29 @@
       </div>
 
       <div>
-        <h1 class="pay-title">Memorial Tour Guide</h1>
-        <p class="pay-subtitle">Full access to the interactive audio tour with maps, stop descriptions, and historical content.</p>
+        <h1 class="pay-title" id="payTitle">Memorial Tour Guide</h1>
+        <p class="pay-subtitle" id="paySubtitle">Full access to the interactive audio tour with maps, stop descriptions, and historical content.</p>
       </div>
 
-      <ul class="pay-features">
-        <li>All tour stops with audio guides</li>
-        <li>Interactive temple grounds map</li>
-        <li>English, Japanese, Korean &amp; Chinese</li>
-        <li>24-hour unlimited access</li>
+      <ul class="pay-features" id="payFeatures">
+        <li id="feat1">All tour stops with audio guides</li>
+        <li id="feat2">Interactive temple grounds map</li>
+        <li id="feat3">English, Japanese, Korean &amp; Chinese</li>
+        <li id="feat4">24-hour unlimited access</li>
       </ul>
 
       <div class="pay-divider"></div>
 
       <div class="pay-price-row">
-        <span class="pay-price" id="priceDisplay">¥1,500</span>
-        <span class="pay-price-note">· 24-hour access</span>
+        <span class="pay-price">¥1,500</span>
+        <span class="pay-price-note" id="payPriceNote">· 24-hour access</span>
       </div>
 
       <div class="pay-error" id="payError"></div>
-      <div class="pay-notice is-cancelled" id="cancelledNotice" style="display:none">
-        Payment was cancelled. You can try again whenever you're ready.
-      </div>
+      <div class="pay-notice is-cancelled" id="cancelledNotice" style="display:none"></div>
 
       <button class="pay-btn" id="payBtn" type="button">
-        <span class="pay-btn-label">Purchase Access</span>
+        <span class="pay-btn-label" id="payBtnLabel">Purchase Access</span>
         <span class="pay-btn-spinner" aria-hidden="true"></span>
       </button>
 
@@ -258,40 +256,120 @@
           <rect x="1" y="5" width="9" height="7.5" rx="1.5" stroke="currentColor" stroke-width="1.2"/>
           <path d="M3 5V3.5a2.5 2.5 0 015 0V5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
         </svg>
-        Secure payment via Stripe · No card data stored
+        <span id="paySecureLabel">Secure payment via Stripe · No card data stored</span>
       </div>
 
-      <div class="pay-notice" id="accessNotice" style="display:none">
-        ✓ Payment confirmed — redirecting you to the tour…
-      </div>
+      <div class="pay-notice" id="accessNotice" style="display:none"></div>
     </div>
 
     <script>
-      const payBtn = document.getElementById("payBtn");
-      const payError = document.getElementById("payError");
-      const cancelledNotice = document.getElementById("cancelledNotice");
-      const accessNotice = document.getElementById("accessNotice");
-      const fontScales = { small: 1.14, normal: 1.14, large: 1.14, xlarge: 1.3, xxlarge: 1.5 };
+      const STRINGS = {
+        ja: {
+          title: "天恩山 五百羅漢寺 音声ガイド",
+          subtitle: "マップ・各スポットの説明・歴史コンテンツを含む音声ガイドへの完全アクセス。",
+          feat1: "全スポットの音声ガイド",
+          feat2: "境内インタラクティブマップ",
+          feat3: "日本語・英語・韓国語・中国語対応",
+          feat4: "24時間無制限アクセス",
+          priceNote: "· 24時間アクセス",
+          btn: "アクセスを購入する",
+          secure: "Stripeによる安全な決済 · カード情報は保存されません",
+          cancelled: "決済がキャンセルされました。準備ができたら再度お試しください。",
+          confirmed: "✓ 決済が完了しました — ツアーへ移動中…",
+          error: "決済の確認中にエラーが発生しました。もう一度お試しいただくか、サポートにお問い合わせください。",
+        },
+        en: {
+          title: "Memorial Tour Guide",
+          subtitle: "Full access to the interactive audio tour with maps, stop descriptions, and historical content.",
+          feat1: "All tour stops with audio guides",
+          feat2: "Interactive temple grounds map",
+          feat3: "English, Japanese, Korean & Chinese",
+          feat4: "24-hour unlimited access",
+          priceNote: "· 24-hour access",
+          btn: "Purchase Access",
+          secure: "Secure payment via Stripe · No card data stored",
+          cancelled: "Payment was cancelled. You can try again whenever you're ready.",
+          confirmed: "✓ Payment confirmed — redirecting you to the tour…",
+          error: "Something went wrong verifying your payment. Please try again or contact support.",
+        },
+        ko: {
+          title: "메모리얼 투어 가이드",
+          subtitle: "지도, 각 스팟 설명, 역사 콘텐츠를 포함한 인터랙티브 오디오 투어 전체 이용권.",
+          feat1: "전 스팟 오디오 가이드",
+          feat2: "사원 경내 인터랙티브 지도",
+          feat3: "한국어·영어·일본어·중국어 지원",
+          feat4: "24시간 무제한 이용",
+          priceNote: "· 24시간 이용",
+          btn: "이용권 구매",
+          secure: "Stripe 보안 결제 · 카드 정보 저장 없음",
+          cancelled: "결제가 취소되었습니다. 준비가 되면 다시 시도해 주세요.",
+          confirmed: "✓ 결제 완료 — 투어로 이동 중…",
+          error: "결제 확인 중 오류가 발생했습니다. 다시 시도하거나 지원팀에 문의하세요.",
+        },
+        zh: {
+          title: "纪念导览指南",
+          subtitle: "包含地图、景点说明及历史内容的互动语音导览完整使用权。",
+          feat1: "全景点语音导览",
+          feat2: "寺院互动地图",
+          feat3: "支持中文、英文、日文、韩文",
+          feat4: "24小时无限次使用",
+          priceNote: "· 24小时使用",
+          btn: "购买使用权",
+          secure: "通过 Stripe 安全付款 · 不存储银行卡信息",
+          cancelled: "付款已取消，准备好后可重新尝试。",
+          confirmed: "✓ 付款成功 — 正在跳转至导览…",
+          error: "验证付款时出错，请重试或联系客服。",
+        },
+      };
 
+      // Detect language from tourPrefs, fallback to browser language
+      function getLang() {
+        try {
+          const prefs = JSON.parse(localStorage.getItem("tourPrefs") || "{}");
+          if (prefs.lang && STRINGS[prefs.lang]) return prefs.lang;
+        } catch {}
+        const browser = (navigator.language || "en").slice(0, 2).toLowerCase();
+        return STRINGS[browser] ? browser : "en";
+      }
+
+      const lang = getLang();
+      const t = STRINGS[lang];
+
+      // Apply font scale from prefs
+      const fontScales = { small: 1.14, normal: 1.14, large: 1.14, xlarge: 1.3, xxlarge: 1.5 };
       try {
         const prefs = JSON.parse(localStorage.getItem("tourPrefs") || "{}");
         if (fontScales[prefs.size]) {
-          document.documentElement.style.setProperty(
-            "--tour-font-scale",
-            String(fontScales[prefs.size]),
-          );
+          document.documentElement.style.setProperty("--tour-font-scale", String(fontScales[prefs.size]));
         }
       } catch {}
 
+      // Apply translations
+      document.documentElement.lang = lang;
+      document.getElementById("payTitle").textContent = t.title;
+      document.getElementById("paySubtitle").textContent = t.subtitle;
+      document.getElementById("feat1").textContent = t.feat1;
+      document.getElementById("feat2").textContent = t.feat2;
+      document.getElementById("feat3").textContent = t.feat3;
+      document.getElementById("feat4").textContent = t.feat4;
+      document.getElementById("payPriceNote").textContent = t.priceNote;
+      document.getElementById("payBtnLabel").textContent = t.btn;
+      document.getElementById("paySecureLabel").textContent = t.secure;
+      document.getElementById("accessNotice").textContent = t.confirmed;
+
+      const payBtn = document.getElementById("payBtn");
+      const payError = document.getElementById("payError");
+      const cancelledNotice = document.getElementById("cancelledNotice");
+
       const params = new URLSearchParams(window.location.search);
-      const nextPath = params.get("next") || "/";
 
       if (params.get("cancelled") === "1") {
+        cancelledNotice.textContent = t.cancelled;
         cancelledNotice.style.display = "block";
       }
 
       if (params.get("error")) {
-        showError("Something went wrong verifying your payment. Please try again or contact support.");
+        showError(t.error);
       }
 
       payBtn.addEventListener("click", async () => {
@@ -302,7 +380,7 @@
           const res = await fetch("/api/create-checkout", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ next: nextPath }),
+            body: JSON.stringify({}),
           });
 
           const data = await res.json();
@@ -311,11 +389,10 @@
             throw new Error(data.error || "Could not start checkout.");
           }
 
-          // Redirect to Stripe Checkout
           window.location.href = data.url;
         } catch (err) {
           setLoading(false);
-          showError(err.message || "Something went wrong. Please try again.");
+          showError(err.message || t.error);
         }
       });
 

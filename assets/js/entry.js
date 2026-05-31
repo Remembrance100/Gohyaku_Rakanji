@@ -693,6 +693,7 @@ const TRANSLATIONS = {
     "notice-offering": "Please place offerings in the offering box, not on top of the statues.",
     "notice-pets": "Pets are not allowed inside the temple grounds.",
     "confirm-btn": "Start Tour",
+    "start-btn": "Guide Map",
   },
   ja: {
     "label-language": "言語",
@@ -711,6 +712,7 @@ const TRANSLATIONS = {
     "notice-offering": "お賽銭はお賽銭箱にお入れください、像の上に置かないでください。",
     "notice-pets": "ペットの境内への持ち込みはご遠慮ください。",
     "confirm-btn": "ガイド開始",
+    "start-btn": "ガイドマップ",
   },
   ko: {
     "label-language": "언어",
@@ -729,6 +731,7 @@ const TRANSLATIONS = {
     "notice-offering": "헌금은 헌금함에 넣어 주세요. 상 위에 올려놓지 마세요.",
     "notice-pets": "반려동물의 경내 동반은 삼가 주세요.",
     "confirm-btn": "가이드 시작",
+    "start-btn": "가이드 맵",
   },
   zh: {
     "label-language": "语言",
@@ -747,6 +750,7 @@ const TRANSLATIONS = {
     "notice-offering": "请将香钱放入功德箱，勿置于像上。",
     "notice-pets": "请勿携带宠物进入境内。",
     "confirm-btn": "开始导览",
+    "start-btn": "导览地图",
   },
 };
 
@@ -845,7 +849,16 @@ function initSettings(onLangChange) {
     savePrefs({ lang: selectedLang, size: selectedSize });
   }
 
-  confirmBtn?.addEventListener("click", hideSettings);
+  confirmBtn?.addEventListener("click", () => {
+    savePrefs({ lang: selectedLang, size: selectedSize });
+    const expiry = parseInt(localStorage.getItem("tourAccessExpiry") || "0", 10);
+    const hasToken = localStorage.getItem("tourAccessToken") && expiry > Date.now();
+    if (hasToken) {
+      hideSettings();
+    } else {
+      window.location.href = "./pay.html";
+    }
+  });
 
   // Re-open from gear icon
   entrySettingsBtn?.addEventListener("click", () => {

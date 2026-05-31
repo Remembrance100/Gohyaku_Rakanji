@@ -21,6 +21,51 @@
         });
       }
     </script>
+    <script>
+      // Access gate — must have a valid 24h token or a fresh Stripe session_id
+      (function () {
+        const TOUR_TOKEN_KEY = "tourAccessToken";
+        const TOUR_EXPIRY_KEY = "tourAccessExpiry";
+
+        function hasValidToken() {
+          const expiry = parseInt(localStorage.getItem(TOUR_EXPIRY_KEY) || "0", 10);
+          return localStorage.getItem(TOUR_TOKEN_KEY) && expiry > Date.now();
+        }
+
+        function redirectToPay() {
+          window.location.replace("./pay.html");
+        }
+
+        const params = new URLSearchParams(window.location.search);
+        const sessionId = params.get("session_id");
+
+        if (hasValidToken()) {
+          // Strip session_id from URL without reload
+          if (sessionId) {
+            params.delete("session_id");
+            const qs = params.toString();
+            history.replaceState(null, "", qs ? "?" + qs : window.location.pathname);
+          }
+          return;
+        }
+
+        if (!sessionId) {
+          redirectToPay();
+          return;
+        }
+
+        // Verify the Stripe session server-side, then store a token
+        fetch("/api/verify-session?session_id=" + encodeURIComponent(sessionId))
+          .then((r) => r.json())
+          .then((data) => {
+            if (!data.valid) { redirectToPay(); return; }
+            localStorage.setItem(TOUR_TOKEN_KEY, data.token);
+            localStorage.setItem(TOUR_EXPIRY_KEY, String(data.expiry));
+            window.location.replace("./index.html");
+          })
+          .catch(() => redirectToPay());
+      })();
+    </script>
     <link rel="icon" href="./assets/icons/icon.svg" type="image/svg+xml" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -28,7 +73,7 @@
       href="https://fonts.googleapis.com/css2?family=Barlow:wght@500;700;800&family=Manrope:wght@500;700;800&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./assets/css/styles.css?v=20260524a" />
+    <link rel="stylesheet" href="./assets/css/styles.css?v=20260529a" />
   </head>
   <body>
     <!-- Persistent chrome around the tour experience. -->
@@ -67,6 +112,18 @@
               <div class="map-pins" id="mapPins" aria-label="Tour stop buttons"></div>
             </div>
           </div>
+          <a
+            class="map-settings-btn"
+            href="./index.html"
+            aria-label="Settings"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.8"/>
+              <path d="M12 2C9.5 6 8 9 8 12s1.5 6 4 10M12 2c2.5 4 4 7 4 10s-1.5 6-4 10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+              <path d="M2 12h20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+              <path d="M4 7h16M4 17h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            </svg>
+          </a>
           <button
             class="map-end-btn"
             id="mapEndBtn"
@@ -110,6 +167,13 @@
 
           <div class="detail-audio-inline hidden" id="detailAudioInline">
             <button class="detail-play-btn" id="detailPlayBtn" type="button" aria-label="Play audio guide"></button>
+            <div class="audio-scrubber-wrap">
+              <input class="audio-scrubber" id="audioScrubber" type="range" min="0" max="100" value="0" step="0.1" aria-label="Audio position" />
+              <div class="audio-time">
+                <span id="audioTimeCurrent">0:00</span>
+                <span id="audioTimeDuration">0:00</span>
+              </div>
+            </div>
           </div>
 
           <section class="detail-transcript-block" id="detailTranscriptBlock" hidden>
@@ -132,6 +196,18 @@
           </svg>
         </button>
       </nav>
+
+      <!-- Coach mark hint overlay -->
+      <div class="coach-overlay hidden" id="coachOverlay" aria-live="polite">
+        <div class="coach-spotlight" id="coachSpotlight"></div>
+        <div class="coach-bubble" id="coachBubble">
+          <p class="coach-text" id="coachText"></p>
+          <div class="coach-footer">
+            <span class="coach-step" id="coachStep"></span>
+            <button class="coach-next-btn" id="coachNextBtn" type="button"></button>
+          </div>
+        </div>
+      </div>
 
       <div class="stop-picker hidden" id="stopPicker" role="dialog" aria-modal="true" aria-label="スポットを選択">
         <div class="stop-picker-backdrop" id="stopPickerBackdrop"></div>
@@ -228,6 +304,28 @@
             <line x1="11" y1="1" x2="1" y2="11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
           </svg>
         </button>
+      </div>
+
+      <!-- Priest message videos (Japanese only, plays 1→2→3 then loops) -->
+      <div class="omamori-msg-player" id="omamoriMsgPlayer">
+        <video
+          class="omamori-msg-video"
+          id="omamoriMsgVideo"
+          playsinline
+          autoplay
+          muted
+          preload="none"
+        ></video>
+        <button class="omamori-msg-unmute" id="omamoriMsgUnmute" type="button" aria-label="音声オン">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path id="omamoriMsgUnmuteIcon" d="M11 5L6 9H2v6h4l5 4V5zM23 9l-6 6M17 9l6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <div class="omamori-msg-dots" id="omamoriMsgDots">
+          <span class="omamori-msg-dot is-active" data-idx="0"></span>
+          <span class="omamori-msg-dot" data-idx="1"></span>
+          <span class="omamori-msg-dot" data-idx="2"></span>
+        </div>
       </div>
 
       <div class="omamori-priest">
@@ -349,6 +447,6 @@
       </div>
     </div>
 
-    <script src="./assets/js/script.js?v=20260524a"></script>
+    <script src="./assets/js/script.js?v=20260529a"></script>
   </body>
 </html>
