@@ -213,7 +213,7 @@ body {
 .map-settings-btn {
   position: absolute;
   top: 0.9rem;
-  left: 0.9rem;
+  right: 0.9rem;
   z-index: 9;
   width: 38px;
   height: 38px;
@@ -232,6 +232,30 @@ body {
 
 @media (hover: hover) {
   .map-settings-btn:hover { filter: brightness(1.2); }
+}
+
+.detail-settings-btn {
+  position: absolute;
+  top: 0.7rem;
+  right: 0.7rem;
+  z-index: 9;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  display: grid;
+  place-items: center;
+  color: #fff;
+  text-decoration: none;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  -webkit-tap-highlight-color: transparent;
+  transition: filter 140ms;
+}
+
+@media (hover: hover) {
+  .detail-settings-btn:hover { filter: brightness(1.2); }
 }
 
 .map-end-btn {
@@ -1447,17 +1471,22 @@ button:active {
   position: fixed;
   border-radius: 50%;
   box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.72);
-  transition: top 320ms ease, left 320ms ease, width 320ms ease, height 320ms ease;
   pointer-events: none;
+  will-change: transform, top, left, width, height;
+  transition: top 240ms cubic-bezier(0.4, 0, 0.2, 1),
+              left 240ms cubic-bezier(0.4, 0, 0.2, 1),
+              width 240ms cubic-bezier(0.4, 0, 0.2, 1),
+              height 240ms cubic-bezier(0.4, 0, 0.2, 1),
+              border-radius 240ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 @keyframes coachPulse {
-  0%, 100% { box-shadow: 0 0 0 9999px rgba(0,0,0,0.72), 0 0 0 0 rgba(255,255,255,0.35); }
-  50%       { box-shadow: 0 0 0 9999px rgba(0,0,0,0.72), 0 0 0 10px rgba(255,255,255,0); }
+  0%, 100% { box-shadow: 0 0 0 9999px rgba(0,0,0,0.72), 0 0 0 0 rgba(255,255,255,0.3); }
+  50%       { box-shadow: 0 0 0 9999px rgba(0,0,0,0.72), 0 0 0 8px rgba(255,255,255,0); }
 }
 
 .coach-spotlight.is-pulsing {
-  animation: coachPulse 1.6s ease-in-out infinite;
+  animation: coachPulse 1.8s ease-in-out infinite;
 }
 
 .coach-bubble {
@@ -1470,7 +1499,8 @@ button:active {
   border-radius: 14px;
   padding: 1rem 1.1rem 0.85rem;
   box-shadow: 0 8px 32px rgba(0,0,0,0.55);
-  transition: top 320ms ease, bottom 320ms ease;
+  will-change: opacity, top, bottom;
+  transition: opacity 160ms ease, top 240ms cubic-bezier(0.4, 0, 0.2, 1), bottom 240ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .coach-bubble::before {
@@ -1802,6 +1832,7 @@ button:active {
   padding: 1.4rem 1rem 0;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
+  align-items: stretch;
   gap: 0.75rem;
 }
 
@@ -1827,6 +1858,8 @@ button:active {
   display: flex;
   flex-direction: column;
   gap: 0.3rem;
+  flex: 1 1 auto;
+  justify-content: space-between;
 }
 
 .omamori-card-name {
@@ -1958,4 +1991,230 @@ button:active {
 
 .omamori-fullscreen-dl:active {
   filter: brightness(0.88);
+}
+
+/* ─── Tour settings overlay (language + font size) ───── */
+
+.settings-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #000000;
+  background-size: cover;
+  background-position: center;
+  transition:
+    opacity 280ms ease,
+    visibility 280ms ease;
+}
+
+.settings-screen.is-hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.settings-inner {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  width: 100%;
+  min-height: 100svh;
+  padding: 0;
+  overflow: hidden;
+}
+
+.settings-card {
+  width: 100%;
+  height: 100svh;
+  background: #111114;
+  border-radius: 0;
+  padding: calc(1.4rem + env(safe-area-inset-top)) 1.4rem calc(1.4rem + env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  overflow: hidden;
+}
+
+.settings-section-label {
+  margin: 0;
+  margin-top: 0.25rem;
+  font: 600 0.72rem "Manrope", sans-serif;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.38);
+}
+
+.settings-lang-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.6rem;
+}
+
+.settings-lang-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 0.65rem 0.5rem;
+  background: #1e1e22;
+  border: 1.5px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 0.95rem;
+  font-weight: 700;
+  font-family: "Hiragino Sans", "Noto Sans JP", "Manrope", sans-serif;
+  line-height: 1.4;
+  cursor: pointer;
+  transition:
+    border-color 150ms,
+    background 150ms,
+    color 150ms;
+}
+
+.settings-lang-btn.is-active {
+  background: rgba(246, 81, 95, 0.12);
+  border-color: #f6515f;
+  color: #fff;
+}
+
+.settings-notices-list {
+  margin: 0;
+  padding: 1rem 0;
+  list-style: none;
+  display: grid;
+  gap: 0.55rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.settings-notice-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.settings-notice-icon {
+  font-size: var(--tour-text-size);
+  line-height: 1.5;
+  flex-shrink: 0;
+}
+
+.settings-notice-text {
+  font-family: "Manrope", sans-serif;
+  font-weight: 500;
+  font-size: var(--tour-text-size);
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.settings-font-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.6rem;
+}
+
+.settings-font-btn {
+  display: grid;
+  grid-template-rows: 30px 16px;
+  place-items: center;
+  justify-content: center;
+  gap: 0.2rem;
+  height: 64px;
+  padding: 0.6rem 0.4rem;
+  background: #1e1e22;
+  border: 1.5px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.75);
+  cursor: pointer;
+  transition:
+    border-color 150ms,
+    background 150ms;
+}
+
+.settings-font-btn.is-active {
+  background: rgba(246, 81, 95, 0.12);
+  border-color: #f6515f;
+}
+
+.settings-font-sample {
+  font: 800 1rem "Barlow", sans-serif;
+  line-height: 1;
+  color: inherit;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 30px;
+}
+
+.settings-font-btn[data-size="large"] .settings-font-sample {
+  font-size: 20px;
+}
+
+.settings-font-btn[data-size="xlarge"] .settings-font-sample {
+  font-size: 24px;
+}
+
+.settings-font-btn[data-size="xxlarge"] .settings-font-sample {
+  font-size: 28px;
+}
+
+.settings-font-label {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 16px;
+  font: 700 12px/1 "Manrope", sans-serif;
+  color: rgba(255, 255, 255, 0.4);
+  letter-spacing: 0.02em;
+}
+
+.settings-font-btn.is-active .settings-font-label {
+  font-size: 12px;
+  color: #f6515f;
+}
+
+.settings-confirm-btn {
+  display: block;
+  width: 100%;
+  height: 52px;
+  border-radius: 999px;
+  border: none;
+  background: linear-gradient(135deg, #f6515f, #db3f4c);
+  color: #fff;
+  font-family: "Barlow", sans-serif;
+  font-weight: 800;
+  font-size: 1rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(219, 63, 76, 0.4);
+  transition: filter 150ms;
+  flex: 0 0 auto;
+}
+
+@media (hover: hover) {
+  .settings-confirm-btn:hover { filter: brightness(1.1); }
+  .settings-lang-btn:hover { border-color: #f6515f; }
+  .settings-font-btn:hover { border-color: #f6515f; }
+}
+
+@media (max-width: 490px) {
+  .settings-card {
+    padding: calc(1rem + env(safe-area-inset-top)) 1rem calc(1rem + env(safe-area-inset-bottom));
+    gap: 0.72rem;
+  }
+  .settings-lang-grid,
+  .settings-font-row { gap: 0.42rem; }
+  .settings-lang-btn { min-height: 44px; padding: 0.42rem 0.45rem; }
+  .settings-font-btn { min-height: 58px; padding: 0.42rem 0.35rem; }
+  .settings-notices-list { gap: 0.48rem; padding: 0.8rem 0; }
+  .settings-notice-item { gap: 0.42rem; }
 }

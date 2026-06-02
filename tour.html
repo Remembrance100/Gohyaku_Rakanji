@@ -21,6 +21,7 @@
         });
       }
     </script>
+    <!-- TODO: re-enable access gate when payment is ready
     <script>
       // Access gate — must have a valid 24h token or a fresh Stripe session_id
       (function () {
@@ -66,6 +67,7 @@
           .catch(() => redirectToPay());
       })();
     </script>
+    -->
     <link rel="icon" href="./assets/icons/icon.svg" type="image/svg+xml" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -73,7 +75,7 @@
       href="https://fonts.googleapis.com/css2?family=Barlow:wght@500;700;800&family=Manrope:wght@500;700;800&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./assets/css/styles.css?v=20260529a" />
+    <link rel="stylesheet" href="./assets/css/styles.css?v=20260602e" />
   </head>
   <body>
     <!-- Persistent chrome around the tour experience. -->
@@ -112,9 +114,10 @@
               <div class="map-pins" id="mapPins" aria-label="Tour stop buttons"></div>
             </div>
           </div>
-          <a
+          <button
             class="map-settings-btn"
-            href="./index.html"
+            id="mapSettingsBtn"
+            type="button"
             aria-label="Settings"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -123,7 +126,7 @@
               <path d="M2 12h20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
               <path d="M4 7h16M4 17h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
             </svg>
-          </a>
+          </button>
           <button
             class="map-end-btn"
             id="mapEndBtn"
@@ -137,6 +140,14 @@
         <div class="detail-hero">
           <button class="back-btn" id="backButton" type="button" aria-label="Go back">
             <
+          </button>
+          <button class="detail-settings-btn" id="detailSettingsBtn" type="button" aria-label="Settings">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.8"/>
+              <path d="M12 2C9.5 6 8 9 8 12s1.5 6 4 10M12 2c2.5 4 4 7 4 10s-1.5 6-4 10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+              <path d="M2 12h20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+              <path d="M4 7h16M4 17h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            </svg>
           </button>
           <div class="detail-hero-track" id="detailHeroTrack"></div>
           <div
@@ -447,6 +458,78 @@
       </div>
     </div>
 
-    <script src="./assets/js/script.js?v=20260529a"></script>
+    <!-- Settings overlay (language + font size), opened from tour without navigation) -->
+    <div
+      id="tourSettingsScreen"
+      class="settings-screen is-hidden"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Preferences"
+    >
+      <div class="settings-inner">
+        <div class="settings-card">
+          <p class="settings-section-label" data-t="label-language">言語</p>
+          <div class="settings-lang-grid" id="tourSettingsLangGrid" role="group" aria-label="Select language">
+            <button class="settings-lang-btn is-active" type="button" data-lang="ja" aria-pressed="true">
+              <span class="settings-lang-name">日本語</span>
+            </button>
+            <button class="settings-lang-btn" type="button" data-lang="en" aria-pressed="false">
+              <span class="settings-lang-name">English</span>
+            </button>
+            <button class="settings-lang-btn" type="button" data-lang="ko" aria-pressed="false">
+              <span class="settings-lang-name">한국어</span>
+            </button>
+            <button class="settings-lang-btn" type="button" data-lang="zh" aria-pressed="false">
+              <span class="settings-lang-name">中文</span>
+            </button>
+          </div>
+
+          <p class="settings-section-label" data-t="label-fontsize">文字サイズ</p>
+          <div class="settings-font-row" role="group" aria-label="文字サイズ">
+            <button class="settings-font-btn" type="button" data-size="large" aria-pressed="false">
+              <span class="settings-font-sample" data-t="font-sample-large">あ</span>
+              <span class="settings-font-label">S</span>
+            </button>
+            <button class="settings-font-btn is-active" type="button" data-size="xlarge" aria-pressed="true">
+              <span class="settings-font-sample" data-t="font-sample-large">あ</span>
+              <span class="settings-font-label">M</span>
+            </button>
+            <button class="settings-font-btn" type="button" data-size="xxlarge" aria-pressed="false">
+              <span class="settings-font-sample" data-t="font-sample-large">あ</span>
+              <span class="settings-font-label">L</span>
+            </button>
+          </div>
+
+          <ul class="settings-notices-list">
+            <li class="settings-notice-item">
+              <span class="settings-notice-icon" aria-hidden="true">📵</span>
+              <span class="settings-notice-text" data-t="notice-photo">羅漢像や位牌の撮影はご遠慮ください。</span>
+            </li>
+            <li class="settings-notice-item">
+              <span class="settings-notice-icon" aria-hidden="true">🔊</span>
+              <span class="settings-notice-text" data-t="notice-quiet">音声ガイドの音量にご注意いただき、周りの方のご迷惑にならないようご配慮ください。</span>
+            </li>
+            <li class="settings-notice-item">
+              <span class="settings-notice-icon" aria-hidden="true">🚭</span>
+              <span class="settings-notice-text" data-t="notice-smoke">境内での喫煙は禁止されています。</span>
+            </li>
+            <li class="settings-notice-item">
+              <span class="settings-notice-icon" aria-hidden="true">🪙</span>
+              <span class="settings-notice-text" data-t="notice-offering">お賽銭はお賽銭箱にお入れください、像の上に置かないでください。</span>
+            </li>
+            <li class="settings-notice-item">
+              <span class="settings-notice-icon" aria-hidden="true">🐕</span>
+              <span class="settings-notice-text" data-t="notice-pets">ペットの境内への持ち込みはご遠慮ください。</span>
+            </li>
+          </ul>
+
+          <button class="settings-confirm-btn" id="tourSettingsConfirmBtn" type="button">
+            <span data-t="confirm-btn">ガイド開始</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script src="./assets/js/script.js?v=20260602e"></script>
   </body>
 </html>

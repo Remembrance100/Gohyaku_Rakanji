@@ -851,13 +851,15 @@ function initSettings(onLangChange) {
 
   confirmBtn?.addEventListener("click", () => {
     savePrefs({ lang: selectedLang, size: selectedSize });
-    const expiry = parseInt(localStorage.getItem("tourAccessExpiry") || "0", 10);
-    const hasToken = localStorage.getItem("tourAccessToken") && expiry > Date.now();
-    if (hasToken) {
-      hideSettings();
-    } else {
-      window.location.href = "./pay.html";
-    }
+    hideSettings();
+    // TODO: re-enable payment gate when ready
+    // const expiry = parseInt(localStorage.getItem("tourAccessExpiry") || "0", 10);
+    // const hasToken = localStorage.getItem("tourAccessToken") && expiry > Date.now();
+    // if (hasToken) {
+    //   hideSettings();
+    // } else {
+    //   window.location.href = "./pay.html";
+    // }
   });
 
   // Re-open from gear icon
@@ -904,6 +906,24 @@ function applySettingsBg(stop) {
   }
 }
 
+const STOP_ZERO_CACHE_KEY = "stopZeroCache";
+
+function loadCachedStopZero() {
+  try {
+    const raw = localStorage.getItem(STOP_ZERO_CACHE_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
+}
+
+function cacheStopZero(rawStop) {
+  try {
+    localStorage.setItem(STOP_ZERO_CACHE_KEY, JSON.stringify(rawStop));
+  } catch {}
+}
+
 async function init() {
   let rawStopZeroData = null;
 
@@ -917,6 +937,16 @@ async function init() {
   initSettings(rerender);
   bindEvents();
 
+  const cached = loadCachedStopZero();
+  if (cached) {
+    rawStopZeroData = cached;
+    const stopZero = mapStop(cached, 0);
+    applySettingsBg(stopZero);
+    renderEntry(stopZero);
+    entryLoadingOverlay?.classList.add("hidden");
+    return;
+  }
+
   try {
     const response = await fetch(DATA_URL);
     if (!response.ok) throw new Error(`Failed: ${response.status}`);
@@ -929,6 +959,7 @@ async function init() {
     }) || data.stops[0];
 
     rawStopZeroData = rawStop;
+    cacheStopZero(rawStop);
     const stopZero = rawStop ? mapStop(rawStop, 0) : null;
     applySettingsBg(stopZero || fallbackStopZero);
     renderEntry(stopZero || fallbackStopZero);

@@ -73,6 +73,7 @@ const isTourPage =
   new URLSearchParams(window.location.search).get("tour") === "1";
 
 let activeStop = null;
+let rawStopsData = [];
 let stopsData = [];
 let tourStopsData = [];
 let heroSlideIndex = 0;
@@ -430,6 +431,18 @@ function getRequestedLang() {
 
 const UI_STRINGS = {
   ja: {
+    "label-language": "言語",
+    "label-fontsize": "文字サイズ",
+    "font-sample-large": "あ",
+    "font-small": "小",
+    "font-normal": "中",
+    "font-large": "大",
+    "notice-photo": "羅漢像や位牌の撮影はご遠慮ください。",
+    "notice-quiet": "音声ガイドの音量にご注意いただき、周りの方のご迷惑にならないようご配慮ください。",
+    "notice-smoke": "境内での喫煙は禁止されています。",
+    "notice-offering": "お賽銭はお賽銭箱にお入れください、像の上に置かないでください。",
+    "notice-pets": "ペットの境内への持ち込みはご遠慮ください。",
+    "confirm-btn": "閉じる",
     "end-tour-btn": "ガイド終了",
     "map-preview-title": "地図",
     "highlight-label": "ハイライト",
@@ -449,15 +462,30 @@ const UI_STRINGS = {
     "omamori-pink-desc": "縁結び・健康祈願",
     "omamori-save-btn": "保存",
     "omamori-fullscreen-save": "お守りを保存",
-    "coach-1": "番号の付いたピンをタップすると、各スポットの詳細と音声ガイドが表示されます。",
+    "coach-1": "番号の付いたピンをタップすると、各スポットが開きます。",
     "coach-2": "このボタンをタップすると言語や設定を変更できます。",
+    "coach-3a": "スポットのタイトルと番号です。今どのスポットにいるかが一目でわかります。",
+    "coach-3b": "ハイライトには、そのスポットの見どころや重要なポイントがまとめられています。",
     "coach-3": "再生ボタンをタップすると音声ガイドが始まります。バーをドラッグして位置を調整できます。",
+    "coach-3c": "テキストガイドには、このスポットの詳しい解説が記載されています。",
     "coach-4": "この矢印ボタンで前後のスポットに移動できます。",
     "coach-next": "次へ",
     "coach-done": "始める",
     "coach-skip": "スキップ",
   },
   en: {
+    "label-language": "Language",
+    "label-fontsize": "Text Size",
+    "font-sample-large": "Aa",
+    "font-small": "S",
+    "font-normal": "M",
+    "font-large": "L",
+    "notice-photo": "Please refrain from photographing Rakan statues and memorial tablets.",
+    "notice-quiet": "Please be mindful of the audio guide volume so as not to disturb those around you.",
+    "notice-smoke": "Smoking is not permitted on the grounds.",
+    "notice-offering": "Please place offerings in the offering box, not on top of the statues.",
+    "notice-pets": "Pets are not allowed inside the temple grounds.",
+    "confirm-btn": "Close",
     "end-tour-btn": "End Tour",
     "map-preview-title": "Map",
     "highlight-label": "Highlights",
@@ -477,15 +505,30 @@ const UI_STRINGS = {
     "omamori-pink-desc": "Good relationships · Health",
     "omamori-save-btn": "Save",
     "omamori-fullscreen-save": "Save Omamori",
-    "coach-1": "Tap a numbered pin to open that stop's details and audio guide.",
+    "coach-1": "Tap a numbered pin to open that stop.",
     "coach-2": "Tap this button to change the language or adjust settings.",
+    "coach-3a": "This is the stop title and number — it tells you exactly where you are.",
+    "coach-3b": "The highlights section shows the key points and things to look for at this stop.",
     "coach-3": "Tap the play button to start the audio guide. Drag the bar to jump to any point.",
+    "coach-3c": "The text guide has a full written description of this stop.",
     "coach-4": "Use these arrows to move to the previous or next stop.",
     "coach-next": "Next",
     "coach-done": "Let's go",
     "coach-skip": "Skip",
   },
   ko: {
+    "label-language": "언어",
+    "label-fontsize": "글자 크기",
+    "font-sample-large": "가",
+    "font-small": "소",
+    "font-normal": "중",
+    "font-large": "대",
+    "notice-photo": "나한상이나 위패 촬영은 삼가 주세요.",
+    "notice-quiet": "오디오 가이드 볼륨에 주의하여 주변 분들께 불편을 드리지 않도록 배려해 주세요.",
+    "notice-smoke": "경내 흡연은 금지되어 있습니다.",
+    "notice-offering": "헌금은 헌금함에 넣어 주세요. 상 위에 올려놓지 마세요.",
+    "notice-pets": "반려동물의 경내 동반은 삼가 주세요.",
+    "confirm-btn": "닫기",
     "end-tour-btn": "투어 종료",
     "map-preview-title": "지도",
     "highlight-label": "하이라이트",
@@ -505,15 +548,30 @@ const UI_STRINGS = {
     "omamori-pink-desc": "인연 · 건강 기원",
     "omamori-save-btn": "저장",
     "omamori-fullscreen-save": "오마모리 저장",
-    "coach-1": "번호가 붙은 핀을 탭하면 해당 스팟의 상세 정보와 오디오 가이드를 볼 수 있습니다.",
+    "coach-1": "번호가 붙은 핀을 탭하면 해당 스팟이 열립니다.",
     "coach-2": "이 버튼을 탭하면 언어나 설정을 변경할 수 있습니다.",
+    "coach-3a": "스팟의 제목과 번호입니다. 지금 어느 스팟에 있는지 한눈에 알 수 있습니다.",
+    "coach-3b": "하이라이트에는 이 스팟의 주요 볼거리와 핵심 포인트가 정리되어 있습니다.",
     "coach-3": "재생 버튼을 탭하면 오디오 가이드가 시작됩니다. 바를 드래그하여 위치를 조정할 수 있습니다.",
+    "coach-3c": "텍스트 가이드에는 이 스팟에 대한 자세한 설명이 기재되어 있습니다.",
     "coach-4": "이 화살표로 이전 또는 다음 스팟으로 이동할 수 있습니다.",
     "coach-next": "다음",
     "coach-done": "시작하기",
     "coach-skip": "건너뛰기",
   },
   zh: {
+    "label-language": "语言",
+    "label-fontsize": "文字大小",
+    "font-sample-large": "文",
+    "font-small": "小",
+    "font-normal": "中",
+    "font-large": "大",
+    "notice-photo": "请勿拍摄罗汉像或灵牌。",
+    "notice-quiet": "请注意音频导览的音量，以免打扰周围的其他游客。",
+    "notice-smoke": "境内禁止吸烟。",
+    "notice-offering": "请将香钱放入功德箱，勿置于像上。",
+    "notice-pets": "请勿携带宠物进入境内。",
+    "confirm-btn": "关闭",
     "end-tour-btn": "结束导览",
     "map-preview-title": "地图",
     "highlight-label": "亮点",
@@ -533,9 +591,12 @@ const UI_STRINGS = {
     "omamori-pink-desc": "良缘 · 健康祈愿",
     "omamori-save-btn": "保存",
     "omamori-fullscreen-save": "保存御守",
-    "coach-1": "点击编号标记可查看该景点的详情和语音导览。",
+    "coach-1": "点击编号标记可打开该景点。",
     "coach-2": "点击此按钮可更改语言或调整设置。",
+    "coach-3a": "这是景点的标题和编号，让您一目了然地知道自己在哪里。",
+    "coach-3b": "亮点部分列出了该景点的看点和重要内容。",
     "coach-3": "点击播放按钮开始语音导览。拖动进度条可跳转到任意位置。",
+    "coach-3c": "文字导览包含此景点的详细说明。",
     "coach-4": "使用这些箭头可切换到上一个或下一个景点。",
     "coach-next": "下一步",
     "coach-done": "出发",
@@ -557,15 +618,94 @@ function applySelectedLanguage() {
   applyUiLang(lang);
 }
 
-function applyFontScale() {
+function applyFontScale(sizeOverride) {
   const scales = { small: 0.88, normal: 1, large: 1.14, xlarge: 1.3, xxlarge: 1.5 };
   const sizeRemap = { small: "large", normal: "large" };
-  const raw = loadPrefs().size || "xlarge";
+  const raw = sizeOverride || loadPrefs().size || "xlarge";
   const size = sizeRemap[raw] || raw;
   document.documentElement.style.setProperty(
     "--tour-font-scale",
     String(scales[size] || 1),
   );
+}
+
+function savePrefs(prefs) {
+  try {
+    localStorage.setItem(PREFS_KEY, JSON.stringify(prefs));
+  } catch {}
+}
+
+function initTourSettings() {
+  const screen = document.getElementById("tourSettingsScreen");
+  const confirmBtn = document.getElementById("tourSettingsConfirmBtn");
+  const langGrid = document.getElementById("tourSettingsLangGrid");
+  const mapBtn = document.getElementById("mapSettingsBtn");
+  const detailBtn = document.getElementById("detailSettingsBtn");
+  if (!screen) return;
+
+  const prefs = loadPrefs();
+  const sizeRemap = { small: "large", normal: "large" };
+  let selectedLang = prefs.lang || "ja";
+  let selectedSize = sizeRemap[prefs.size] || prefs.size || "xlarge";
+
+  function syncLangBtns() {
+    langGrid?.querySelectorAll(".settings-lang-btn").forEach((btn) => {
+      const active = btn.dataset.lang === selectedLang;
+      btn.classList.toggle("is-active", active);
+      btn.setAttribute("aria-pressed", String(active));
+    });
+  }
+
+  function syncFontBtns() {
+    screen.querySelectorAll(".settings-font-btn").forEach((btn) => {
+      const active = btn.dataset.size === selectedSize;
+      btn.classList.toggle("is-active", active);
+      btn.setAttribute("aria-pressed", String(active));
+    });
+  }
+
+  function openSettings() {
+    selectedLang = loadPrefs().lang || "ja";
+    selectedSize = sizeRemap[loadPrefs().size] || loadPrefs().size || "xlarge";
+    syncLangBtns();
+    syncFontBtns();
+    screen.classList.remove("is-hidden");
+  }
+
+  function closeSettings() {
+    screen.classList.add("is-hidden");
+  }
+
+  syncLangBtns();
+  syncFontBtns();
+
+  langGrid?.addEventListener("click", (e) => {
+    const btn = e.target.closest(".settings-lang-btn");
+    if (!btn) return;
+    selectedLang = btn.dataset.lang;
+    document.documentElement.lang = selectedLang;
+    applyUiLang(selectedLang);
+    savePrefs({ lang: selectedLang, size: selectedSize });
+    syncLangBtns();
+    remapStopsForLang();
+  });
+
+  screen.querySelectorAll(".settings-font-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      selectedSize = btn.dataset.size;
+      savePrefs({ lang: selectedLang, size: selectedSize });
+      applyFontScale(selectedSize);
+      syncFontBtns();
+    });
+  });
+
+  confirmBtn?.addEventListener("click", () => {
+    savePrefs({ lang: selectedLang, size: selectedSize });
+    closeSettings();
+  });
+
+  mapBtn?.addEventListener("click", openSettings);
+  detailBtn?.addEventListener("click", openSettings);
 }
 
 function getLocalizedField(rawObj, key, fallback = "") {
@@ -1151,7 +1291,20 @@ async function loadStops() {
   if (!data || !Array.isArray(data.stops)) {
     throw new Error("Invalid tour data response");
   }
+  rawStopsData = data.stops;
   return data.stops.map((stop, index) => mapWpStop(stop, index, 0));
+}
+
+function remapStopsForLang() {
+  if (!rawStopsData.length) return;
+  stopsData = rawStopsData.map((stop, index) => mapWpStop(stop, index, 0));
+  tourStopsData = getTourStops(stopsData);
+  renderMapPins(tourStopsData);
+  buildStopPicker();
+  if (activeStop) {
+    const refreshed = tourStopsData.find((s) => s.id === activeStop.id);
+    if (refreshed) setDetailStop(refreshed);
+  }
 }
 
 // Percentage positions [left%, top%] for stops 1–20 derived from the map image.
@@ -2286,6 +2439,7 @@ async function init() {
   appLoadingOverlay?.classList.remove("hidden");
   applySelectedLanguage();
   applyFontScale();
+  initTourSettings();
 
   try {
     stopsData = await loadStops();
@@ -2332,8 +2486,7 @@ function runCoachMarks() {
   const lang = getRequestedLang();
   const t = UI_STRINGS[lang] || UI_STRINGS.ja;
 
-  // 4 steps: map pin → globe/settings button → audio play button → prev/next nav
-  // Steps 1–2 show on the map screen. Steps 3–4 show after auto-opening the first stop.
+  // Steps: map pin → settings → (open detail) title → highlight → audio → transcript → prev/next
   const STEPS = [
     {
       targetFn: () => document.querySelector(".map-pin"),
@@ -2346,14 +2499,40 @@ function runCoachMarks() {
       pad: 14,
     },
     {
+      targetFn: () => document.querySelector("#detailTitle"),
+      text: t["coach-3a"],
+      pad: 10,
+      rect: true,
+      openDetail: true,
+      scrollTo: "#detailTitle",
+    },
+    {
+      targetFn: () => document.querySelector("#detailHighlight"),
+      text: t["coach-3b"],
+      pad: 10,
+      rect: true,
+      openDetail: true,
+      scrollTo: "#detailHighlight",
+    },
+    {
       targetFn: () => document.querySelector("#detailPlayBtn"),
       text: t["coach-3"],
       pad: 16,
       openDetail: true,
+      scrollTo: "#detailAudioInline",
+    },
+    {
+      targetFn: () => document.querySelector("#detailNextBtn"),
+      text: t["coach-4"],
+      pad: 14,
+      openDetail: true,
+      scrollTo: "#detailNextBtn",
     },
   ];
 
   let step = 0;
+
+  let spotlightReady = false;
 
   function positionSpotlight(el, pad, rect) {
     const r = el.getBoundingClientRect();
@@ -2374,7 +2553,15 @@ function runCoachMarks() {
       spotlight.style.top = `${cy - radius}px`;
       spotlight.style.borderRadius = "50%";
     }
-    spotlight.classList.add("is-pulsing");
+
+    // Only restart pulse after the position transition settles, to avoid jank
+    spotlight.classList.remove("is-pulsing");
+    if (spotlightReady) {
+      setTimeout(() => spotlight.classList.add("is-pulsing"), 260);
+    } else {
+      spotlight.classList.add("is-pulsing");
+      spotlightReady = true;
+    }
 
     const elBottom = r.top + r.height + pad;
     const elTop = r.top - pad;
@@ -2398,7 +2585,7 @@ function runCoachMarks() {
     if (s.openDetail && !appShell.classList.contains("is-detail")) {
       const firstStop = tourStopsData.find((st) => st.number === 1) || tourStopsData[0];
       if (firstStop) openDetailById(firstStop.id);
-      setTimeout(() => showStep(i), 800);
+      setTimeout(() => showStep(i), 700);
       return;
     }
 
@@ -2408,15 +2595,15 @@ function runCoachMarks() {
       detailAudio.pause();
       detailPlayBtn.classList.remove("is-playing");
       detailPlayBtn.innerHTML = playIconHtml(DETAIL_AUDIO_ICON_SIZE);
-      setTimeout(() => showStep(i), 480);
+      setTimeout(() => showStep(i), 380);
       return;
     }
 
-    // Scroll audio player into view before spotlighting it
-    if (s.openDetail) {
-      const audioEl = document.querySelector("#detailAudioInline");
-      if (audioEl) audioEl.scrollIntoView({ behavior: "smooth", block: "center" });
-      setTimeout(() => renderStep(i), 500);
+    // Scroll target element into view then wait for layout to settle
+    if (s.openDetail && s.scrollTo) {
+      const el = document.querySelector(s.scrollTo);
+      if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+      setTimeout(() => renderStep(i), 280);
       return;
     }
 
@@ -2427,28 +2614,41 @@ function runCoachMarks() {
     const s = STEPS[i];
     const isLast = i === STEPS.length - 1;
 
-    coachText.textContent = s.text;
-    coachStep.textContent = `${i + 1} / ${STEPS.length}`;
-    nextBtn.style.display = "";
-    nextBtn.textContent = isLast ? t["coach-done"] : t["coach-next"];
-
     const el = s.targetFn ? s.targetFn() : null;
-    if (!el) { finishCoach(); return; }
-    positionSpotlight(el, s.pad, s.rect);
+    // Skip hidden or missing elements (e.g. highlight/transcript when stop has none)
+    if (!el || el.hidden || el.classList.contains("hidden")) {
+      if (!isLast) { showStep(i + 1); return; }
+      finishCoach();
+      return;
+    }
 
-    overlay.classList.remove("hidden");
-    overlay.classList.add("is-active");
+    // Fade bubble out, swap content, fade back in
+    const doRender = () => {
+      coachText.textContent = s.text;
+      coachStep.textContent = `${i + 1} / ${STEPS.length}`;
+      nextBtn.style.display = "";
+      nextBtn.textContent = isLast ? t["coach-done"] : t["coach-next"];
+      positionSpotlight(el, s.pad, s.rect);
+      bubble.style.opacity = "1";
+      overlay.classList.remove("hidden");
+      overlay.classList.add("is-active");
+    };
+
+    if (overlay.classList.contains("is-active")) {
+      bubble.style.opacity = "0";
+      setTimeout(doRender, 160);
+    } else {
+      bubble.style.opacity = "1";
+      doRender();
+    }
   }
 
   function finishCoach() {
-    overlay.classList.add("hidden");
-    overlay.classList.remove("is-active");
-    if (appShell.classList.contains("is-detail")) {
-      appShell.classList.remove("is-detail");
-      detailAudio.pause();
-      detailPlayBtn.classList.remove("is-playing");
-      detailPlayBtn.innerHTML = playIconHtml(DETAIL_AUDIO_ICON_SIZE);
-    }
+    bubble.style.opacity = "0";
+    setTimeout(() => {
+      overlay.classList.add("hidden");
+      overlay.classList.remove("is-active");
+    }, 160);
     localStorage.setItem(COACH_KEY, "1");
   }
 
