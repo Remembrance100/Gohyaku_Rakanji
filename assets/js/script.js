@@ -60,13 +60,14 @@ const omamoriCloseBtn = document.querySelector("#omamoriCloseBtn");
 const omamoriMsgVideo = document.querySelector("#omamoriMsgVideo");
 const omamoriMsgUnmute = document.querySelector("#omamoriMsgUnmute");
 const omamoriMsgUnmuteIcon = document.querySelector("#omamoriMsgUnmuteIcon");
-const omamoriMsgDots = document.querySelector("#omamoriMsgDots");
 const mapEndBtn = document.querySelector("#mapEndBtn");
 const omamoriFullscreen = document.querySelector("#omamoriFullscreen");
 const omamoriFullscreenVideo = document.querySelector(
   "#omamoriFullscreenVideo",
 );
 const omamoriFullscreenDl = document.querySelector("#omamoriFullscreenDl");
+const omamoriFullscreenBack = document.querySelector("#omamoriFullscreenBack");
+const omamoriTranscriptEl = document.getElementById("omamoriTranscript");
 
 const detailAudio = new Audio();
 const isTourPage =
@@ -462,12 +463,21 @@ const UI_STRINGS = {
     "omamori-pink-desc": "縁結び・健康祈願",
     "omamori-save-btn": "保存",
     "omamori-fullscreen-save": "お守りを保存",
+    "omamori-transcript-label": "トランスクリプト",
+    "omamori-transcript-q1": "羅漢さんの前に立ち止まった時、何を考えてほしいですか？",
+    "omamori-transcript-a1": "いろんな気持ちが出てくると思うんですね。その時にこう、いろんな感情があると思うんですけども、その、感じられた気持ちをぜひね、大切にしていただきたい。素直に、驚いたのか、これは何だろうと疑問に思ったのかとかですね、あの、不思議な気持ちになったのかとか、いろんなこう、楽しい気持ちになったのかとか、それぞれのですね、まあ先、説明の中でも、以前、申しましたが、その、鏡のようにですね、自分と向き合うようなものなので、ぜひですね、その時感じられた、今のご自身の気持ちをですね、ぜひ大切にしていただきたい。で、機会があればぜひもう一度来ていただいてですね、またその時に感じられるもの、また別のものを感じられたらですね、さらに深まっていくのではないかと考えています。",
+    "omamori-transcript-q2": "この305体の羅漢さんが、ガラスケースに入っていない理由は？",
+    "omamori-transcript-a2": "ガラスケースに入れてしまうと、ま、皆様もですね、博物館とか美術館に行った時に、その、ケースの中に入った仏像とか、仏様の絵なんかを見られることがあると思うんですけども、その前に立ち止まって手を合わせるということはなかなかないんですね。ここは、お寺なので、ここで実際に法要、法事も行いますし、この信じている方、信仰されている方が来てですね、実際に手を合わせることもある。これが全てガラスケースに入ってしまうと、そういう信仰の場を失ってしまうんですね。ですから、このように手を伸ばせば触れられるような、身近にですね、感じられる場所にですね、安置させていただいてます。その木造、木でできているので、先ほどの話の、なんですけど、ガラスケースに入れて空調管理していかないと、どんどん、どんどん、朽ちていっちゃうんですよね。で、実際問題、まああと、何、まあ、100年、200年もすればですね、この状態が実際保てるかどうかってのは非常に難しいんですけれども、仏教では、ま、その、一期一会っていう言葉がありますようにですね、今この瞬間に巡り合えたっていう、この、その時間も大切にしていただきたい。あの、形が変わっていくのももう仕方が無いんですけども、うん、今この時代に生まれて、今この瞬間ここに、来ることができた、この羅漢像と出会うことができたというですね、その奇跡をぜひ、どこか心に、留めていただければな、とは思いますね、うん。",
+    "omamori-transcript-q3": "10年後、50年後の羅漢寺はどんな場所であってほしいですか？",
+    "omamori-transcript-a3": "10年後、50年後にですね、まあいろいろ、世界というものはどんどん、どんどん変わっていくと思います。けれどもですね、やはり心の拠り所、安らぐ場所としてですね、今と変わらない状態でですね、この羅漢像が50年後にも残っていてほしい。今、我々が見ているものをですね、50年後の人々にもですね、ぜひ見ていただきたい。これ、350年前からですね、繋がっているものを我々は、次の世代にですね、渡さなければ、そのまま引き継いでいくことが使命だと思っておりますので、ぜひ、この今の状態、今の羅漢寺のままですね、今の羅漢像のまま、残っていたらいいなと、心から思っています。",
     "coach-1": "番号の付いたピンをタップすると、各スポットが開きます。",
     "coach-2": "このボタンをタップすると言語や設定を変更できます。",
     "coach-3a": "スポットのタイトルと番号です。今どのスポットにいるかが一目でわかります。",
     "coach-3b": "ハイライトには、そのスポットの見どころや重要なポイントがまとめられています。",
     "coach-3": "再生ボタンをタップすると音声ガイドが始まります。バーをドラッグして位置を調整できます。",
     "coach-3c": "テキストガイドには、このスポットの詳しい解説が記載されています。",
+    "coach-end": "ツアーを終了するときは、このボタンをタップします。",
+    "coach-back": "この「＜」ボタンをタップすると、マップに戻ります。",
     "coach-4": "この矢印ボタンで前後のスポットに移動できます。",
     "coach-next": "次へ",
     "coach-done": "始める",
@@ -505,12 +515,21 @@ const UI_STRINGS = {
     "omamori-pink-desc": "Good relationships · Health",
     "omamori-save-btn": "Save",
     "omamori-fullscreen-save": "Save Omamori",
+    "omamori-transcript-label": "Transcript",
+    "omamori-transcript-q1": "When people stop and stand in front of the Rakan statues, what do you hope crosses their minds?",
+    "omamori-transcript-a1": "I believe a wide variety of emotions will naturally come up. When that happens, whatever it is you feel, I truly want you to cherish that feeling. Whether it's straightforward surprise, curiosity about what it is, a sense of wonder, or a feeling of joy—whatever it may be. As I mentioned earlier in my explanation, these statues act like a mirror reflecting your inner self. So please, hold onto and value whatever emotion you feel in that exact moment. And if you have the chance, I hope you will visit again. If you feel something entirely different on your next visit, I believe your experience and understanding will deepen even further.",
+    "omamori-transcript-q2": "Why are these 305 Rakan statues not kept inside glass display cases?",
+    "omamori-transcript-a2": "When things are placed inside glass cases—as you might have experienced when seeing Buddhist statues or paintings at a museum or art gallery—people rarely stop to press their hands together in prayer. Because this is a temple, we actually hold memorial services and Buddhist rituals here, and believers come to pray before them. If everything were sealed inside glass cases, we would lose that space of living faith. That is why they are enshrined out in the open, close enough that you could reach out and touch them. Now, because they are made of wood, as I mentioned earlier, they will gradually decay unless they are kept in a climate-controlled glass case. Truthfully, it is highly uncertain whether they can be preserved in this exact condition 100 or 200 years from now. However, Buddhism teaches the concept of Ichigo Ichie—the idea of a once-in-a-lifetime encounter. We want people to cherish the very moment they cross paths with these statues. While it is inevitable that their physical forms will change over time, I hope visitors will hold a small place in their hearts for the miracle of being born into this era, coming here at this exact moment, and being able to encounter these Rakan statues.",
+    "omamori-transcript-q3": "What kind of place do you hope Rakan-ji Temple will be in 10 or 50 years?",
+    "omamori-transcript-a3": "Ten or fifty years from now, I am sure the world will continue to change rapidly. Even so, I sincerely hope that these Rakan statues will remain fifty years from now in the exact same state they are in today—serving as a spiritual anchor and a place of peace. I truly want people fifty years into the future to see exactly what we are looking at right now. We are holding onto something that has been continuously connected to the past for 350 years. I believe it is our solemn mission to hand this down to the next generation, to pass it along seamlessly. Therefore, I hope from the bottom of my heart that Rakan-ji and these Rakan statues can be preserved just as they are today.",
     "coach-1": "Tap a numbered pin to open that stop.",
     "coach-2": "Tap this button to change the language or adjust settings.",
     "coach-3a": "This is the stop title and number — it tells you exactly where you are.",
     "coach-3b": "The highlights section shows the key points and things to look for at this stop.",
     "coach-3": "Tap the play button to start the audio guide. Drag the bar to jump to any point.",
     "coach-3c": "The text guide has a full written description of this stop.",
+    "coach-end": "Tap this button when you're ready to end the tour.",
+    "coach-back": "Tap the « button to return to the map at any time.",
     "coach-4": "Use these arrows to move to the previous or next stop.",
     "coach-next": "Next",
     "coach-done": "Let's go",
@@ -548,12 +567,21 @@ const UI_STRINGS = {
     "omamori-pink-desc": "인연 · 건강 기원",
     "omamori-save-btn": "저장",
     "omamori-fullscreen-save": "오마모리 저장",
+    "omamori-transcript-label": "대화록",
+    "omamori-transcript-q1": "나한상 앞에 멈춰 섰을 때, 사람들이 어떤 생각을 하길 바라시나요?",
+    "omamori-transcript-a1": "다양한 감정들이 피어오를 것이라 생각합니다. 그럴 때 느끼시는 그 감정들을 꼭 소중히 여겨주셨으면 합니다. 솔직하게 놀란 감정인지, '이게 뭘까' 하는 의문인지, 신비로운 느낌인지, 아니면 즐거운 마음인지... 각자가 느끼는 감정 말이죠. 앞서 설명해 드렸듯이 나한상은 스스로를 마주하게 하는 거울과 같은 존재입니다. 그러니 그 순간 느끼신 지금 선 자리에서의 스스로의 마음을 꼭 소중히 간직해 주시길 바랍니다. 그리고 기회가 된다면 꼭 한 번 더 찾아주셔서, 그때 또 다른 감정을 느끼게 되신다면 더욱 깊어지지 않을까 생각합니다.",
+    "omamori-transcript-q2": "왜 이 305점의 나한상들은 유리 쇼케이스 안에 보관하지 않나요?",
+    "omamori-transcript-a2": "유리 쇼케이스에 넣어두면, 여러분도 박물관이나 미술관에 가셨을 때 쇼케이스 안의 불상이나 불화를 보신 적이 있겠지만, 그 앞에서 발길을 멈추고 두 손을 모아 합장하는 일은 좀처럼 없습니다. 이곳은 사찰이기 때문에 실제로 법요와 법사를 지내기도 하고, 불자님들이 오셔서 실제로 합장을 하기도 합니다. 이 모든 것이 유리 쇼케이스 안에 들어가 버리면, 그러한 신앙의 장소를 잃어버리게 됩니다. 그래서 손을 뻗으면 닿을 듯한, 아주 가까이에서 느끼실 수 있는 자리에 모셔두고 있습니다. 나무로 만들어졌기 때문에, 유리 쇼케이스에 넣고 공조 시스템으로 관리하지 않으면 점점 노후화되고 썩어갈 수밖에 없습니다. 현실적으로 앞으로 100년, 200년이 지났을 때 이 상태가 그대로 유지될 수 있을지는 매우 장담하기 어렵습니다. 하지만 불교에는 '일기일회(一期一會)'라는 말이 있듯이, 지금 이 순간에 마주할 수 있었다는 그 시간 자체를 소중히 여겨주셨으면 합니다. 형태가 변해가는 것은 어쩔 수 없는 일이지만, 지금 이 시대에 태어나 지금 이 순간 이곳에 올 수 있었던 것, 그리고 이 나한상과 만날 수 있었다는 그 기적을 부디 마음 한구석에 간직해 주셨으면 좋겠습니다.",
+    "omamori-transcript-q3": "10년 후, 혹은 50년 후에 라칸지가 어떤 장소가 되기를 바라시나요?",
+    "omamori-transcript-a3": "10년 후, 50년 후에 세상은 정말이지 빠르게 변해갈 것이라 생각합니다. 그럼에도 불구하고, 역시 마음의 안식처이자 평온을 얻는 공간으로서 지금과 변함없는 모습으로 이 나한상들이 50년 후에도 남아있기를 바랍니다. 지금 우리가 보고 있는 이 풍경을 50년 후의 사람들도 꼭 볼 수 있었으면 좋겠습니다. 이것은 350년 전부터 이어져 온 소중한 유산이며, 우리가 다음 세대에게 온전히 전해주어야 할 사명이라고 생각합니다. 그렇기에 지금 이 상태의 라칸지 그대로, 지금 이 모습의 나한상 그대로 미래에도 남아주기를 진심으로 바라고 있습니다.",
     "coach-1": "번호가 붙은 핀을 탭하면 해당 스팟이 열립니다.",
     "coach-2": "이 버튼을 탭하면 언어나 설정을 변경할 수 있습니다.",
     "coach-3a": "스팟의 제목과 번호입니다. 지금 어느 스팟에 있는지 한눈에 알 수 있습니다.",
     "coach-3b": "하이라이트에는 이 스팟의 주요 볼거리와 핵심 포인트가 정리되어 있습니다.",
     "coach-3": "재생 버튼을 탭하면 오디오 가이드가 시작됩니다. 바를 드래그하여 위치를 조정할 수 있습니다.",
     "coach-3c": "텍스트 가이드에는 이 스팟에 대한 자세한 설명이 기재되어 있습니다.",
+    "coach-end": "투어를 끝낼 준비가 되면 이 버튼을 탭하세요.",
+    "coach-back": "「＜」 버튼을 탭하면 언제든지 지도로 돌아갑니다.",
     "coach-4": "이 화살표로 이전 또는 다음 스팟으로 이동할 수 있습니다.",
     "coach-next": "다음",
     "coach-done": "시작하기",
@@ -591,12 +619,21 @@ const UI_STRINGS = {
     "omamori-pink-desc": "良缘 · 健康祈愿",
     "omamori-save-btn": "保存",
     "omamori-fullscreen-save": "保存御守",
+    "omamori-transcript-label": "文字记录",
+    "omamori-transcript-q1": "当人们在罗汉像前停下脚步时，您希望他们心中浮现什么？",
+    "omamori-transcript-a1": "我相信人们心中会涌现出各种各样的情感。当这些情绪出现时，无论是怎样的感受，都希望大家能好好珍惜。是直截了当的惊讶，还是「这是什么」的疑问？是不可思议的奇妙感觉，还是心生欢喜？无论哪种皆可。正如我之前在讲解中提到的，罗汉像就像一面镜子，能让人审视内心。因此，请务必珍视那一刻您内心最真实的感受。如果以后有机会，希望您能再来走走。到那时，如果您产生了截然不同的新感受，我相信这份体验将会变得更加深厚。",
+    "omamori-transcript-q2": "为什么这305尊罗汉像没有放入玻璃展柜中保存？",
+    "omamori-transcript-a2": "如果把它们放入玻璃展柜——大家去博物馆或美术馆时应该也有过类似的经历，看到展柜里的佛像或佛画，人们很少会停下脚步并合掌参拜。但这里是寺院，我们实际上会在这里举行法要和法事，信众们也会前来合掌祈福。如果全部用玻璃柜隔绝开来，就会失去这种信仰的道场。因此，我们才把它们安奉在如此近距离的地方，仿佛伸手便可触及。因为是木雕，如果不放进玻璃柜进行控温控湿，它们就会不可避免地逐渐朽坏。从现实问题来看，再过个一百年、两百年，这些罗汉像是否还能保持现在的状态，是非常难说的。然而，佛教中讲求一期一会，我们也希望大家能好好珍惜此时此刻得以相遇的这段缘分。虽说外在形态的改变在所难免，但我由衷地希望，大家能将这份奇迹留在心底——那就是生于当今时代、在此时此刻来到这里，并得以与这些罗汉像相遇的奇迹。",
+    "omamori-transcript-q3": "您希望十年后、五十年后的罗汉寺成为怎样的地方？",
+    "omamori-transcript-a3": "我想，十年、五十年后，世界必定会发生翻天覆地的变化。然而，我依然由衷地希望，这些罗汉像在五十年后也能保持如今的面貌，继续作为一个能让人们净化心灵、安顿身心的港湾。我非常渴望能让五十年后的人们，也亲眼看一看我们此时此刻正凝望着的一切。这是自350年前便紧紧相连、承袭至今的财富。我认为，将其完好无损地传递给下一代，在手中继续薪火相传，是我们的使命。因此，我由衷地期盼着，未来的罗汉寺与眼前的罗汉像，都能以现在的模样永远留存下去。",
     "coach-1": "点击编号标记可打开该景点。",
     "coach-2": "点击此按钮可更改语言或调整设置。",
     "coach-3a": "这是景点的标题和编号，让您一目了然地知道自己在哪里。",
     "coach-3b": "亮点部分列出了该景点的看点和重要内容。",
     "coach-3": "点击播放按钮开始语音导览。拖动进度条可跳转到任意位置。",
     "coach-3c": "文字导览包含此景点的详细说明。",
+    "coach-end": "准备结束导览时，点击此按钮。",
+    "coach-back": "点击「＜」按钮可随时返回地图。",
     "coach-4": "使用这些箭头可切换到上一个或下一个景点。",
     "coach-next": "下一步",
     "coach-done": "出发",
@@ -1830,64 +1867,47 @@ function renderOmamoriVideos() {
 
 // ─── Priest message video player ─────────────────────────────────────────────
 
-const MSG_VIDEOS = [
-  "https://stg-apirakanjicom-stgrakanji.kinsta.cloud/wp-content/uploads/2026/05/1.mp4",
-  "https://stg-apirakanjicom-stgrakanji.kinsta.cloud/wp-content/uploads/2026/05/2_1.mp4",
-  "https://stg-apirakanjicom-stgrakanji.kinsta.cloud/wp-content/uploads/2026/05/3.mp4",
-];
+const MSG_VIDEO_URLS = {
+  ja: "https://stg-apirakanjicom-stgrakanji.kinsta.cloud/wp-content/uploads/2026/05/1.mp4",
+  zh: "https://stg-apirakanjicom-stgrakanji.kinsta.cloud/wp-content/uploads/2026/06/%E4%B8%AD%E5%9B%BD%E8%AA%9E%E3%82%A4%E3%83%B3%E3%82%BF%E3%83%93%E3%83%A5%E3%83%BC%E3%83%95%E3%83%AB-1.mp4",
+  en: "https://stg-apirakanjicom-stgrakanji.kinsta.cloud/wp-content/uploads/2026/06/%E8%8B%B1%E8%AA%9E%E3%82%A4%E3%83%B3%E3%82%BF%E3%83%93%E3%83%A5%E3%83%BC%E3%83%95%E3%83%AB-1.mp4",
+  ko: "https://stg-apirakanjicom-stgrakanji.kinsta.cloud/wp-content/uploads/2026/06/%E9%9F%93%E5%9B%BD%E8%AA%9E%E3%82%A4%E3%83%B3%E3%82%BF%E3%83%93%E3%83%A5%E3%83%BC%E3%83%95%E3%83%AB-1.mp4",
+};
 
-let msgVideoIndex = 0;
 let msgPlayerInit = false;
+
+omamoriMsgUnmute?.addEventListener("click", () => {
+  if (!omamoriMsgVideo) return;
+  omamoriMsgVideo.muted = !omamoriMsgVideo.muted;
+  const muted = omamoriMsgVideo.muted;
+  omamoriMsgUnmuteIcon?.setAttribute(
+    "d",
+    muted
+      ? "M11 5L6 9H2v6h4l5 4V5zM23 9l-6 6M17 9l6 6"
+      : "M11 5L6 9H2v6h4l5 4V5zM15.54 8.46a5 5 0 010 7.07M19.07 4.93a10 10 0 010 14.14"
+  );
+});
 
 function initMsgPlayer() {
   if (msgPlayerInit || !omamoriMsgVideo) return;
   msgPlayerInit = true;
 
-  function loadVideo(idx) {
-    msgVideoIndex = idx;
-    omamoriMsgVideo.src = MSG_VIDEOS[idx];
-    omamoriMsgVideo.load();
-    omamoriMsgVideo.play().catch(() => {});
-    omamoriMsgDots?.querySelectorAll(".omamori-msg-dot").forEach((dot) => {
-      dot.classList.toggle("is-active", Number(dot.dataset.idx) === idx);
-    });
-  }
-
-  omamoriMsgVideo.addEventListener("ended", () => {
-    const next = msgVideoIndex + 1;
-    if (next < MSG_VIDEOS.length) loadVideo(next);
-  });
-
-  omamoriMsgUnmute?.addEventListener("click", () => {
-    omamoriMsgVideo.muted = !omamoriMsgVideo.muted;
-    const muted = omamoriMsgVideo.muted;
-    omamoriMsgUnmuteIcon?.setAttribute(
-      "d",
-      muted
-        ? "M11 5L6 9H2v6h4l5 4V5zM23 9l-6 6M17 9l6 6"
-        : "M11 5L6 9H2v6h4l5 4V5zM15.54 8.46a5 5 0 010 7.07M19.07 4.93a10 10 0 010 14.14"
-    );
-  });
-
-  omamoriMsgDots?.addEventListener("click", (e) => {
-    const dot = e.target.closest(".omamori-msg-dot");
-    if (!dot) return;
-    loadVideo(Number(dot.dataset.idx));
-  });
-
-  loadVideo(0);
+  omamoriMsgVideo.muted = true;
+  omamoriMsgUnmuteIcon?.setAttribute(
+    "d",
+    "M11 5L6 9H2v6h4l5 4V5zM23 9l-6 6M17 9l6 6"
+  );
+  omamoriMsgVideo.src = MSG_VIDEO_URLS[getLangKey()] ?? MSG_VIDEO_URLS.ja;
+  omamoriMsgVideo.load();
+  omamoriMsgVideo.play().catch(() => {});
 }
 
 function resetMsgPlayer() {
   msgPlayerInit = false;
-  msgVideoIndex = 0;
   if (omamoriMsgVideo) {
     omamoriMsgVideo.pause();
     omamoriMsgVideo.src = "";
   }
-  omamoriMsgDots?.querySelectorAll(".omamori-msg-dot").forEach((dot) => {
-    dot.classList.toggle("is-active", dot.dataset.idx === "0");
-  });
 }
 
 function openDetailById(stopId) {
@@ -2390,17 +2410,55 @@ function bindEvents() {
   stopPickerBackdrop?.addEventListener("click", closeStopPicker);
 
   omamoriCloseBtn?.addEventListener("click", closeOmamori);
+
+  omamoriTranscriptEl?.querySelectorAll(".omamori-transcript-toggle").forEach((toggle) => {
+    toggle.addEventListener("click", () => {
+      const expanded = toggle.getAttribute("aria-expanded") === "true";
+      toggle.setAttribute("aria-expanded", String(!expanded));
+      const body = document.getElementById(toggle.getAttribute("aria-controls"));
+      if (body) body.hidden = expanded;
+    });
+  });
   mapEndBtn?.addEventListener("click", openOmamori);
 
+  function openOmamoriFullscreen(key) {
+    const url = OMAMORI_URLS[key];
+    if (!url || !omamoriFullscreen || !omamoriFullscreenVideo) return;
+    omamoriFullscreenVideo.src = url;
+    omamoriFullscreenVideo.play().catch(() => {});
+    omamoriFullscreenDl.dataset.omamoriKey = key;
+    omamoriFullscreen.classList.remove("hidden");
+  }
+
+  function closeOmamoriFullscreen() {
+    if (!omamoriFullscreen) return;
+    omamoriFullscreen.classList.add("hidden");
+    omamoriFullscreenVideo.pause();
+    omamoriFullscreenVideo.src = "";
+  }
+
+  omamoriFullscreenBack?.addEventListener("click", closeOmamoriFullscreen);
+
+  function lockOmamoriDownloads() {
+    omamoriScreen?.querySelectorAll(".omamori-download-btn").forEach((btn) => {
+      btn.disabled = true;
+      btn.classList.add("is-downloaded");
+    });
+    if (omamoriFullscreenDl) {
+      omamoriFullscreenDl.disabled = true;
+      omamoriFullscreenDl.classList.add("is-downloaded");
+    }
+  }
+
   omamoriScreen?.querySelectorAll(".omamori-card").forEach((card) => {
-    card.addEventListener("click", () => {
-      const key = card.dataset.omamoriKey;
-      const url = OMAMORI_URLS[key];
-      if (!url || !omamoriFullscreen || !omamoriFullscreenVideo) return;
-      omamoriFullscreenVideo.src = url;
-      omamoriFullscreenVideo.play().catch(() => {});
-      omamoriFullscreenDl.dataset.omamoriKey = key;
-      omamoriFullscreen.classList.remove("hidden");
+    card.addEventListener("click", (e) => {
+      if (e.target.closest(".omamori-download-btn")) return;
+      openOmamoriFullscreen(card.dataset.omamoriKey);
+    });
+
+    card.querySelector(".omamori-download-btn")?.addEventListener("click", (e) => {
+      e.stopPropagation();
+      openOmamoriFullscreen(card.dataset.omamoriKey);
     });
   });
 
@@ -2416,6 +2474,7 @@ function bindEvents() {
       // iOS Safari: use share sheet so user can save to Files/Photos
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
         await navigator.share({ files: [file], title: filename });
+        lockOmamoriDownloads();
         return;
       }
       // Desktop / Android: blob download
@@ -2427,6 +2486,7 @@ function bindEvents() {
       a.click();
       document.body.removeChild(a);
       setTimeout(() => URL.revokeObjectURL(objectUrl), 10000);
+      lockOmamoriDownloads();
     } catch {
       window.location.href = url;
     }
@@ -2486,7 +2546,8 @@ function runCoachMarks() {
   const lang = getRequestedLang();
   const t = UI_STRINGS[lang] || UI_STRINGS.ja;
 
-  // Steps: map pin → settings → (open detail) title → highlight → audio → transcript → prev/next
+  // Steps: map pin → end tour → (open detail) back → settings → highlight → audio → transcript → prev/next
+  // Every targetFn must return a guaranteed-visible element — no hidden/display:none targets.
   const STEPS = [
     {
       targetFn: () => document.querySelector(".map-pin"),
@@ -2494,25 +2555,32 @@ function runCoachMarks() {
       pad: 14,
     },
     {
-      targetFn: () => document.querySelector(".map-settings-btn"),
-      text: t["coach-2"],
+      targetFn: () => document.querySelector("#mapEndBtn"),
+      text: t["coach-end"],
       pad: 14,
     },
     {
-      targetFn: () => document.querySelector("#detailTitle"),
-      text: t["coach-3a"],
-      pad: 10,
-      rect: true,
+      targetFn: () => document.querySelector("#backButton"),
+      text: t["coach-back"],
+      pad: 14,
       openDetail: true,
-      scrollTo: "#detailTitle",
     },
     {
-      targetFn: () => document.querySelector("#detailHighlight"),
+      targetFn: () => document.querySelector("#detailSettingsBtn"),
+      text: t["coach-2"],
+      pad: 14,
+      openDetail: true,
+    },
+    {
+      targetFn: () => {
+        const el = document.querySelector("#detailHighlight");
+        return (el && !el.classList.contains("hidden")) ? el : document.querySelector("#detailText");
+      },
       text: t["coach-3b"],
       pad: 10,
       rect: true,
       openDetail: true,
-      scrollTo: "#detailHighlight",
+      scrollTo: "#detailText",
     },
     {
       targetFn: () => document.querySelector("#detailPlayBtn"),
@@ -2522,11 +2590,22 @@ function runCoachMarks() {
       scrollTo: "#detailAudioInline",
     },
     {
+      targetFn: () => {
+        const el = document.querySelector("#detailTranscriptBlock");
+        return (el && !el.hidden) ? el : document.querySelector("#detailText");
+      },
+      text: t["coach-3c"],
+      pad: 10,
+      rect: true,
+      openDetail: true,
+      scrollTo: "#detailText",
+    },
+    {
+      // bottom-nav is position:fixed — spotlight in place, no scrollIntoView
       targetFn: () => document.querySelector("#detailNextBtn"),
       text: t["coach-4"],
       pad: 14,
       openDetail: true,
-      scrollTo: "#detailNextBtn",
     },
   ];
 
@@ -2565,7 +2644,9 @@ function runCoachMarks() {
 
     const elBottom = r.top + r.height + pad;
     const elTop = r.top - pad;
-    const bubbleH = 140;
+    // Measure the actual rendered bubble height rather than a fixed estimate,
+    // so positioning works correctly regardless of content length.
+    const bubbleH = bubble.offsetHeight || 140;
     const spaceBelow = window.innerHeight - (elBottom + 16);
     if (spaceBelow > bubbleH) {
       bubble.style.top = `${elBottom + 16}px`;
@@ -2599,11 +2680,20 @@ function runCoachMarks() {
       return;
     }
 
-    // Scroll target element into view then wait for layout to settle
+    // Scroll the target into view using instant (no animation) so position is
+    // stable before we call getBoundingClientRect. Smooth scroll is async with
+    // no callback, making timing unreliable, especially for rect-based steps.
     if (s.openDetail && s.scrollTo) {
-      const el = document.querySelector(s.scrollTo);
-      if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
-      setTimeout(() => renderStep(i), 280);
+      const primary = document.querySelector(s.scrollTo);
+      const fallback = s.scrollFallback ? document.querySelector(s.scrollFallback) : null;
+      const scrollTarget = (primary && !primary.hidden) ? primary : fallback;
+      if (scrollTarget) {
+        const pos = window.getComputedStyle(scrollTarget).position;
+        if (pos !== "fixed" && pos !== "sticky") {
+          scrollTarget.scrollIntoView({ behavior: "instant", block: "center" });
+        }
+      }
+      requestAnimationFrame(() => requestAnimationFrame(() => renderStep(i)));
       return;
     }
 
@@ -2615,8 +2705,7 @@ function runCoachMarks() {
     const isLast = i === STEPS.length - 1;
 
     const el = s.targetFn ? s.targetFn() : null;
-    // Skip hidden or missing elements (e.g. highlight/transcript when stop has none)
-    if (!el || el.hidden || el.classList.contains("hidden")) {
+    if (!el) {
       if (!isLast) { showStep(i + 1); return; }
       finishCoach();
       return;

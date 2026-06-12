@@ -139,7 +139,7 @@
       <section class="detail-view" aria-label="Stop detail">
         <div class="detail-hero">
           <button class="back-btn" id="backButton" type="button" aria-label="Go back">
-            <
+            &lt;
           </button>
           <button class="detail-settings-btn" id="detailSettingsBtn" type="button" aria-label="Settings">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -247,7 +247,7 @@
             id="mapPreviewClose"
             aria-label="Close map preview"
           >
-            x
+            &times;
           </button>
         </div>
         <div class="overlay-map-stage" id="mapPreviewStage">
@@ -278,7 +278,7 @@
             id="termModalClose"
             aria-label="Close keyword details"
           >
-            x
+            &times;
           </button>
         </div>
         <div class="term-modal-scroll" id="termModalScroll">
@@ -317,7 +317,7 @@
         </button>
       </div>
 
-      <!-- Priest message videos (Japanese only, plays 1→2→3 then loops) -->
+      <!-- Priest message video (one per language) -->
       <div class="omamori-msg-player" id="omamoriMsgPlayer">
         <video
           class="omamori-msg-video"
@@ -332,17 +332,44 @@
             <path id="omamoriMsgUnmuteIcon" d="M11 5L6 9H2v6h4l5 4V5zM23 9l-6 6M17 9l6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
         </button>
-        <div class="omamori-msg-dots" id="omamoriMsgDots">
-          <span class="omamori-msg-dot is-active" data-idx="0"></span>
-          <span class="omamori-msg-dot" data-idx="1"></span>
-          <span class="omamori-msg-dot" data-idx="2"></span>
-        </div>
       </div>
 
-      <div class="omamori-priest">
-        <div class="omamori-priest-bubble">
-          <p class="omamori-priest-role" data-t="omamori-priest-role">住職より</p>
-          <p class="omamori-priest-quote" data-t="omamori-priest-quote">「本日はご参拝いただき、誠にありがとうございます。この地に眠る御霊が、皆様の歩みをいつまでも見守っておられます。どうかお守りを携え、健やかな日々をお過ごしください。」</p>
+      <!-- Transcript accordion -->
+      <div class="omamori-transcript" id="omamoriTranscript">
+        <div class="omamori-transcript-inner">
+          <div class="omamori-transcript-item">
+            <button class="omamori-transcript-toggle" type="button" aria-expanded="false" aria-controls="omamoriTranscriptBody1">
+              <span class="omamori-transcript-q" data-t="omamori-transcript-q1"></span>
+              <svg class="omamori-transcript-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+            <div class="omamori-transcript-body" id="omamoriTranscriptBody1" hidden>
+              <p class="omamori-transcript-a" data-t="omamori-transcript-a1"></p>
+            </div>
+          </div>
+          <div class="omamori-transcript-item">
+            <button class="omamori-transcript-toggle" type="button" aria-expanded="false" aria-controls="omamoriTranscriptBody2">
+              <span class="omamori-transcript-q" data-t="omamori-transcript-q2"></span>
+              <svg class="omamori-transcript-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+            <div class="omamori-transcript-body" id="omamoriTranscriptBody2" hidden>
+              <p class="omamori-transcript-a" data-t="omamori-transcript-a2"></p>
+            </div>
+          </div>
+          <div class="omamori-transcript-item">
+            <button class="omamori-transcript-toggle" type="button" aria-expanded="false" aria-controls="omamoriTranscriptBody3">
+              <span class="omamori-transcript-q" data-t="omamori-transcript-q3"></span>
+              <svg class="omamori-transcript-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+            <div class="omamori-transcript-body" id="omamoriTranscriptBody3" hidden>
+              <p class="omamori-transcript-a" data-t="omamori-transcript-a3"></p>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -445,8 +472,13 @@
       </div>
     </section>
 
-    <!-- Fullscreen omamori video viewer — no back button, download only. -->
+    <!-- Fullscreen omamori video viewer -->
     <div class="omamori-fullscreen hidden" id="omamoriFullscreen" aria-modal="true" role="dialog" aria-label="お守り動画">
+      <button class="omamori-fullscreen-back" id="omamoriFullscreenBack" type="button" aria-label="戻る">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
       <video class="omamori-fullscreen-video" id="omamoriFullscreenVideo" autoplay muted loop playsinline></video>
       <div class="omamori-fullscreen-actions">
         <button class="omamori-fullscreen-dl" id="omamoriFullscreenDl" type="button">

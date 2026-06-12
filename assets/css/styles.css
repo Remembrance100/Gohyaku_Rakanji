@@ -1501,6 +1501,8 @@ button:active {
   box-shadow: 0 8px 32px rgba(0,0,0,0.55);
   will-change: opacity, top, bottom;
   transition: opacity 160ms ease, top 240ms cubic-bezier(0.4, 0, 0.2, 1), bottom 240ms cubic-bezier(0.4, 0, 0.2, 1);
+  /* Fixed size regardless of user's chosen font scale */
+  font-size: 1rem;
 }
 
 .coach-bubble::before {
@@ -1777,53 +1779,71 @@ button:active {
   -webkit-tap-highlight-color: transparent;
 }
 
-.omamori-msg-dots {
-  display: flex;
-  justify-content: center;
-  gap: 0.45rem;
-  margin-top: 0.6rem;
-}
 
-.omamori-msg-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.22);
-  transition: background 200ms;
-  cursor: pointer;
-}
+/* ─── Omamori transcript accordion ───────────────────── */
 
-.omamori-msg-dot.is-active {
-  background: #f6515f;
-}
-
-.omamori-priest {
+.omamori-transcript {
   width: 100%;
   max-width: 560px;
-  padding: 1.2rem 1rem 0;
+  padding: 1rem 1rem 0;
 }
 
-.omamori-priest-bubble {
-  background: #16161c;
+.omamori-transcript-inner {
   border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 14px;
-  padding: 0.7rem 0.85rem;
-  display: grid;
-  gap: 0.38rem;
+  border-radius: 10px;
+  overflow: hidden;
 }
 
-.omamori-priest-role {
-  margin: 0;
-  font: 700 var(--tour-text-size) "Barlow", sans-serif;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: #f6515f;
+.omamori-transcript-item + .omamori-transcript-item {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.omamori-priest-quote {
+.omamori-transcript-toggle {
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.6rem;
+  padding: 0.75rem 0.85rem;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.75);
+  text-align: left;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: color 140ms;
+}
+
+.omamori-transcript-toggle:active,
+.omamori-transcript-toggle[aria-expanded="true"] {
+  color: #fff;
+}
+
+.omamori-transcript-q {
+  flex: 1;
+  font: 600 var(--tour-text-size) / 1.55 "Manrope", sans-serif;
+}
+
+.omamori-transcript-chevron {
+  flex-shrink: 0;
+  margin-top: 0.18em;
+  transition: transform 220ms ease;
+}
+
+.omamori-transcript-toggle[aria-expanded="true"] .omamori-transcript-chevron {
+  transform: rotate(180deg);
+}
+
+.omamori-transcript-body {
+  padding: 0 0.85rem 0.85rem;
+}
+
+.omamori-transcript-a {
   margin: 0;
-  font: 500 var(--tour-text-size) / 1.65 "Manrope", sans-serif;
-  color: rgba(255, 255, 255, 0.72);
+  font: 400 var(--tour-text-size) / 1.7 "Manrope", sans-serif;
+  color: rgba(255, 255, 255, 0.6);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding-top: 0.65rem;
 }
 
 .omamori-grid {
@@ -1897,6 +1917,20 @@ button:active {
   filter: brightness(0.88);
 }
 
+.omamori-download-btn.is-downloaded,
+.omamori-download-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.omamori-fullscreen-dl.is-downloaded,
+.omamori-fullscreen-dl:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
 @media (hover: hover) {
   .omamori-download-btn:hover {
     filter: brightness(1.14);
@@ -1968,6 +2002,35 @@ button:active {
   right: 0;
   display: flex;
   justify-content: center;
+}
+
+.omamori-fullscreen-back {
+  position: absolute;
+  top: calc(1.2rem + env(safe-area-inset-top));
+  left: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 140ms;
+  z-index: 1;
+}
+
+.omamori-fullscreen-back:active {
+  background: rgba(255, 255, 255, 0.28);
+}
+
+@media (hover: hover) {
+  .omamori-fullscreen-back:hover {
+    background: rgba(255, 255, 255, 0.25);
+  }
 }
 
 .omamori-fullscreen-dl {
