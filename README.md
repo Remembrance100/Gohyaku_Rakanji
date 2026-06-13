@@ -10,19 +10,19 @@ A production-ready, multilingual audio tour web app built for real-world deploym
 
 | Language & Settings | Interactive Map | Stop Detail | Post-Tour Gift |
 |---|---|---|---|
-| ![Language and font size settings screen](screenshots/tour/Screenshot%202026-06-13%20at%209.08.02%20AM.png) | ![Interactive temple map with numbered stop pins](screenshots/tour/Screenshot%202026-06-13%20at%209.08.13%20AM.png) | ![Stop detail view with image, audio player and transcript](screenshots/tour/Screenshot%202026-06-13%20at%209.08.33%20AM.png) | ![Post-tour omamori gift selection screen](screenshots/tour/Screenshot%202026-06-13%20at%209.08.56%20AM.png) |
+| ![Language and font size settings screen](screenshots/tour/settings.png) | ![Interactive temple map with numbered stop pins](screenshots/tour/map.png) | ![Stop detail view with image, audio player and transcript](screenshots/tour/stop-detail.png) | ![Post-tour omamori gift selection screen](screenshots/tour/omamori.png) |
 
 ### WordPress CMS · Temple Staff Dashboard
 
 | Memorial Stop Management | Media Library |
 |---|---|
-| ![WordPress Memorial Stops admin list](screenshots/wordpress/Screenshot%202026-06-13%20at%209.03.54%20AM.png) | ![WordPress Media Library with temple images and videos](screenshots/wordpress/Screenshot%202026-06-13%20at%209.04.20%20AM.png) |
+| ![WordPress Memorial Stops admin list](screenshots/wordpress/memorial-stops.png) | ![WordPress Media Library with temple images and videos](screenshots/wordpress/media-library.png) |
 
 ### Cloudflare Pages · Production Deployment
 
 | Workers & Pages Dashboard | Deployment Details |
 |---|---|
-| ![Cloudflare Workers and Pages dashboard](screenshots/cloudflare/Screenshot%202026-06-13%20at%209.06.05%20AM.png) | ![Cloudflare deployment details showing production status](screenshots/cloudflare/Screenshot%202026-06-13%20at%209.06.56%20AM.png) |
+| ![Cloudflare Workers and Pages dashboard](screenshots/cloudflare/dashboard.png) | ![Cloudflare deployment details showing production status](screenshots/cloudflare/deployment.png) |
 
 ---
 
