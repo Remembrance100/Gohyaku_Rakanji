@@ -60,6 +60,8 @@ const omamoriCloseBtn = document.querySelector("#omamoriCloseBtn");
 const omamoriMsgVideo = document.querySelector("#omamoriMsgVideo");
 const omamoriMsgUnmute = document.querySelector("#omamoriMsgUnmute");
 const omamoriMsgUnmuteIcon = document.querySelector("#omamoriMsgUnmuteIcon");
+const omamoriMsgUnmuteLabel = document.querySelector("#omamoriMsgUnmuteLabel");
+const omamoriMsgSettings = document.querySelector("#omamoriMsgSettings");
 const mapEndBtn = document.querySelector("#mapEndBtn");
 const omamoriFullscreen = document.querySelector("#omamoriFullscreen");
 const omamoriFullscreenVideo = document.querySelector(
@@ -432,6 +434,8 @@ function getRequestedLang() {
 
 const UI_STRINGS = {
   ja: {
+    "audio-on": "音声オン",
+    "audio-off": "音声オフ",
     "label-language": "言語",
     "label-fontsize": "文字サイズ",
     "font-sample-large": "あ",
@@ -484,6 +488,8 @@ const UI_STRINGS = {
     "coach-skip": "スキップ",
   },
   en: {
+    "audio-on": "Audio On",
+    "audio-off": "Audio Off",
     "label-language": "Language",
     "label-fontsize": "Text Size",
     "font-sample-large": "Aa",
@@ -536,6 +542,8 @@ const UI_STRINGS = {
     "coach-skip": "Skip",
   },
   ko: {
+    "audio-on": "음성 켜기",
+    "audio-off": "음성 끄기",
     "label-language": "언어",
     "label-fontsize": "글자 크기",
     "font-sample-large": "가",
@@ -588,6 +596,8 @@ const UI_STRINGS = {
     "coach-skip": "건너뛰기",
   },
   zh: {
+    "audio-on": "开启音频",
+    "audio-off": "关闭音频",
     "label-language": "语言",
     "label-fontsize": "文字大小",
     "font-sample-large": "文",
@@ -725,6 +735,8 @@ function initTourSettings() {
     savePrefs({ lang: selectedLang, size: selectedSize });
     syncLangBtns();
     remapStopsForLang();
+    syncOmamoriAudioBtn();
+    reloadMsgPlayerForLang();
   });
 
   screen.querySelectorAll(".settings-font-btn").forEach((btn) => {
@@ -743,6 +755,7 @@ function initTourSettings() {
 
   mapBtn?.addEventListener("click", openSettings);
   detailBtn?.addEventListener("click", openSettings);
+  document.getElementById("omamoriMsgSettings")?.addEventListener("click", openSettings);
 }
 
 function getLocalizedField(rawObj, key, fallback = "") {
@@ -1876,16 +1889,26 @@ const MSG_VIDEO_URLS = {
 
 let msgPlayerInit = false;
 
-omamoriMsgUnmute?.addEventListener("click", () => {
+function syncOmamoriAudioBtn() {
   if (!omamoriMsgVideo) return;
-  omamoriMsgVideo.muted = !omamoriMsgVideo.muted;
   const muted = omamoriMsgVideo.muted;
+  const t = UI_STRINGS[getLangKey()] || UI_STRINGS.ja;
+  if (omamoriMsgUnmuteLabel) {
+    omamoriMsgUnmuteLabel.textContent = muted ? (t["audio-on"] ?? "音声オン") : (t["audio-off"] ?? "音声オフ");
+  }
   omamoriMsgUnmuteIcon?.setAttribute(
     "d",
     muted
       ? "M11 5L6 9H2v6h4l5 4V5zM23 9l-6 6M17 9l6 6"
       : "M11 5L6 9H2v6h4l5 4V5zM15.54 8.46a5 5 0 010 7.07M19.07 4.93a10 10 0 010 14.14"
   );
+  omamoriMsgUnmute?.classList.toggle("is-unmuted", !muted);
+}
+
+omamoriMsgUnmute?.addEventListener("click", () => {
+  if (!omamoriMsgVideo) return;
+  omamoriMsgVideo.muted = !omamoriMsgVideo.muted;
+  syncOmamoriAudioBtn();
 });
 
 function initMsgPlayer() {
@@ -1893,10 +1916,7 @@ function initMsgPlayer() {
   msgPlayerInit = true;
 
   omamoriMsgVideo.muted = true;
-  omamoriMsgUnmuteIcon?.setAttribute(
-    "d",
-    "M11 5L6 9H2v6h4l5 4V5zM23 9l-6 6M17 9l6 6"
-  );
+  syncOmamoriAudioBtn();
   omamoriMsgVideo.src = MSG_VIDEO_URLS[getLangKey()] ?? MSG_VIDEO_URLS.ja;
   omamoriMsgVideo.load();
   omamoriMsgVideo.play().catch(() => {});
@@ -1908,6 +1928,15 @@ function resetMsgPlayer() {
     omamoriMsgVideo.pause();
     omamoriMsgVideo.src = "";
   }
+}
+
+function reloadMsgPlayerForLang() {
+  if (!msgPlayerInit || !omamoriMsgVideo) return;
+  omamoriMsgVideo.src = MSG_VIDEO_URLS[getLangKey()] ?? MSG_VIDEO_URLS.ja;
+  omamoriMsgVideo.muted = true;
+  omamoriMsgVideo.load();
+  omamoriMsgVideo.play().catch(() => {});
+  syncOmamoriAudioBtn();
 }
 
 function openDetailById(stopId) {

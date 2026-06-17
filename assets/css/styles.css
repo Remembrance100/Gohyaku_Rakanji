@@ -1688,30 +1688,6 @@ button:active {
   transform: translateY(0);
 }
 
-.omamori-header {
-  width: 100%;
-  max-width: 560px;
-  padding: 1.1rem 1rem 0;
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-}
-
-.omamori-close-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  background: rgba(255, 255, 255, 0.07);
-  color: #fff;
-  cursor: pointer;
-  flex-shrink: 0;
-  -webkit-tap-highlight-color: transparent;
-}
-
 .omamori-hero {
   width: 100%;
   max-width: 560px;
@@ -1749,34 +1725,83 @@ button:active {
 .omamori-msg-player {
   width: 100%;
   max-width: 560px;
-  padding: 1rem 1rem 0;
   position: relative;
 }
 
 .omamori-msg-video {
   width: 100%;
   aspect-ratio: 16 / 9;
-  border-radius: 12px;
   background: #000;
   display: block;
   object-fit: cover;
 }
 
-.omamori-msg-unmute {
-  position: absolute;
-  top: calc(1rem + 0.6rem);
-  right: calc(1rem + 0.6rem);
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  border: none;
-  background: rgba(0, 0, 0, 0.55);
-  color: #fff;
+.omamori-header {
+  width: 100%;
+  max-width: 560px;
+  padding: 1rem 1rem 0.5rem;
+  display: flex;
+  align-items: center;
+}
+
+.omamori-close-btn {
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.07);
+  color: #fff;
+  cursor: pointer;
+  flex-shrink: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.omamori-msg-unmute {
+  position: absolute;
+  top: 0.7rem;
+  left: 0.7rem;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.38rem 0.7rem 0.38rem 0.5rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(0, 0, 0, 0.62);
+  color: #fff;
+  font: 600 var(--tour-text-size) "Manrope", sans-serif;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  white-space: nowrap;
+}
+
+.omamori-msg-unmute.is-unmuted {
+  opacity: 0.55;
+}
+
+.omamori-msg-settings {
+  position: absolute;
+  top: 0.7rem;
+  right: 0.7rem;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(0, 0, 0, 0.62);
+  color: #fff;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
 }
 
 
@@ -1792,6 +1817,7 @@ button:active {
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 10px;
   overflow: hidden;
+  counter-reset: transcript-q;
 }
 
 .omamori-transcript-item + .omamori-transcript-item {
@@ -1819,9 +1845,17 @@ button:active {
   color: #fff;
 }
 
+.omamori-transcript-item {
+  counter-increment: transcript-q;
+}
+
 .omamori-transcript-q {
   flex: 1;
   font: 600 var(--tour-text-size) / 1.55 "Manrope", sans-serif;
+}
+
+.omamori-transcript-q::before {
+  content: counter(transcript-q) ". ";
 }
 
 .omamori-transcript-chevron {

@@ -658,8 +658,13 @@ function renderEntry(stop) {
 function updateUnmuteBtn() {
   if (!entryVideo || !entryUnmuteBtn) return;
   const muted = entryVideo.muted;
-  if (entryUnmuteLabel)
-    entryUnmuteLabel.textContent = muted ? "音声オン" : "音声オフ";
+  if (entryUnmuteLabel) {
+    const lang = document.documentElement.lang || "ja";
+    const t = TRANSLATIONS[lang] || TRANSLATIONS.ja;
+    entryUnmuteLabel.textContent = muted
+      ? t["audio-on"] ?? "音声オン"
+      : t["audio-off"] ?? "音声オフ";
+  }
   if (entryUnmuteIcon) {
     entryUnmuteIcon.setAttribute(
       "d",
@@ -677,6 +682,8 @@ const PREFS_KEY = "tourPrefs";
 
 const TRANSLATIONS = {
   en: {
+    "audio-on": "Audio On",
+    "audio-off": "Audio Off",
     "label-language": "Language",
     "label-fontsize": "Text Size",
     "font-sample-small": "Aa",
@@ -696,6 +703,8 @@ const TRANSLATIONS = {
     "start-btn": "Guide Map",
   },
   ja: {
+    "audio-on": "音声オン",
+    "audio-off": "音声オフ",
     "label-language": "言語",
     "label-fontsize": "文字サイズ",
     "font-sample-small": "あ",
@@ -715,6 +724,8 @@ const TRANSLATIONS = {
     "start-btn": "ガイドマップ",
   },
   ko: {
+    "audio-on": "음성 켜기",
+    "audio-off": "음성 끄기",
     "label-language": "언어",
     "label-fontsize": "글자 크기",
     "font-sample-small": "가",
@@ -734,6 +745,8 @@ const TRANSLATIONS = {
     "start-btn": "가이드 맵",
   },
   zh: {
+    "audio-on": "开启音频",
+    "audio-off": "关闭音频",
     "label-language": "语言",
     "label-fontsize": "文字大小",
     "font-sample-small": "文",
@@ -832,6 +845,7 @@ function initSettings(onLangChange) {
     selectedLang = btn.dataset.lang;
     applyLang(selectedLang);
     syncLangBtns();
+    updateUnmuteBtn();
     onLangChange?.(selectedLang);
   });
 
