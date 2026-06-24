@@ -25,7 +25,7 @@ export async function onRequestPost(context) {
         {
           price_data: {
             currency: "jpy",
-            unit_amount: 1500,
+            unit_amount: 1000,
             product_data: {
               name: "Memorial Tour Guide",
               description: "24-hour access to the interactive audio tour",
