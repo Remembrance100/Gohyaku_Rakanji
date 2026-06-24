@@ -12,6 +12,9 @@ export async function onRequestPost(context) {
     body = await context.request.json();
   } catch {}
 
+  const LOCALE_MAP = { ja: "ja", en: "en", ko: "ko", zh: "zh" };
+  const locale = LOCALE_MAP[body.lang] || "auto";
+
   const successUrl = `${origin}/tour.html?session_id={CHECKOUT_SESSION_ID}`;
   const cancelUrl = `${origin}/pay.html?cancelled=1`;
 
@@ -34,6 +37,7 @@ export async function onRequestPost(context) {
 
   const params = new URLSearchParams();
   params.append("mode", "payment");
+  params.append("locale", locale);
   params.append("success_url", successUrl);
   params.append("cancel_url", cancelUrl);
   lineItems.forEach((item, i) => {
