@@ -23,7 +23,8 @@
     </script>
     <script>
       // Access gate — must have a valid 24h token or a fresh Stripe session_id
-      (function () {
+      // TODO: re-enable payment gate
+      (function () { return; // payment gate disabled
         const TOUR_TOKEN_KEY = "tourAccessToken";
         const TOUR_EXPIRY_KEY = "tourAccessExpiry";
 

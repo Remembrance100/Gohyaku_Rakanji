@@ -1305,6 +1305,7 @@ function mapWpStop(rawStop, index, numberOffset = 0) {
     terms,
     audioUrl:
       resolveMediaUrl(rawStop?.[`audio_url_${lang}`]) ||
+      resolveMediaUrl(rawStop?.audioUrl) ||
       resolveMediaUrl(rawStop?.audio_url) ||
       "",
     videoUrl: getStopVideoUrl(rawStop),

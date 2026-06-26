@@ -865,13 +865,15 @@ function initSettings(onLangChange) {
 
   confirmBtn?.addEventListener("click", () => {
     savePrefs({ lang: selectedLang, size: selectedSize });
-    const expiry = parseInt(localStorage.getItem("tourAccessExpiry") || "0", 10);
-    const hasToken = localStorage.getItem("tourAccessToken") && expiry > Date.now();
-    if (hasToken) {
-      hideSettings();
-    } else {
-      window.location.href = "./pay.html";
-    }
+    // TODO: re-enable payment gate
+    // const expiry = parseInt(localStorage.getItem("tourAccessExpiry") || "0", 10);
+    // const hasToken = localStorage.getItem("tourAccessToken") && expiry > Date.now();
+    // if (hasToken) {
+    //   hideSettings();
+    // } else {
+    //   window.location.href = "./pay.html";
+    // }
+    hideSettings();
   });
 
   // Re-open from gear icon
