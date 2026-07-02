@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#08080c" />
+    <title>Memorial Tour Guide · Select Payment</title>
+    <link rel="icon" href="./assets/icons/icon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Barlow:wght@500;700;800&family=Manrope:wght@500;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --tour-font-scale: 1;
+        --tour-text-size: calc(1rem * var(--tour-font-scale));
+      }
+
+      *, *::before, *::after { box-sizing: border-box; }
+
+      html, body {
+        margin: 0;
+        min-height: 100%;
+      }
+
+      body {
+        font-family: "Manrope", sans-serif;
+        font-size: var(--tour-text-size);
+        background: #000;
+        color: #f2f2f2;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100svh;
+        padding: 1.5rem;
+      }
+
+      .pay-card {
+        width: min(100%, 420px);
+        background: #111114;
+        border-top: 5px solid #f6515f;
+        border-radius: 4px;
+        padding: 2rem 1.6rem 1.6rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1.2rem;
+        box-shadow: 0 16px 48px rgba(0, 0, 0, 0.8);
+      }
+
+      .pay-brand {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font: 700 var(--tour-text-size) "Manrope", sans-serif;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: rgba(255,255,255,0.4);
+      }
+
+      .pay-brand svg {
+        flex-shrink: 0;
+        opacity: 0.5;
+      }
+
+      .pay-title {
+        margin: 0;
+        font: 800 var(--tour-text-size) / 1.2 "Barlow", sans-serif;
+        color: #f6f6f6;
+      }
+
+      .pay-subtitle {
+        margin: 0;
+        font-size: var(--tour-text-size);
+        color: rgba(255,255,255,0.6);
+        line-height: 1.55;
+      }
+
+      .pay-divider {
+        height: 1px;
+        background: rgba(255,255,255,0.1);
+      }
+
+      .method-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+
+      .method-btn {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        width: 100%;
+        padding: 1rem 1.1rem;
+        background: rgba(255,255,255,0.05);
+        border: 1.5px solid rgba(255,255,255,0.1);
+        border-radius: 10px;
+        color: #f2f2f2;
+        font: 700 var(--tour-text-size) "Manrope", sans-serif;
+        cursor: pointer;
+        text-align: left;
+        transition: border-color 150ms, background 150ms;
+        position: relative;
+      }
+
+      .method-btn:hover:not(:disabled) {
+        border-color: rgba(246, 81, 95, 0.6);
+        background: rgba(246, 81, 95, 0.06);
+      }
+
+      .method-btn:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+      }
+
+      .method-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        font-size: 1.2rem;
+      }
+
+      .method-icon--card {
+        background: rgba(255,255,255,0.08);
+      }
+
+      .method-icon--paypay {
+        background: #e0001b;
+      }
+
+      .method-text {
+        flex: 1;
+      }
+
+      .method-name {
+        display: block;
+        font: 700 var(--tour-text-size) "Barlow", sans-serif;
+        letter-spacing: 0.03em;
+        text-transform: uppercase;
+      }
+
+      .method-sub {
+        display: block;
+        font-size: calc(var(--tour-text-size) * 0.82);
+        color: rgba(255,255,255,0.45);
+        margin-top: 0.1rem;
+      }
+
+      .method-badge {
+        font: 600 calc(var(--tour-text-size) * 0.75) "Manrope", sans-serif;
+        background: rgba(255,255,255,0.08);
+        color: rgba(255,255,255,0.4);
+        border-radius: 999px;
+        padding: 0.2em 0.65em;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+
+      .method-arrow {
+        color: rgba(255,255,255,0.3);
+        flex-shrink: 0;
+      }
+
+      .pay-secure {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.4rem;
+        font-size: var(--tour-text-size);
+        color: rgba(255,255,255,0.3);
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="pay-card">
+      <div class="pay-brand">
+        <svg width="16" height="16" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+          <circle cx="9" cy="9" r="8" stroke="currentColor" stroke-width="1.2"/>
+          <circle cx="9" cy="9" r="3.5" fill="currentColor"/>
+          <line x1="9" y1="1" x2="9" y2="4" stroke="currentColor" stroke-width="1.2"/>
+          <line x1="9" y1="14" x2="9" y2="17" stroke="currentColor" stroke-width="1.2"/>
+          <line x1="1" y1="9" x2="4" y2="9" stroke="currentColor" stroke-width="1.2"/>
+          <line x1="14" y1="9" x2="17" y2="9" stroke="currentColor" stroke-width="1.2"/>
+        </svg>
+        SmartSenior
+      </div>
+
+      <div>
+        <h1 class="pay-title" id="selTitle">Select Payment Method</h1>
+        <p class="pay-subtitle" id="selSubtitle">Choose how you'd like to purchase access to the tour.</p>
+      </div>
+
+      <div class="pay-divider"></div>
+
+      <div class="method-list">
+        <button class="method-btn" id="btnCard" type="button">
+          <div class="method-icon method-icon--card">
+            <svg width="22" height="16" viewBox="0 0 22 16" fill="none" aria-hidden="true">
+              <rect x="1" y="1" width="20" height="14" rx="2" stroke="white" stroke-width="1.4"/>
+              <rect x="1" y="4.5" width="20" height="3" fill="white" opacity="0.35"/>
+              <rect x="4" y="10" width="6" height="1.5" rx="0.75" fill="white" opacity="0.6"/>
+            </svg>
+          </div>
+          <div class="method-text">
+            <span class="method-name" id="cardName">Credit Card</span>
+            <span class="method-sub" id="cardSub">Visa, Mastercard &amp; more via Stripe</span>
+          </div>
+          <svg class="method-arrow" width="7" height="12" viewBox="0 0 7 12" fill="none" aria-hidden="true">
+            <path d="M1 1l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+
+        <button class="method-btn" id="btnPaypay" type="button" disabled>
+          <div class="method-icon method-icon--paypay">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <text x="2" y="18" font-size="14" font-weight="900" font-family="Arial, sans-serif" fill="white">PP</text>
+            </svg>
+          </div>
+          <div class="method-text">
+            <span class="method-name">PayPay</span>
+            <span class="method-sub" id="paypaySubText">PayPay online payment</span>
+          </div>
+          <span class="method-badge" id="paypayBadge">Coming Soon</span>
+        </button>
+      </div>
+
+      <div class="pay-secure">
+        <svg width="11" height="13" viewBox="0 0 11 13" fill="none" aria-hidden="true">
+          <rect x="1" y="5" width="9" height="7.5" rx="1.5" stroke="currentColor" stroke-width="1.2"/>
+          <path d="M3 5V3.5a2.5 2.5 0 015 0V5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+        </svg>
+        <span id="secureLabel">Secure checkout · ¥1,000 · 24-hour access</span>
+      </div>
+    </div>
+
+    <script>
+      const STRINGS = {
+        ja: {
+          title: "お支払い方法を選択",
+          subtitle: "音声ガイドへのアクセス購入方法をお選びください。",
+          cardName: "クレジットカード",
+          cardSub: "Visa・Mastercard他（Stripe決済）",
+          paypaySubText: "PayPayオンライン決済",
+          badge: "近日公開",
+          secure: "安全なチェックアウト · ¥1,000 · 24時間アクセス",
+        },
+        en: {
+          title: "Select Payment Method",
+          subtitle: "Choose how you'd like to purchase access to the tour.",
+          cardName: "Credit Card",
+          cardSub: "Visa, Mastercard & more via Stripe",
+          paypaySubText: "PayPay online payment",
+          badge: "Coming Soon",
+          secure: "Secure checkout · ¥1,000 · 24-hour access",
+        },
+        ko: {
+          title: "결제 방법 선택",
+          subtitle: "투어 이용권 구매 방법을 선택해 주세요.",
+          cardName: "신용카드",
+          cardSub: "Visa, Mastercard 등 (Stripe 결제)",
+          paypaySubText: "PayPay 온라인 결제",
+          badge: "출시 예정",
+          secure: "안전한 결제 · ¥1,000 · 24시간 이용",
+        },
+        zh: {
+          title: "选择支付方式",
+          subtitle: "请选择购买导览使用权的支付方式。",
+          cardName: "信用卡",
+          cardSub: "支持 Visa、Mastercard 等（Stripe 支付）",
+          paypaySubText: "PayPay 在线支付",
+          badge: "即将推出",
+          secure: "安全结账 · ¥1,000 · 24小时使用",
+        },
+      };
+
+      function getLang() {
+        try {
+          const prefs = JSON.parse(localStorage.getItem("tourPrefs") || "{}");
+          if (prefs.lang && STRINGS[prefs.lang]) return prefs.lang;
+        } catch {}
+        const browser = (navigator.language || "en").slice(0, 2).toLowerCase();
+        return STRINGS[browser] ? browser : "en";
+      }
+
+      const lang = getLang();
+      const t = STRINGS[lang];
+
+      const fontScales = { small: 1.14, normal: 1.14, large: 1.14, xlarge: 1.3, xxlarge: 1.5 };
+      try {
+        const prefs = JSON.parse(localStorage.getItem("tourPrefs") || "{}");
+        if (fontScales[prefs.size]) {
+          document.documentElement.style.setProperty("--tour-font-scale", String(fontScales[prefs.size]));
+        }
+      } catch {}
+
+      document.documentElement.lang = lang;
+      document.getElementById("selTitle").textContent = t.title;
+      document.getElementById("selSubtitle").textContent = t.subtitle;
+      document.getElementById("cardName").textContent = t.cardName;
+      document.getElementById("cardSub").textContent = t.cardSub;
+      document.getElementById("paypaySubText").textContent = t.paypaySubText;
+      document.getElementById("paypayBadge").textContent = t.badge;
+      document.getElementById("secureLabel").textContent = t.secure;
+
+      document.getElementById("btnCard").addEventListener("click", () => {
+        window.location.href = "./pay.html";
+      });
+
+      // PayPay: no URL yet — button stays disabled
+    </script>
+  </body>
+</html>
