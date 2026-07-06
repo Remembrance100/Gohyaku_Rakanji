@@ -731,16 +731,16 @@ const TRANSLATIONS = {
     "font-sample-small": "가",
     "font-sample-normal": "가",
     "font-sample-large": "가",
-    "font-small": "소",
-    "font-normal": "중",
-    "font-large": "대",
+    "font-small": "S",
+    "font-normal": "M",
+    "font-large": "L",
     "font-xlarge": "특대",
     "font-xxlarge": "최대",
     "notice-photo": "나한상이나 위패 촬영은 삼가 주세요.",
-    "notice-quiet": "오디오 가이드 볼륨에 주의하여 주변 분들께 불편을 드리지 않도록 배려해 주세요.",
-    "notice-smoke": "경내 흡연은 금지되어 있습니다.",
-    "notice-offering": "헌금은 헌금함에 넣어 주세요. 상 위에 올려놓지 마세요.",
-    "notice-pets": "반려동물의 경내 동반은 삼가 주세요.",
+    "notice-quiet": "오디오 가이드 볼륨을 적절히 조절하여 주변 분들께 불편을 드리지 않도록 배려해 주세요.",
+    "notice-smoke": "경내에서는 흡연이 금지되어 있습니다.",
+    "notice-offering": "헌금은 헌금함에 넣어 주세요. 상 위에 올려놓지 말아 주세요.",
+    "notice-pets": "반려동물의 경내 출입은 삼가 주세요.",
     "confirm-btn": "가이드 시작",
     "start-btn": "가이드 맵",
   },
@@ -752,9 +752,9 @@ const TRANSLATIONS = {
     "font-sample-small": "文",
     "font-sample-normal": "文",
     "font-sample-large": "文",
-    "font-small": "小",
-    "font-normal": "中",
-    "font-large": "大",
+    "font-small": "S",
+    "font-normal": "M",
+    "font-large": "L",
     "font-xlarge": "特大",
     "font-xxlarge": "最大",
     "notice-photo": "请勿拍摄罗汉像或灵牌。",
@@ -864,7 +864,14 @@ function initSettings(onLangChange) {
   }
 
   confirmBtn?.addEventListener("click", () => {
-    hideSettings();
+    savePrefs({ lang: selectedLang, size: selectedSize });
+    const expiry = parseInt(localStorage.getItem("tourAccessExpiry") || "0", 10);
+    const hasToken = localStorage.getItem("tourAccessToken") && expiry > Date.now();
+    if (hasToken) {
+      hideSettings();
+    } else {
+      window.location.href = "./pay-select.html";
+    }
   });
 
   // Re-open from gear icon

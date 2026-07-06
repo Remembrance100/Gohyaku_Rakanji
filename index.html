@@ -30,14 +30,6 @@
         });
       }
     </script>
-    <script>
-      // Payment gate — redirect to payment selection if no valid 24h token
-      (function () {
-        var expiry = parseInt(localStorage.getItem("tourAccessExpiry") || "0", 10);
-        var hasToken = localStorage.getItem("tourAccessToken") && expiry > Date.now();
-        if (!hasToken) window.location.replace("./pay-select.html");
-      })();
-    </script>
     <link rel="icon" href="./assets/icons/icon.svg" type="image/svg+xml" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
