@@ -1541,6 +1541,20 @@ button:active {
   color: rgba(255,255,255,0.35);
 }
 
+.coach-skip-btn {
+  height: 34px;
+  padding: 0 0.75rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.18);
+  background: transparent;
+  color: rgba(255,255,255,0.45);
+  font: 600 0.78rem "Barlow", sans-serif;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
 .coach-next-btn {
   height: 34px;
   padding: 0 1rem;

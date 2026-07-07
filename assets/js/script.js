@@ -2571,6 +2571,7 @@ function runCoachMarks() {
   const coachText = document.querySelector("#coachText");
   const coachStep = document.querySelector("#coachStep");
   const nextBtn = document.querySelector("#coachNextBtn");
+  const skipBtn = document.querySelector("#coachSkipBtn");
   if (!overlay || !spotlight || !bubble || !nextBtn) return;
 
   const lang = getRequestedLang();
@@ -2747,6 +2748,10 @@ function runCoachMarks() {
       coachStep.textContent = `${i + 1} / ${STEPS.length}`;
       nextBtn.style.display = "";
       nextBtn.textContent = isLast ? t["coach-done"] : t["coach-next"];
+      if (skipBtn) {
+        skipBtn.textContent = t["coach-skip"];
+        skipBtn.style.display = isLast ? "none" : "";
+      }
       positionSpotlight(el, s.pad, s.rect);
       bubble.style.opacity = "1";
       overlay.classList.remove("hidden");
@@ -2776,6 +2781,8 @@ function runCoachMarks() {
     if (step >= STEPS.length) { finishCoach(); return; }
     showStep(step);
   });
+
+  skipBtn?.addEventListener("click", () => finishCoach());
 
   overlay.addEventListener("click", (e) => {
     if (e.target === overlay) { finishCoach(); }

@@ -61,7 +61,7 @@
             if (!data.valid) { redirectToPay(); return; }
             localStorage.setItem(TOUR_TOKEN_KEY, data.token);
             localStorage.setItem(TOUR_EXPIRY_KEY, String(data.expiry));
-            window.location.replace("./index.html");
+            window.location.replace("./index.html?skip_settings=1");
           })
           .catch(() => redirectToPay());
       })();
@@ -212,6 +212,7 @@
         <div class="coach-bubble" id="coachBubble">
           <p class="coach-text" id="coachText"></p>
           <div class="coach-footer">
+            <button class="coach-skip-btn" id="coachSkipBtn" type="button"></button>
             <span class="coach-step" id="coachStep"></span>
             <button class="coach-next-btn" id="coachNextBtn" type="button"></button>
           </div>

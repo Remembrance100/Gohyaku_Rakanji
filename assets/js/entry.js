@@ -881,8 +881,14 @@ function initSettings(onLangChange) {
     syncFontBtns();
   });
 
-  // Always show settings on page load
-  screen.classList.remove("is-hidden");
+  // Skip settings if returning from payment (user already set prefs before paying)
+  const skipSettings = new URLSearchParams(window.location.search).get("skip_settings") === "1";
+  if (skipSettings) {
+    history.replaceState(null, "", window.location.pathname);
+    screen.classList.add("is-hidden");
+  } else {
+    screen.classList.remove("is-hidden");
+  }
 }
 
 // ─── Entry events & init ─────────────────────────────────────────────────────
