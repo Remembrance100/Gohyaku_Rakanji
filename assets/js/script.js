@@ -486,6 +486,11 @@ const UI_STRINGS = {
     "coach-next": "次へ",
     "coach-done": "始める",
     "coach-skip": "スキップ",
+    "omamori-coach-msg": "住職からの結びのメッセージです。スピーカーのアイコンをタップすると音声が流れます。",
+    "omamori-coach-transcript": "気になる質問をタップすると、住職のインタビューをもっと読むことができます。",
+    "omamori-coach-grid": "ツアーの記念に、お守りを1つお選びいただけます。カードをタップすると大きく表示されます。",
+    "omamori-coach-save": "「保存」をタップすると端末に保存できます。保存できるお守りはお一人様1つまでです。",
+    "omamori-coach-close": "このボタンでいつでもツアーに戻れます。",
   },
   en: {
     "audio-on": "Audio On",
@@ -540,6 +545,11 @@ const UI_STRINGS = {
     "coach-next": "Next",
     "coach-done": "Let's go",
     "coach-skip": "Skip",
+    "omamori-coach-msg": "This is a closing message from the head priest. Tap the speaker icon to hear it.",
+    "omamori-coach-transcript": "Tap a question to read more from the priest's interview.",
+    "omamori-coach-grid": "Choose one omamori as a memento of your tour — tap a card to view it full-screen.",
+    "omamori-coach-save": "Tap \"Save\" to download it to your device. You can only save one omamori, so choose your favorite.",
+    "omamori-coach-close": "Tap here anytime to return to the tour.",
   },
   ko: {
     "audio-on": "음성 켜기",
@@ -594,6 +604,11 @@ const UI_STRINGS = {
     "coach-next": "다음",
     "coach-done": "시작하기",
     "coach-skip": "건너뛰기",
+    "omamori-coach-msg": "주지 스님이 전하는 마지막 메시지입니다. 스피커 아이콘을 탭하면 소리가 재생됩니다.",
+    "omamori-coach-transcript": "궁금한 질문을 탭하면 주지 스님의 인터뷰를 더 읽을 수 있습니다.",
+    "omamori-coach-grid": "투어 기념으로 오마모리를 하나 선택할 수 있습니다. 카드를 탭하면 크게 볼 수 있습니다.",
+    "omamori-coach-save": "「저장」을 탭하면 기기에 저장됩니다. 오마모리는 한 분당 하나만 저장할 수 있습니다.",
+    "omamori-coach-close": "이 버튼으로 언제든지 투어로 돌아갈 수 있습니다.",
   },
   zh: {
     "audio-on": "开启音频",
@@ -648,6 +663,11 @@ const UI_STRINGS = {
     "coach-next": "下一步",
     "coach-done": "出发",
     "coach-skip": "跳过",
+    "omamori-coach-msg": "这是住持送上的结束寄语。点击喇叭图标即可播放声音。",
+    "omamori-coach-transcript": "点击您感兴趣的问题，即可阅读住持访谈的更多内容。",
+    "omamori-coach-grid": "您可以选择一款御守作为本次导览的纪念。点击卡片即可全屏查看。",
+    "omamori-coach-save": "点击「保存」即可将其下载到您的设备。每人只能保存一款御守，请谨慎选择。",
+    "omamori-coach-close": "点击此按钮可随时返回导览。",
   },
 };
 
@@ -1855,6 +1875,7 @@ function openOmamori() {
   omamoriScreen.setAttribute("aria-hidden", "false");
   renderOmamoriVideos();
   initMsgPlayer();
+  runOmamoriCoachMarks();
 }
 
 function closeOmamori() {
@@ -2562,6 +2583,54 @@ async function init() {
 
 const COACH_KEY = "tourCoachSeen";
 
+// Shared by runCoachMarks() and runOmamoriCoachMarks() — positions the spotlight
+// cutout + hint bubble around `el`, flipping the bubble above/below to stay on screen.
+function positionCoachSpotlight(spotlight, bubble, el, pad, rect, wasReady) {
+  const r = el.getBoundingClientRect();
+  if (rect) {
+    spotlight.style.width = `${r.width + pad * 2}px`;
+    spotlight.style.height = `${r.height + pad * 2}px`;
+    spotlight.style.left = `${r.left - pad}px`;
+    spotlight.style.top = `${r.top - pad}px`;
+    spotlight.style.borderRadius = "18px";
+  } else {
+    const cx = r.left + r.width / 2;
+    const cy = r.top + r.height / 2;
+    const radius = Math.max(r.width, r.height) / 2 + pad;
+    const size = radius * 2;
+    spotlight.style.width = `${size}px`;
+    spotlight.style.height = `${size}px`;
+    spotlight.style.left = `${cx - radius}px`;
+    spotlight.style.top = `${cy - radius}px`;
+    spotlight.style.borderRadius = "50%";
+  }
+
+  // Only restart pulse after the position transition settles, to avoid jank
+  spotlight.classList.remove("is-pulsing");
+  if (wasReady) {
+    setTimeout(() => spotlight.classList.add("is-pulsing"), 260);
+  } else {
+    spotlight.classList.add("is-pulsing");
+  }
+
+  const elBottom = r.top + r.height + pad;
+  const elTop = r.top - pad;
+  // Measure the actual rendered bubble height rather than a fixed estimate,
+  // so positioning works correctly regardless of content length.
+  const bubbleH = bubble.offsetHeight || 140;
+  const spaceBelow = window.innerHeight - (elBottom + 16);
+  if (spaceBelow > bubbleH) {
+    bubble.style.top = `${elBottom + 16}px`;
+    bubble.style.bottom = "auto";
+    bubble.className = "coach-bubble arrow-up";
+  } else {
+    bubble.style.bottom = `${window.innerHeight - (elTop - 16)}px`;
+    bubble.style.top = "auto";
+    bubble.className = "coach-bubble arrow-down";
+  }
+  return true;
+}
+
 function runCoachMarks() {
   // if (localStorage.getItem(COACH_KEY)) return;
 
@@ -2644,52 +2713,6 @@ function runCoachMarks() {
 
   let spotlightReady = false;
 
-  function positionSpotlight(el, pad, rect) {
-    const r = el.getBoundingClientRect();
-    if (rect) {
-      spotlight.style.width = `${r.width + pad * 2}px`;
-      spotlight.style.height = `${r.height + pad * 2}px`;
-      spotlight.style.left = `${r.left - pad}px`;
-      spotlight.style.top = `${r.top - pad}px`;
-      spotlight.style.borderRadius = "18px";
-    } else {
-      const cx = r.left + r.width / 2;
-      const cy = r.top + r.height / 2;
-      const radius = Math.max(r.width, r.height) / 2 + pad;
-      const size = radius * 2;
-      spotlight.style.width = `${size}px`;
-      spotlight.style.height = `${size}px`;
-      spotlight.style.left = `${cx - radius}px`;
-      spotlight.style.top = `${cy - radius}px`;
-      spotlight.style.borderRadius = "50%";
-    }
-
-    // Only restart pulse after the position transition settles, to avoid jank
-    spotlight.classList.remove("is-pulsing");
-    if (spotlightReady) {
-      setTimeout(() => spotlight.classList.add("is-pulsing"), 260);
-    } else {
-      spotlight.classList.add("is-pulsing");
-      spotlightReady = true;
-    }
-
-    const elBottom = r.top + r.height + pad;
-    const elTop = r.top - pad;
-    // Measure the actual rendered bubble height rather than a fixed estimate,
-    // so positioning works correctly regardless of content length.
-    const bubbleH = bubble.offsetHeight || 140;
-    const spaceBelow = window.innerHeight - (elBottom + 16);
-    if (spaceBelow > bubbleH) {
-      bubble.style.top = `${elBottom + 16}px`;
-      bubble.style.bottom = "auto";
-      bubble.className = "coach-bubble arrow-up";
-    } else {
-      bubble.style.bottom = `${window.innerHeight - (elTop - 16)}px`;
-      bubble.style.top = "auto";
-      bubble.className = "coach-bubble arrow-down";
-    }
-  }
-
   function showStep(i) {
     const s = STEPS[i];
 
@@ -2752,7 +2775,7 @@ function runCoachMarks() {
         skipBtn.textContent = t["coach-skip"];
         skipBtn.style.display = isLast ? "none" : "";
       }
-      positionSpotlight(el, s.pad, s.rect);
+      spotlightReady = positionCoachSpotlight(spotlight, bubble, el, s.pad, s.rect, spotlightReady);
       bubble.style.opacity = "1";
       overlay.classList.remove("hidden");
       overlay.classList.add("is-active");
@@ -2795,6 +2818,154 @@ function runCoachMarks() {
   } else {
     setTimeout(startCoach, 400);
   }
+}
+
+// ─── Omamori coach marks ─────────────────────────────────────
+
+const OMAMORI_COACH_KEY = "omamoriCoachSeen";
+let omamoriCoachShown = false;
+
+function runOmamoriCoachMarks() {
+  // if (localStorage.getItem(OMAMORI_COACH_KEY)) return;
+  if (omamoriCoachShown) return;
+  omamoriCoachShown = true;
+
+  const overlay = document.querySelector("#coachOverlay");
+  const spotlight = document.querySelector("#coachSpotlight");
+  const bubble = document.querySelector("#coachBubble");
+  const coachText = document.querySelector("#coachText");
+  const coachStep = document.querySelector("#coachStep");
+  let nextBtn = document.querySelector("#coachNextBtn");
+  let skipBtn = document.querySelector("#coachSkipBtn");
+  if (!overlay || !spotlight || !bubble || !nextBtn) return;
+
+  // runCoachMarks() binds click handlers to these same shared controls once per
+  // page load and never removes them. Swap in clones so this sequence's handlers
+  // (with their own step counter) are the only ones listening.
+  nextBtn.replaceWith(nextBtn.cloneNode(true));
+  nextBtn = document.querySelector("#coachNextBtn");
+  if (skipBtn) {
+    skipBtn.replaceWith(skipBtn.cloneNode(true));
+    skipBtn = document.querySelector("#coachSkipBtn");
+  }
+
+  const t = UI_STRINGS[getRequestedLang()] || UI_STRINGS.ja;
+
+  // Steps: priest message → transcript → omamori picker → save (one-per-visit) → close
+  const STEPS = [
+    {
+      targetFn: () => document.querySelector("#omamoriMsgPlayer"),
+      text: t["omamori-coach-msg"],
+      pad: 10,
+      rect: true,
+    },
+    {
+      targetFn: () => omamoriTranscriptEl,
+      text: t["omamori-coach-transcript"],
+      pad: 10,
+      rect: true,
+      scrollTo: "#omamoriTranscript",
+    },
+    {
+      targetFn: () => document.querySelector(".omamori-grid"),
+      text: t["omamori-coach-grid"],
+      pad: 12,
+      rect: true,
+      scrollTo: ".omamori-grid",
+    },
+    {
+      targetFn: () => document.querySelector(".omamori-download-btn"),
+      text: t["omamori-coach-save"],
+      pad: 8,
+      rect: true,
+      scrollTo: ".omamori-download-btn",
+    },
+    {
+      targetFn: () => omamoriCloseBtn,
+      text: t["omamori-coach-close"],
+      pad: 12,
+      scrollTo: "#omamoriCloseBtn",
+    },
+  ];
+
+  let step = 0;
+  let spotlightReady = false;
+
+  function showStep(i) {
+    const s = STEPS[i];
+
+    if (s.scrollTo) {
+      const target = document.querySelector(s.scrollTo);
+      if (target) {
+        const pos = window.getComputedStyle(target).position;
+        if (pos !== "fixed" && pos !== "sticky") {
+          target.scrollIntoView({ behavior: "instant", block: "center" });
+        }
+      }
+      requestAnimationFrame(() => requestAnimationFrame(() => renderStep(i)));
+      return;
+    }
+
+    renderStep(i);
+  }
+
+  function renderStep(i) {
+    const s = STEPS[i];
+    const isLast = i === STEPS.length - 1;
+
+    const el = s.targetFn ? s.targetFn() : null;
+    if (!el) {
+      if (!isLast) { showStep(i + 1); return; }
+      finishCoach();
+      return;
+    }
+
+    const doRender = () => {
+      coachText.textContent = s.text;
+      coachStep.textContent = `${i + 1} / ${STEPS.length}`;
+      nextBtn.style.display = "";
+      nextBtn.textContent = isLast ? t["coach-done"] : t["coach-next"];
+      if (skipBtn) {
+        skipBtn.textContent = t["coach-skip"];
+        skipBtn.style.display = isLast ? "none" : "";
+      }
+      spotlightReady = positionCoachSpotlight(spotlight, bubble, el, s.pad, s.rect, spotlightReady);
+      bubble.style.opacity = "1";
+      overlay.classList.remove("hidden");
+      overlay.classList.add("is-active");
+    };
+
+    if (overlay.classList.contains("is-active")) {
+      bubble.style.opacity = "0";
+      setTimeout(doRender, 160);
+    } else {
+      bubble.style.opacity = "1";
+      doRender();
+    }
+  }
+
+  function finishCoach() {
+    bubble.style.opacity = "0";
+    setTimeout(() => {
+      overlay.classList.add("hidden");
+      overlay.classList.remove("is-active");
+    }, 160);
+    localStorage.setItem(OMAMORI_COACH_KEY, "1");
+  }
+
+  nextBtn.addEventListener("click", () => {
+    step++;
+    if (step >= STEPS.length) { finishCoach(); return; }
+    showStep(step);
+  });
+
+  skipBtn?.addEventListener("click", () => finishCoach());
+
+  overlay.addEventListener("click", (e) => {
+    if (e.target === overlay) { finishCoach(); }
+  });
+
+  setTimeout(() => showStep(0), 500);
 }
 
 disablePwa();

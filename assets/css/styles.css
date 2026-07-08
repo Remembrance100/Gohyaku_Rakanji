@@ -1459,7 +1459,8 @@ button:active {
 .coach-overlay {
   position: fixed;
   inset: 0;
-  z-index: 200;
+  /* Above .omamori-screen (also 200) so hints render over the omamori tutorial too. */
+  z-index: 210;
   pointer-events: none;
 }
 
