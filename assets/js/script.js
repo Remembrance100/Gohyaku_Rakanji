@@ -486,9 +486,6 @@ const UI_STRINGS = {
     "coach-skip": "スキップ",
     "omamori-coach-msg": "住職からの結びのメッセージです。スピーカーのアイコンをタップすると音声が流れます。",
     "omamori-coach-transcript": "気になる質問をタップすると、住職のインタビューをもっと読むことができます。",
-    "omamori-coach-grid": "ツアーの記念に、お守りを1つお選びいただけます。",
-    "omamori-coach-save": "「保存」をタップすると端末に保存でき、続けて壁紙として設定する方法もご案内します。保存できるお守りはお一人様1つまでです。",
-    "omamori-coach-close": "このボタンでいつでもツアーに戻れます。",
     "omamori-continue-btn": "お守りを選択する",
     "omamori-bg-title": "壁紙として設定する方法",
     "omamori-bg-ios-label": "iPhoneの場合",
@@ -550,9 +547,6 @@ const UI_STRINGS = {
     "coach-skip": "Skip",
     "omamori-coach-msg": "This is a closing message from the head priest. Tap the speaker icon to hear it.",
     "omamori-coach-transcript": "Tap a question to read more from the priest's interview.",
-    "omamori-coach-grid": "Choose one omamori as a memento of your tour.",
-    "omamori-coach-save": "Tap \"Save\" to download it to your device — we'll then show you how to set it as your wallpaper. You can only save one omamori, so choose your favorite.",
-    "omamori-coach-close": "Tap here anytime to return to the tour.",
     "omamori-continue-btn": "Choose an Omamori",
     "omamori-bg-title": "How to Set as Wallpaper",
     "omamori-bg-ios-label": "On iPhone",
@@ -603,20 +597,17 @@ const UI_STRINGS = {
     "coach-1": "번호가 표시된 핀을 탭하면 해당 스팟이 열립니다.",
     "coach-2": "이 버튼을 탭하면 언어나 설정을 변경할 수 있습니다.",
     "coach-3a": "스팟의 제목과 번호입니다. 지금 어느 스팟에 있는지 한눈에 알 수 있습니다.",
-    "coach-3b": "하이라이트에는 이 스팟의 주요 볼거리와 핵심 내용을 확인할 수 있습니다.",
+    "coach-3b": "하이라이트에는 이 장소의 주요 볼거리와 핵심 내용을 확인할 수 있습니다.",
     "coach-3": "재생 버튼을 탭하면 오디오 가이드가 시작됩니다. 진행 바를 드래그하여 원하는 위치를 조정할 수 있습니다.",
-    "coach-3c": "텍스트 가이드에는 이 스팟에 대한 자세한 설명이 기재되어 있습니다.",
+    "coach-3c": "텍스트 가이드에는 이 장소에 대한 자세한 설명이 기재되어 있습니다.",
     "coach-end": "투어를 종료하려면 이 버튼을 탭하세요.",
     "coach-back": "「＜」 버튼을 탭하면 언제든지 지도로 돌아갈 수 있습니다.",
-    "coach-4": "이 화살표로 이전 또는 다음 스팟으로 이동할 수 있습니다.",
+    "coach-4": "이 화살표로 이전 또는 다음 장소로 이동할 수 있습니다.",
     "coach-next": "다음",
     "coach-done": "시작하기",
     "coach-skip": "건너뛰기",
     "omamori-coach-msg": "주지 스님이 전하는 마지막 메시지입니다. 스피커 아이콘을 탭하면 소리가 재생됩니다.",
     "omamori-coach-transcript": "궁금한 질문을 탭하면 주지 스님의 인터뷰를 더 읽을 수 있습니다.",
-    "omamori-coach-grid": "투어 기념으로 오마모리를 하나 선택할 수 있습니다.",
-    "omamori-coach-save": "「저장」을 탭하면 기기에 저장되며, 이어서 배경화면으로 설정하는 방법도 안내해 드립니다. 오마모리는 한 분당 하나만 저장할 수 있습니다.",
-    "omamori-coach-close": "이 버튼으로 언제든지 투어로 돌아갈 수 있습니다.",
     "omamori-continue-btn": "오마모리 선택하기",
     "omamori-bg-title": "배경화면으로 설정하는 방법",
     "omamori-bg-ios-label": "아이폰의 경우",
@@ -678,9 +669,6 @@ const UI_STRINGS = {
     "coach-skip": "跳过",
     "omamori-coach-msg": "这是住持送上的结束寄语。点击喇叭图标即可播放声音。",
     "omamori-coach-transcript": "点击您感兴趣的问题，即可阅读住持访谈的更多内容。",
-    "omamori-coach-grid": "您可以选择一款御守作为本次导览的纪念。",
-    "omamori-coach-save": "点击「保存」即可下载到您的设备，随后我们会展示设为壁纸的方法。每人只能保存一款御守，请谨慎选择。",
-    "omamori-coach-close": "点击此按钮可随时返回导览。",
     "omamori-continue-btn": "选择御守",
     "omamori-bg-title": "如何设置为壁纸",
     "omamori-bg-ios-label": "iPhone 用户",
@@ -1892,6 +1880,7 @@ function openOmamoriMessage() {
   if (!omamoriMessageScreen) return;
   omamoriMessageScreen.classList.add("is-open");
   omamoriMessageScreen.setAttribute("aria-hidden", "false");
+  omamoriMessageScreen.scrollTo({ top: 0 });
   initMsgPlayer();
   runOmamoriMessageCoachMarks();
 }
@@ -1912,8 +1901,8 @@ function openOmamori() {
   if (!omamoriScreen) return;
   omamoriScreen.classList.add("is-open");
   omamoriScreen.setAttribute("aria-hidden", "false");
+  omamoriScreen.scrollTo({ top: 0 });
   renderOmamoriVideos();
-  runOmamoriCoachMarks();
 }
 
 function closeOmamori() {
@@ -1926,18 +1915,6 @@ const OMAMORI_URLS = {
   blue: "https://stg-apirakanjicom-stgrakanji.kinsta.cloud/wp-content/uploads/2026/04/fortuneate.mp4",
   gold: "https://stg-apirakanjicom-stgrakanji.kinsta.cloud/wp-content/uploads/2026/05/money-2.mp4",
   pink: "https://stg-apirakanjicom-stgrakanji.kinsta.cloud/wp-content/uploads/2026/04/luck.mp4",
-};
-
-// Overrides OMAMORI_URLS for the download button only. Blue ships as a Live
-// Photo wallpaper bundle (.zip) instead of a plain preview video — the card
-// preview keeps playing OMAMORI_URLS.blue, only "Save" fetches this.
-const OMAMORI_DOWNLOAD_URLS = {
-  blue: "https://stg-apirakanjicom-stgrakanji.kinsta.cloud/wp-content/uploads/2026/07/wallpaper_live_photo.zip",
-};
-
-const OMAMORI_MIME_BY_EXT = {
-  mp4: "video/mp4",
-  zip: "application/zip",
 };
 
 // Visitors may only keep one omamori total. Persisted so a page refresh can't
@@ -2554,15 +2531,13 @@ function bindEvents() {
   }
 
   async function downloadOmamori(key) {
-    const url = OMAMORI_DOWNLOAD_URLS[key] || OMAMORI_URLS[key];
+    const url = OMAMORI_URLS[key];
     if (!url) return;
-    const ext = /\.([a-z0-9]+)(?:\?.*)?$/i.exec(url)?.[1]?.toLowerCase() || "mp4";
-    const mime = OMAMORI_MIME_BY_EXT[ext] || "application/octet-stream";
-    const filename = `omamori-${key}.${ext}`;
+    const filename = `omamori-${key}.mp4`;
     try {
       const res = await fetch(url);
       const blob = await res.blob();
-      const file = new File([blob], filename, { type: mime });
+      const file = new File([blob], filename, { type: "video/mp4" });
       // iOS Safari: use share sheet so user can save to Files/Photos
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
         await navigator.share({ files: [file], title: filename });
@@ -2636,7 +2611,7 @@ async function init() {
 
 const COACH_KEY = "tourCoachSeen";
 
-// Shared by runCoachMarks() and runOmamoriCoachMarks() — positions the spotlight
+// Shared by runCoachMarks() and runOmamoriMessageCoachMarks() — positions the spotlight
 // cutout + hint bubble around `el`, flipping the bubble above/below to stay on screen.
 function positionCoachSpotlight(spotlight, bubble, el, pad, rect, wasReady) {
   const r = el.getBoundingClientRect();
@@ -2984,141 +2959,6 @@ function runOmamoriMessageCoachMarks() {
       overlay.classList.remove("is-active");
     }, 160);
     localStorage.setItem(OMAMORI_MSG_COACH_KEY, "1");
-  }
-
-  nextBtn.addEventListener("click", () => {
-    step++;
-    if (step >= STEPS.length) { finishCoach(); return; }
-    showStep(step);
-  });
-
-  skipBtn?.addEventListener("click", () => finishCoach());
-
-  overlay.addEventListener("click", (e) => {
-    if (e.target === overlay) { finishCoach(); }
-  });
-
-  setTimeout(() => showStep(0), 500);
-}
-
-// ─── Omamori picker coach marks ───────────────────────────────
-
-const OMAMORI_COACH_KEY = "omamoriCoachSeen";
-let omamoriCoachShown = false;
-
-function runOmamoriCoachMarks() {
-  // if (localStorage.getItem(OMAMORI_COACH_KEY)) return;
-  if (omamoriCoachShown) return;
-  omamoriCoachShown = true;
-
-  const overlay = document.querySelector("#coachOverlay");
-  const spotlight = document.querySelector("#coachSpotlight");
-  const bubble = document.querySelector("#coachBubble");
-  const coachText = document.querySelector("#coachText");
-  const coachStep = document.querySelector("#coachStep");
-  let nextBtn = document.querySelector("#coachNextBtn");
-  let skipBtn = document.querySelector("#coachSkipBtn");
-  if (!overlay || !spotlight || !bubble || !nextBtn) return;
-
-  // runCoachMarks() binds click handlers to these same shared controls once per
-  // page load and never removes them. Swap in clones so this sequence's handlers
-  // (with their own step counter) are the only ones listening.
-  nextBtn.replaceWith(nextBtn.cloneNode(true));
-  nextBtn = document.querySelector("#coachNextBtn");
-  if (skipBtn) {
-    skipBtn.replaceWith(skipBtn.cloneNode(true));
-    skipBtn = document.querySelector("#coachSkipBtn");
-  }
-
-  const t = UI_STRINGS[getRequestedLang()] || UI_STRINGS.ja;
-
-  // Steps: omamori picker → save (one-per-visit) → set as background → close
-  const STEPS = [
-    {
-      targetFn: () => document.querySelector(".omamori-list"),
-      text: t["omamori-coach-grid"],
-      pad: 12,
-      rect: true,
-      scrollTo: ".omamori-list",
-    },
-    {
-      targetFn: () => document.querySelector(".omamori-download-btn"),
-      text: t["omamori-coach-save"],
-      pad: 8,
-      rect: true,
-      scrollTo: ".omamori-download-btn",
-    },
-    {
-      targetFn: () => omamoriCloseBtn,
-      text: t["omamori-coach-close"],
-      pad: 12,
-      scrollTo: "#omamoriCloseBtn",
-    },
-  ];
-
-  let step = 0;
-  let spotlightReady = false;
-
-  function showStep(i) {
-    const s = STEPS[i];
-
-    if (s.scrollTo) {
-      const target = document.querySelector(s.scrollTo);
-      if (target) {
-        const pos = window.getComputedStyle(target).position;
-        if (pos !== "fixed" && pos !== "sticky") {
-          target.scrollIntoView({ behavior: "instant", block: "center" });
-        }
-      }
-      requestAnimationFrame(() => requestAnimationFrame(() => renderStep(i)));
-      return;
-    }
-
-    renderStep(i);
-  }
-
-  function renderStep(i) {
-    const s = STEPS[i];
-    const isLast = i === STEPS.length - 1;
-
-    const el = s.targetFn ? s.targetFn() : null;
-    if (!el) {
-      if (!isLast) { showStep(i + 1); return; }
-      finishCoach();
-      return;
-    }
-
-    const doRender = () => {
-      coachText.textContent = s.text;
-      coachStep.textContent = `${i + 1} / ${STEPS.length}`;
-      nextBtn.style.display = "";
-      nextBtn.textContent = isLast ? t["coach-done"] : t["coach-next"];
-      if (skipBtn) {
-        skipBtn.textContent = t["coach-skip"];
-        skipBtn.style.display = isLast ? "none" : "";
-      }
-      spotlightReady = positionCoachSpotlight(spotlight, bubble, el, s.pad, s.rect, spotlightReady);
-      bubble.style.opacity = "1";
-      overlay.classList.remove("hidden");
-      overlay.classList.add("is-active");
-    };
-
-    if (overlay.classList.contains("is-active")) {
-      bubble.style.opacity = "0";
-      setTimeout(doRender, 160);
-    } else {
-      bubble.style.opacity = "1";
-      doRender();
-    }
-  }
-
-  function finishCoach() {
-    bubble.style.opacity = "0";
-    setTimeout(() => {
-      overlay.classList.add("hidden");
-      overlay.classList.remove("is-active");
-    }, 160);
-    localStorage.setItem(OMAMORI_COACH_KEY, "1");
   }
 
   nextBtn.addEventListener("click", () => {

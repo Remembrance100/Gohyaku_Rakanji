@@ -59,29 +59,9 @@ body {
 .site-header-inner {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   padding: 0.45rem 0.25rem 0.6rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.07);
-}
-
-.site-brand {
-  display: flex;
-  align-items: center;
-  gap: 0.48rem;
-}
-
-.site-brand-icon {
-  color: rgba(255, 255, 255, 0.55);
-  flex-shrink: 0;
-}
-
-.site-brand-name {
-  font:
-    700 var(--tour-text-size) "Barlow",
-    sans-serif;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.5);
 }
 
 .site-badge {
