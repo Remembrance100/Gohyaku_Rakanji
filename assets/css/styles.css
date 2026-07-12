@@ -1895,14 +1895,12 @@ button:active {
   padding-top: 0.65rem;
 }
 
-.omamori-grid {
+.omamori-list {
   width: 100%;
   max-width: 560px;
   padding: 1.4rem 1rem 0;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  align-items: stretch;
-  gap: 0.75rem;
+  gap: 1.1rem;
 }
 
 .omamori-card {
@@ -1916,41 +1914,47 @@ button:active {
 
 .omamori-card-preview {
   width: 100%;
-  aspect-ratio: 1 / 1;
+  aspect-ratio: 4 / 5;
   object-fit: cover;
   display: block;
   background: #1a1a20;
 }
 
 .omamori-card-body {
-  padding: 0.6rem 0.65rem 0.7rem;
+  padding: 0.85rem 1rem 1rem;
   display: flex;
   flex-direction: column;
-  gap: 0.3rem;
+  gap: 0.5rem;
   flex: 1 1 auto;
   justify-content: space-between;
 }
 
 .omamori-card-name {
   margin: 0;
-  font: 800 0.78rem "Barlow", sans-serif;
+  font: 800 1rem "Barlow", sans-serif;
   color: #f0f0f0;
 }
 
 .omamori-card-desc {
   margin: 0;
-  font: 500 0.68rem / 1.4 "Manrope", sans-serif;
+  font: 500 0.78rem / 1.5 "Manrope", sans-serif;
   color: rgba(255, 255, 255, 0.5);
 }
 
+.omamori-card-actions {
+  display: flex;
+  gap: 0.55rem;
+  margin-top: 0.3rem;
+}
+
 .omamori-download-btn {
+  flex: 1;
   align-self: stretch;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.28rem;
   padding: 0.32rem 0.5rem;
-  margin-top: 0.2rem;
   border-radius: 999px;
   border: none;
   font: 700 0.7rem "Barlow", sans-serif;
@@ -1968,13 +1972,6 @@ button:active {
 
 .omamori-download-btn.is-downloaded,
 .omamori-download-btn:disabled {
-  opacity: 0.35;
-  cursor: not-allowed;
-  pointer-events: none;
-}
-
-.omamori-fullscreen-dl.is-downloaded,
-.omamori-fullscreen-dl:disabled {
   opacity: 0.35;
   cursor: not-allowed;
   pointer-events: none;
@@ -2016,78 +2013,20 @@ button:active {
   color: #f7a8c8;
 }
 
-.omamori-card {
-  cursor: pointer;
-}
+/* ─── Omamori "continue" CTA (message screen → omamori screen) ─── */
 
-/* ─── Omamori fullscreen video viewer ───────────────── */
-
-.omamori-fullscreen {
-  position: fixed;
-  inset: 0;
-  z-index: 300;
-  background: #000;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-
-.omamori-fullscreen.hidden {
-  display: none;
-}
-
-.omamori-fullscreen-video {
+.omamori-continue-wrap {
   width: 100%;
-  height: 100%;
-  object-fit: contain;
-  display: block;
+  max-width: 560px;
+  padding: 1.4rem 1rem 0;
 }
 
-.omamori-fullscreen-actions {
-  position: absolute;
-  bottom: calc(2rem + env(safe-area-inset-bottom));
-  left: 0;
-  right: 0;
-  display: flex;
-  justify-content: center;
-}
-
-.omamori-fullscreen-back {
-  position: absolute;
-  top: calc(1.2rem + env(safe-area-inset-top));
-  left: 1.2rem;
+.omamori-continue-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  border: none;
-  background: rgba(255, 255, 255, 0.15);
-  color: #fff;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-  transition: background 140ms;
-  z-index: 1;
-}
-
-.omamori-fullscreen-back:active {
-  background: rgba(255, 255, 255, 0.28);
-}
-
-@media (hover: hover) {
-  .omamori-fullscreen-back:hover {
-    background: rgba(255, 255, 255, 0.25);
-  }
-}
-
-.omamori-fullscreen-dl {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-  height: 52px;
-  padding: 0 2rem;
+  width: 100%;
+  height: 54px;
   border-radius: 999px;
   border: none;
   background: linear-gradient(135deg, #f6515f, #db3f4c);
@@ -2096,13 +2035,52 @@ button:active {
   letter-spacing: 0.06em;
   text-transform: uppercase;
   cursor: pointer;
-  box-shadow: 0 6px 20px rgba(219, 63, 76, 0.45);
+  box-shadow: 0 6px 20px rgba(219, 63, 76, 0.4);
   -webkit-tap-highlight-color: transparent;
   transition: filter 140ms;
 }
 
-.omamori-fullscreen-dl:active {
+.omamori-continue-btn:active {
   filter: brightness(0.88);
+}
+
+@media (hover: hover) {
+  .omamori-continue-btn:hover {
+    filter: brightness(1.12);
+  }
+}
+
+/* ─── Set-as-background instructions modal ───────────── */
+
+/* .overlay-modal defaults to z-index 90, below .omamori-screen (200) — this
+   modal opens from a button inside that screen, so it must stack above it. */
+#omamoriBgModal {
+  z-index: 300;
+}
+
+.omamori-bg-modal-inner {
+  width: min(100%, 480px);
+}
+
+.omamori-bg-modal-body {
+  padding: 0.9rem 1rem 1.1rem;
+  display: grid;
+  gap: 1.1rem;
+  overflow-y: auto;
+  max-height: calc(100svh - 7.5rem);
+}
+
+.omamori-bg-modal-platform {
+  margin: 0 0 0.5rem;
+  font: 700 var(--tour-text-size) "Barlow", sans-serif;
+  letter-spacing: 0.04em;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.omamori-bg-modal-step {
+  margin: 0;
+  font: 500 var(--tour-text-size) / 1.55 "Manrope", sans-serif;
+  color: rgba(255, 255, 255, 0.65);
 }
 
 /* ─── Tour settings overlay (language + font size) ───── */

@@ -295,17 +295,17 @@
       <p>Memorial Tour Guide &middot; SmartSenior</p>
     </footer>
 
-    <!-- Omamori memorial gift screen, shown after the final tour stop. -->
+    <!-- Priest's closing video message, shown after the final tour stop. -->
     <section
       class="omamori-screen"
-      id="omamoriScreen"
-      aria-label="Memorial gift selection"
+      id="omamoriMessageScreen"
+      aria-label="Closing message"
       aria-hidden="true"
     >
       <div class="omamori-header">
         <button
           class="omamori-close-btn"
-          id="omamoriCloseBtn"
+          id="omamoriMessageCloseBtn"
           type="button"
           aria-label="ツアーに戻る"
         >
@@ -381,13 +381,41 @@
         </div>
       </div>
 
+      <div class="omamori-continue-wrap">
+        <button class="omamori-continue-btn" id="omamoriContinueBtn" type="button">
+          <span data-t="omamori-continue-btn">お守りを選択する</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Omamori memorial gift screen -->
+    <section
+      class="omamori-screen"
+      id="omamoriScreen"
+      aria-label="Memorial gift selection"
+      aria-hidden="true"
+    >
+      <div class="omamori-header">
+        <button
+          class="omamori-close-btn"
+          id="omamoriCloseBtn"
+          type="button"
+          aria-label="ツアーに戻る"
+        >
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+            <line x1="1" y1="1" x2="11" y2="11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            <line x1="11" y1="1" x2="1" y2="11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+
       <div class="omamori-hero">
         <p class="omamori-eyebrow" data-t="omamori-eyebrow">記念品</p>
         <h2 class="omamori-title" data-t="omamori-title">お守り</h2>
-        <p class="omamori-subtitle" data-t="omamori-subtitle">ツアーの記念に、お守りGIFをお選びください。</p>
+        <p class="omamori-subtitle" data-t="omamori-subtitle">音声ガイドをご購入いただいた方は、記念にお守りを一つお選びいただけます。お守りとは、災厄を退け、福を招くとされる日本の伝統的な護符です。</p>
       </div>
 
-      <div class="omamori-grid">
+      <div class="omamori-list">
         <!-- Blue omamori -->
         <div class="omamori-card omamori-card--blue" data-omamori-key="blue">
           <video
@@ -402,19 +430,21 @@
           <div class="omamori-card-body">
             <div>
               <p class="omamori-card-name" data-t="omamori-blue-name">蒼 Omamori</p>
-              <p class="omamori-card-desc" data-t="omamori-blue-desc">学業成就・旅行安全</p>
+              <p class="omamori-card-desc" data-t="omamori-blue-desc">学業成就や旅行安全を願う、蒼色のお守りです。</p>
             </div>
-            <button
-              class="omamori-download-btn"
-              type="button"
-              data-omamori="blue"
-              aria-label="蒼お守りをダウンロード"
-            >
-              <svg width="11" height="11" viewBox="0 0 11 11" fill="none" aria-hidden="true">
-                <path d="M5.5 1v6M2.5 5l3 3 3-3M1 10h9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-              <span data-t="omamori-save-btn">保存</span>
-            </button>
+            <div class="omamori-card-actions">
+              <button
+                class="omamori-download-btn"
+                type="button"
+                data-omamori="blue"
+                aria-label="蒼お守りをダウンロード"
+              >
+                <svg width="11" height="11" viewBox="0 0 11 11" fill="none" aria-hidden="true">
+                  <path d="M5.5 1v6M2.5 5l3 3 3-3M1 10h9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span data-t="omamori-save-btn">保存</span>
+              </button>
+            </div>
           </div>
         </div>
 
@@ -432,19 +462,21 @@
           <div class="omamori-card-body">
             <div>
               <p class="omamori-card-name" data-t="omamori-gold-name">金 Omamori</p>
-              <p class="omamori-card-desc" data-t="omamori-gold-desc">商売繁盛・金運祈願</p>
+              <p class="omamori-card-desc" data-t="omamori-gold-desc">商売繁盛や金運上昇を願う、金色のお守りです。</p>
             </div>
-            <button
-              class="omamori-download-btn"
-              type="button"
-              data-omamori="gold"
-              aria-label="金お守りをダウンロード"
-            >
-              <svg width="11" height="11" viewBox="0 0 11 11" fill="none" aria-hidden="true">
-                <path d="M5.5 1v6M2.5 5l3 3 3-3M1 10h9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-              <span data-t="omamori-save-btn">保存</span>
-            </button>
+            <div class="omamori-card-actions">
+              <button
+                class="omamori-download-btn"
+                type="button"
+                data-omamori="gold"
+                aria-label="金お守りをダウンロード"
+              >
+                <svg width="11" height="11" viewBox="0 0 11 11" fill="none" aria-hidden="true">
+                  <path d="M5.5 1v6M2.5 5l3 3 3-3M1 10h9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span data-t="omamori-save-btn">保存</span>
+              </button>
+            </div>
           </div>
         </div>
 
@@ -462,41 +494,58 @@
           <div class="omamori-card-body">
             <div>
               <p class="omamori-card-name" data-t="omamori-pink-name">桃 Omamori</p>
-              <p class="omamori-card-desc" data-t="omamori-pink-desc">縁結び・健康祈願</p>
+              <p class="omamori-card-desc" data-t="omamori-pink-desc">良縁や健康を願う、桃色のお守りです。</p>
             </div>
-            <button
-              class="omamori-download-btn"
-              type="button"
-              data-omamori="pink"
-              aria-label="桃お守りをダウンロード"
-            >
-              <svg width="11" height="11" viewBox="0 0 11 11" fill="none" aria-hidden="true">
-                <path d="M5.5 1v6M2.5 5l3 3 3-3M1 10h9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-              <span data-t="omamori-save-btn">保存</span>
-            </button>
+            <div class="omamori-card-actions">
+              <button
+                class="omamori-download-btn"
+                type="button"
+                data-omamori="pink"
+                aria-label="桃お守りをダウンロード"
+              >
+                <svg width="11" height="11" viewBox="0 0 11 11" fill="none" aria-hidden="true">
+                  <path d="M5.5 1v6M2.5 5l3 3 3-3M1 10h9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span data-t="omamori-save-btn">保存</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Fullscreen omamori video viewer -->
-    <div class="omamori-fullscreen hidden" id="omamoriFullscreen" aria-modal="true" role="dialog" aria-label="お守り動画">
-      <button class="omamori-fullscreen-back" id="omamoriFullscreenBack" type="button" aria-label="戻る">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </button>
-      <video class="omamori-fullscreen-video" id="omamoriFullscreenVideo" autoplay muted loop playsinline></video>
-      <div class="omamori-fullscreen-actions">
-        <button class="omamori-fullscreen-dl" id="omamoriFullscreenDl" type="button">
-          <svg width="13" height="13" viewBox="0 0 11 11" fill="none" aria-hidden="true">
-            <path d="M5.5 1v6M2.5 5l3 3 3-3M1 10h9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-          <span data-t="omamori-fullscreen-save">お守りを保存</span>
-        </button>
+    <!-- Set-as-background instructions modal, shared by all omamori cards -->
+    <section
+      class="overlay-modal hidden"
+      id="omamoriBgModal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="omamoriBgModalTitle"
+    >
+      <div class="overlay-modal-inner omamori-bg-modal-inner">
+        <div class="overlay-modal-head">
+          <h3 id="omamoriBgModalTitle" data-t="omamori-bg-title">壁紙として設定する方法</h3>
+          <button
+            type="button"
+            class="overlay-modal-close"
+            id="omamoriBgModalClose"
+            aria-label="Close wallpaper instructions"
+          >
+            &times;
+          </button>
+        </div>
+        <div class="omamori-bg-modal-body">
+          <div class="omamori-bg-modal-group">
+            <p class="omamori-bg-modal-platform" data-t="omamori-bg-ios-label">iPhoneの場合</p>
+            <p class="omamori-bg-modal-step" data-t="omamori-bg-ios-1">保存したファイルを開き、共有アイコンから「壁紙に設定」を選択してください。</p>
+          </div>
+          <div class="omamori-bg-modal-group">
+            <p class="omamori-bg-modal-platform" data-t="omamori-bg-android-label">Androidの場合</p>
+            <p class="omamori-bg-modal-step" data-t="omamori-bg-android-1">保存したファイルを開き、メニューから「壁紙に設定」を選択してください。</p>
+          </div>
+        </div>
       </div>
-    </div>
+    </section>
 
     <!-- Settings overlay (language + font size), opened from tour without navigation) -->
     <div

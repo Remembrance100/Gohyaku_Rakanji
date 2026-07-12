@@ -55,6 +55,9 @@ const termGalleryMeta = document.querySelector("#termGalleryMeta");
 const termGalleryCount = document.querySelector("#termGalleryCount");
 const termGalleryDots = document.querySelector("#termGalleryDots");
 
+const omamoriMessageScreen = document.querySelector("#omamoriMessageScreen");
+const omamoriMessageCloseBtn = document.querySelector("#omamoriMessageCloseBtn");
+const omamoriContinueBtn = document.querySelector("#omamoriContinueBtn");
 const omamoriScreen = document.querySelector("#omamoriScreen");
 const omamoriCloseBtn = document.querySelector("#omamoriCloseBtn");
 const omamoriMsgVideo = document.querySelector("#omamoriMsgVideo");
@@ -63,12 +66,8 @@ const omamoriMsgUnmuteIcon = document.querySelector("#omamoriMsgUnmuteIcon");
 const omamoriMsgUnmuteLabel = document.querySelector("#omamoriMsgUnmuteLabel");
 const omamoriMsgSettings = document.querySelector("#omamoriMsgSettings");
 const mapEndBtn = document.querySelector("#mapEndBtn");
-const omamoriFullscreen = document.querySelector("#omamoriFullscreen");
-const omamoriFullscreenVideo = document.querySelector(
-  "#omamoriFullscreenVideo",
-);
-const omamoriFullscreenDl = document.querySelector("#omamoriFullscreenDl");
-const omamoriFullscreenBack = document.querySelector("#omamoriFullscreenBack");
+const omamoriBgModal = document.querySelector("#omamoriBgModal");
+const omamoriBgModalClose = document.querySelector("#omamoriBgModalClose");
 const omamoriTranscriptEl = document.getElementById("omamoriTranscript");
 
 const detailAudio = new Audio();
@@ -458,15 +457,14 @@ const UI_STRINGS = {
     "omamori-priest-quote": "「本日はご参拝いただき、誠にありがとうございます。この地に眠る御霊が、皆様の歩みをいつまでも見守っておられます。どうかお守りを携え、健やかな日々をお過ごしください。」",
     "omamori-eyebrow": "記念品",
     "omamori-title": "お守り",
-    "omamori-subtitle": "ツアーの記念に、お守りGIFをお選びください。",
+    "omamori-subtitle": "音声ガイドをご購入いただいた方は、記念にお守りを一つお選びいただけます。お守りとは、災厄を退け、福を招くとされる日本の伝統的な護符です。",
     "omamori-blue-name": "蒼 Omamori",
-    "omamori-blue-desc": "学業成就・旅行安全",
+    "omamori-blue-desc": "学業成就や旅行安全を願う、蒼色のお守りです。",
     "omamori-gold-name": "金 Omamori",
-    "omamori-gold-desc": "商売繁盛・金運祈願",
+    "omamori-gold-desc": "商売繁盛や金運上昇を願う、金色のお守りです。",
     "omamori-pink-name": "桃 Omamori",
-    "omamori-pink-desc": "縁結び・健康祈願",
+    "omamori-pink-desc": "良縁や健康を願う、桃色のお守りです。",
     "omamori-save-btn": "保存",
-    "omamori-fullscreen-save": "お守りを保存",
     "omamori-transcript-label": "トランスクリプト",
     "omamori-transcript-q1": "羅漢さんの前に立ち止まった時、何を考えてほしいですか？",
     "omamori-transcript-a1": "いろんな気持ちが出てくると思うんですね。その時にこう、いろんな感情があると思うんですけども、その、感じられた気持ちをぜひね、大切にしていただきたい。素直に、驚いたのか、これは何だろうと疑問に思ったのかとかですね、あの、不思議な気持ちになったのかとか、いろんなこう、楽しい気持ちになったのかとか、それぞれのですね、まあ先、説明の中でも、以前、申しましたが、その、鏡のようにですね、自分と向き合うようなものなので、ぜひですね、その時感じられた、今のご自身の気持ちをですね、ぜひ大切にしていただきたい。で、機会があればぜひもう一度来ていただいてですね、またその時に感じられるもの、また別のものを感じられたらですね、さらに深まっていくのではないかと考えています。",
@@ -488,9 +486,15 @@ const UI_STRINGS = {
     "coach-skip": "スキップ",
     "omamori-coach-msg": "住職からの結びのメッセージです。スピーカーのアイコンをタップすると音声が流れます。",
     "omamori-coach-transcript": "気になる質問をタップすると、住職のインタビューをもっと読むことができます。",
-    "omamori-coach-grid": "ツアーの記念に、お守りを1つお選びいただけます。カードをタップすると大きく表示されます。",
-    "omamori-coach-save": "「保存」をタップすると端末に保存できます。保存できるお守りはお一人様1つまでです。",
+    "omamori-coach-grid": "ツアーの記念に、お守りを1つお選びいただけます。",
+    "omamori-coach-save": "「保存」をタップすると端末に保存でき、続けて壁紙として設定する方法もご案内します。保存できるお守りはお一人様1つまでです。",
     "omamori-coach-close": "このボタンでいつでもツアーに戻れます。",
+    "omamori-continue-btn": "お守りを選択する",
+    "omamori-bg-title": "壁紙として設定する方法",
+    "omamori-bg-ios-label": "iPhoneの場合",
+    "omamori-bg-ios-1": "保存したファイルを開き、共有アイコンから「壁紙に設定」を選択してください。",
+    "omamori-bg-android-label": "Androidの場合",
+    "omamori-bg-android-1": "保存したファイルを開き、メニューから「壁紙に設定」を選択してください。",
   },
   en: {
     "audio-on": "Audio On",
@@ -517,15 +521,14 @@ const UI_STRINGS = {
     "omamori-priest-quote": "\"Thank you for visiting today. May the souls resting here watch over your journey always. Please carry this omamori with you and live each day in good health.\"",
     "omamori-eyebrow": "Memorial Gift",
     "omamori-title": "Omamori",
-    "omamori-subtitle": "Choose an omamori GIF as a memento of your tour.",
+    "omamori-subtitle": "If you've purchased the audio guide, you may choose one omamori as a keepsake. An omamori is a traditional Japanese charm believed to ward off misfortune and bring good luck.",
     "omamori-blue-name": "Ao Omamori",
-    "omamori-blue-desc": "Academic success · Safe travels",
+    "omamori-blue-desc": "A blue omamori believed to support academic success and watch over safe travels.",
     "omamori-gold-name": "Kin Omamori",
-    "omamori-gold-desc": "Business fortune · Prosperity",
+    "omamori-gold-desc": "A gold omamori believed to bring business prosperity and good fortune.",
     "omamori-pink-name": "Momo Omamori",
-    "omamori-pink-desc": "Good relationships · Health",
+    "omamori-pink-desc": "A pink omamori believed to nurture good relationships and health.",
     "omamori-save-btn": "Save",
-    "omamori-fullscreen-save": "Save Omamori",
     "omamori-transcript-label": "Transcript",
     "omamori-transcript-q1": "When people stop and stand in front of the Rakan statues, what do you hope crosses their minds?",
     "omamori-transcript-a1": "I believe a wide variety of emotions will naturally come up. When that happens, whatever it is you feel, I truly want you to cherish that feeling. Whether it's straightforward surprise, curiosity about what it is, a sense of wonder, or a feeling of joy—whatever it may be. As I mentioned earlier in my explanation, these statues act like a mirror reflecting your inner self. So please, hold onto and value whatever emotion you feel in that exact moment. And if you have the chance, I hope you will visit again. If you feel something entirely different on your next visit, I believe your experience and understanding will deepen even further.",
@@ -547,9 +550,15 @@ const UI_STRINGS = {
     "coach-skip": "Skip",
     "omamori-coach-msg": "This is a closing message from the head priest. Tap the speaker icon to hear it.",
     "omamori-coach-transcript": "Tap a question to read more from the priest's interview.",
-    "omamori-coach-grid": "Choose one omamori as a memento of your tour — tap a card to view it full-screen.",
-    "omamori-coach-save": "Tap \"Save\" to download it to your device. You can only save one omamori, so choose your favorite.",
+    "omamori-coach-grid": "Choose one omamori as a memento of your tour.",
+    "omamori-coach-save": "Tap \"Save\" to download it to your device — we'll then show you how to set it as your wallpaper. You can only save one omamori, so choose your favorite.",
     "omamori-coach-close": "Tap here anytime to return to the tour.",
+    "omamori-continue-btn": "Choose an Omamori",
+    "omamori-bg-title": "How to Set as Wallpaper",
+    "omamori-bg-ios-label": "On iPhone",
+    "omamori-bg-ios-1": "Open the saved file and choose \"Use as Wallpaper\" from the share icon.",
+    "omamori-bg-android-label": "On Android",
+    "omamori-bg-android-1": "Open the saved file and choose \"Set as wallpaper\" from the menu.",
   },
   ko: {
     "audio-on": "음성 켜기",
@@ -576,15 +585,14 @@ const UI_STRINGS = {
     "omamori-priest-quote": "「오늘 참배해 주셔서 진심으로 감사드립니다. 이곳에 잠든 영혼들이 여러분의 발걸음을 언제나 지켜보고 있습니다. 부디 오마모리를 간직하시고 건강한 나날을 보내시기 바랍니다.」",
     "omamori-eyebrow": "기념품",
     "omamori-title": "오마모리",
-    "omamori-subtitle": "투어 기념으로 오마모리 GIF를 선택해 주세요.",
+    "omamori-subtitle": "음성 가이드를 구매하신 분은 기념으로 오마모리를 하나 선택하실 수 있습니다. 오마모리는 액운을 물리치고 행운을 불러온다고 여겨지는 일본의 전통 부적입니다.",
     "omamori-blue-name": "파랑 오마모리",
-    "omamori-blue-desc": "학업 성취 · 여행 안전",
+    "omamori-blue-desc": "학업 성취와 여행 안전을 기원하는 파랑 오마모리입니다.",
     "omamori-gold-name": "금 오마모리",
-    "omamori-gold-desc": "사업 번창 · 금운 기원",
+    "omamori-gold-desc": "사업 번창과 금전운 상승을 기원하는 금색 오마모리입니다.",
     "omamori-pink-name": "분홍 오마모리",
-    "omamori-pink-desc": "인연 · 건강 기원",
+    "omamori-pink-desc": "좋은 인연과 건강을 기원하는 분홍 오마모리입니다.",
     "omamori-save-btn": "저장",
-    "omamori-fullscreen-save": "오마모리 저장",
     "omamori-transcript-label": "대화록",
     "omamori-transcript-q1": "나한상 앞에 멈춰 섰을 때, 사람들이 어떤 생각을 하길 바라시나요?",
     "omamori-transcript-a1": "다양한 감정들이 피어오를 것이라 생각합니다. 그럴 때 느끼시는 그 감정들을 꼭 소중히 여겨주셨으면 합니다. 솔직하게 놀란 감정인지, '이게 뭘까' 하는 의문인지, 신비로운 느낌인지, 아니면 즐거운 마음인지... 각자가 느끼는 감정 말이죠. 앞서 설명해 드렸듯이 나한상은 스스로를 마주하게 하는 거울과 같은 존재입니다. 그러니 그 순간 느끼신 지금 선 자리에서의 스스로의 마음을 꼭 소중히 간직해 주시길 바랍니다. 그리고 기회가 된다면 꼭 한 번 더 찾아주셔서, 그때 또 다른 감정을 느끼게 되신다면 더욱 깊어지지 않을까 생각합니다.",
@@ -606,9 +614,15 @@ const UI_STRINGS = {
     "coach-skip": "건너뛰기",
     "omamori-coach-msg": "주지 스님이 전하는 마지막 메시지입니다. 스피커 아이콘을 탭하면 소리가 재생됩니다.",
     "omamori-coach-transcript": "궁금한 질문을 탭하면 주지 스님의 인터뷰를 더 읽을 수 있습니다.",
-    "omamori-coach-grid": "투어 기념으로 오마모리를 하나 선택할 수 있습니다. 카드를 탭하면 크게 볼 수 있습니다.",
-    "omamori-coach-save": "「저장」을 탭하면 기기에 저장됩니다. 오마모리는 한 분당 하나만 저장할 수 있습니다.",
+    "omamori-coach-grid": "투어 기념으로 오마모리를 하나 선택할 수 있습니다.",
+    "omamori-coach-save": "「저장」을 탭하면 기기에 저장되며, 이어서 배경화면으로 설정하는 방법도 안내해 드립니다. 오마모리는 한 분당 하나만 저장할 수 있습니다.",
     "omamori-coach-close": "이 버튼으로 언제든지 투어로 돌아갈 수 있습니다.",
+    "omamori-continue-btn": "오마모리 선택하기",
+    "omamori-bg-title": "배경화면으로 설정하는 방법",
+    "omamori-bg-ios-label": "아이폰의 경우",
+    "omamori-bg-ios-1": "저장된 파일을 열고 공유 아이콘에서 「배경화면으로 사용」을 선택하세요.",
+    "omamori-bg-android-label": "안드로이드의 경우",
+    "omamori-bg-android-1": "저장된 파일을 열고 메뉴에서 「배경화면으로 설정」을 선택하세요.",
   },
   zh: {
     "audio-on": "开启音频",
@@ -635,15 +649,14 @@ const UI_STRINGS = {
     "omamori-priest-quote": "「感谢您今日的到访。长眠于此的灵魂将永远守护您的前行。请携带御守，祝您每天健康平安。」",
     "omamori-eyebrow": "纪念礼品",
     "omamori-title": "御守",
-    "omamori-subtitle": "请选择一款御守GIF作为本次导览的纪念。",
+    "omamori-subtitle": "购买语音导览的用户可选择一款御守作为纪念。御守是日本传统护身符，被认为能辟邪祈福、带来好运。",
     "omamori-blue-name": "蓝色御守",
-    "omamori-blue-desc": "学业进步 · 旅途平安",
+    "omamori-blue-desc": "蓝色御守，寓意学业进步、旅途平安。",
     "omamori-gold-name": "金色御守",
-    "omamori-gold-desc": "生意兴隆 · 财运亨通",
+    "omamori-gold-desc": "金色御守，寓意生意兴隆、财运亨通。",
     "omamori-pink-name": "粉色御守",
-    "omamori-pink-desc": "良缘 · 健康祈愿",
+    "omamori-pink-desc": "粉色御守，寓意良缘美满、身体健康。",
     "omamori-save-btn": "保存",
-    "omamori-fullscreen-save": "保存御守",
     "omamori-transcript-label": "文字记录",
     "omamori-transcript-q1": "当人们在罗汉像前停下脚步时，您希望他们心中浮现什么？",
     "omamori-transcript-a1": "我相信人们心中会涌现出各种各样的情感。当这些情绪出现时，无论是怎样的感受，都希望大家能好好珍惜。是直截了当的惊讶，还是「这是什么」的疑惑？是不可思议的好奇，还是心生欢喜？无论哪种皆可。正如我之前在采访中提到的，罗汉像像一面镜子，能让人审视内心。因此，请务必珍视那一刻您内心最真实的感受。如果以后有机会，希望您能再来走走。到那时，如果您产生了截然不同的新感受，我相信这份体验将会变得更加深厚。",
@@ -665,9 +678,15 @@ const UI_STRINGS = {
     "coach-skip": "跳过",
     "omamori-coach-msg": "这是住持送上的结束寄语。点击喇叭图标即可播放声音。",
     "omamori-coach-transcript": "点击您感兴趣的问题，即可阅读住持访谈的更多内容。",
-    "omamori-coach-grid": "您可以选择一款御守作为本次导览的纪念。点击卡片即可全屏查看。",
-    "omamori-coach-save": "点击「保存」即可将其下载到您的设备。每人只能保存一款御守，请谨慎选择。",
+    "omamori-coach-grid": "您可以选择一款御守作为本次导览的纪念。",
+    "omamori-coach-save": "点击「保存」即可下载到您的设备，随后我们会展示设为壁纸的方法。每人只能保存一款御守，请谨慎选择。",
     "omamori-coach-close": "点击此按钮可随时返回导览。",
+    "omamori-continue-btn": "选择御守",
+    "omamori-bg-title": "如何设置为壁纸",
+    "omamori-bg-ios-label": "iPhone 用户",
+    "omamori-bg-ios-1": "打开已保存的文件，点击分享图标并选择「用作壁纸」。",
+    "omamori-bg-android-label": "Android 用户",
+    "omamori-bg-android-1": "打开已保存的文件，在菜单中选择「设为壁纸」。",
   },
 };
 
@@ -1869,12 +1888,31 @@ function openAdjacentStop(step) {
   detailView?.scrollTo({ top: 0, behavior: "smooth" });
 }
 
+function openOmamoriMessage() {
+  if (!omamoriMessageScreen) return;
+  omamoriMessageScreen.classList.add("is-open");
+  omamoriMessageScreen.setAttribute("aria-hidden", "false");
+  initMsgPlayer();
+  runOmamoriMessageCoachMarks();
+}
+
+function closeOmamoriMessage() {
+  if (!omamoriMessageScreen) return;
+  omamoriMessageScreen.classList.remove("is-open");
+  omamoriMessageScreen.setAttribute("aria-hidden", "true");
+  resetMsgPlayer();
+}
+
+function continueToOmamori() {
+  closeOmamoriMessage();
+  openOmamori();
+}
+
 function openOmamori() {
   if (!omamoriScreen) return;
   omamoriScreen.classList.add("is-open");
   omamoriScreen.setAttribute("aria-hidden", "false");
   renderOmamoriVideos();
-  initMsgPlayer();
   runOmamoriCoachMarks();
 }
 
@@ -1882,7 +1920,6 @@ function closeOmamori() {
   if (!omamoriScreen) return;
   omamoriScreen.classList.remove("is-open");
   omamoriScreen.setAttribute("aria-hidden", "true");
-  resetMsgPlayer();
 }
 
 const OMAMORI_URLS = {
@@ -1890,6 +1927,22 @@ const OMAMORI_URLS = {
   gold: "https://stg-apirakanjicom-stgrakanji.kinsta.cloud/wp-content/uploads/2026/05/money-2.mp4",
   pink: "https://stg-apirakanjicom-stgrakanji.kinsta.cloud/wp-content/uploads/2026/04/luck.mp4",
 };
+
+// Overrides OMAMORI_URLS for the download button only. Blue ships as a Live
+// Photo wallpaper bundle (.zip) instead of a plain preview video — the card
+// preview keeps playing OMAMORI_URLS.blue, only "Save" fetches this.
+const OMAMORI_DOWNLOAD_URLS = {
+  blue: "https://stg-apirakanjicom-stgrakanji.kinsta.cloud/wp-content/uploads/2026/07/wallpaper_live_photo.zip",
+};
+
+const OMAMORI_MIME_BY_EXT = {
+  mp4: "video/mp4",
+  zip: "application/zip",
+};
+
+// Visitors may only keep one omamori total. Persisted so a page refresh can't
+// be used to bypass the limit and download a second one.
+const OMAMORI_DOWNLOAD_KEY = "omamoriDownloaded";
 
 function renderOmamoriVideos() {
   omamoriScreen?.querySelectorAll("[data-omamori-video]").forEach((video) => {
@@ -2400,6 +2453,10 @@ function bindEvents() {
       closeTermModal();
       return;
     }
+    if (!omamoriBgModal?.classList.contains("hidden")) {
+      closeOmamoriBgModal();
+      return;
+    }
     if (!stopPicker?.classList.contains("hidden")) {
       closeStopPicker();
       return;
@@ -2460,6 +2517,8 @@ function bindEvents() {
 
   stopPickerBackdrop?.addEventListener("click", closeStopPicker);
 
+  omamoriMessageCloseBtn?.addEventListener("click", closeOmamoriMessage);
+  omamoriContinueBtn?.addEventListener("click", continueToOmamori);
   omamoriCloseBtn?.addEventListener("click", closeOmamori);
 
   omamoriTranscriptEl?.querySelectorAll(".omamori-transcript-toggle").forEach((toggle) => {
@@ -2470,62 +2529,45 @@ function bindEvents() {
       if (body) body.hidden = expanded;
     });
   });
-  mapEndBtn?.addEventListener("click", openOmamori);
-
-  function openOmamoriFullscreen(key) {
-    const url = OMAMORI_URLS[key];
-    if (!url || !omamoriFullscreen || !omamoriFullscreenVideo) return;
-    omamoriFullscreenVideo.src = url;
-    omamoriFullscreenVideo.play().catch(() => {});
-    omamoriFullscreenDl.dataset.omamoriKey = key;
-    omamoriFullscreen.classList.remove("hidden");
-  }
-
-  function closeOmamoriFullscreen() {
-    if (!omamoriFullscreen) return;
-    omamoriFullscreen.classList.add("hidden");
-    omamoriFullscreenVideo.pause();
-    omamoriFullscreenVideo.src = "";
-  }
-
-  omamoriFullscreenBack?.addEventListener("click", closeOmamoriFullscreen);
+  mapEndBtn?.addEventListener("click", openOmamoriMessage);
 
   function lockOmamoriDownloads() {
     omamoriScreen?.querySelectorAll(".omamori-download-btn").forEach((btn) => {
       btn.disabled = true;
       btn.classList.add("is-downloaded");
     });
-    if (omamoriFullscreenDl) {
-      omamoriFullscreenDl.disabled = true;
-      omamoriFullscreenDl.classList.add("is-downloaded");
-    }
+    localStorage.setItem(OMAMORI_DOWNLOAD_KEY, "1");
   }
 
-  omamoriScreen?.querySelectorAll(".omamori-card").forEach((card) => {
-    card.addEventListener("click", (e) => {
-      if (e.target.closest(".omamori-download-btn")) return;
-      openOmamoriFullscreen(card.dataset.omamoriKey);
-    });
+  // Restore the lock immediately on load — without this, a page refresh would
+  // re-enable all "Save" buttons even though one omamori was already kept.
+  if (localStorage.getItem(OMAMORI_DOWNLOAD_KEY)) {
+    lockOmamoriDownloads();
+  }
 
-    card.querySelector(".omamori-download-btn")?.addEventListener("click", (e) => {
-      e.stopPropagation();
-      openOmamoriFullscreen(card.dataset.omamoriKey);
-    });
-  });
+  function openOmamoriBgModal() {
+    omamoriBgModal?.classList.remove("hidden");
+  }
 
-  omamoriFullscreenDl?.addEventListener("click", async () => {
-    const key = omamoriFullscreenDl.dataset.omamoriKey;
-    const url = OMAMORI_URLS[key];
+  function closeOmamoriBgModal() {
+    omamoriBgModal?.classList.add("hidden");
+  }
+
+  async function downloadOmamori(key) {
+    const url = OMAMORI_DOWNLOAD_URLS[key] || OMAMORI_URLS[key];
     if (!url) return;
-    const filename = `omamori-${key}.mp4`;
+    const ext = /\.([a-z0-9]+)(?:\?.*)?$/i.exec(url)?.[1]?.toLowerCase() || "mp4";
+    const mime = OMAMORI_MIME_BY_EXT[ext] || "application/octet-stream";
+    const filename = `omamori-${key}.${ext}`;
     try {
       const res = await fetch(url);
       const blob = await res.blob();
-      const file = new File([blob], filename, { type: "video/mp4" });
+      const file = new File([blob], filename, { type: mime });
       // iOS Safari: use share sheet so user can save to Files/Photos
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
         await navigator.share({ files: [file], title: filename });
         lockOmamoriDownloads();
+        openOmamoriBgModal();
         return;
       }
       // Desktop / Android: blob download
@@ -2538,9 +2580,20 @@ function bindEvents() {
       document.body.removeChild(a);
       setTimeout(() => URL.revokeObjectURL(objectUrl), 10000);
       lockOmamoriDownloads();
+      openOmamoriBgModal();
     } catch {
       window.location.href = url;
     }
+  }
+
+  omamoriScreen?.querySelectorAll(".omamori-download-btn").forEach((btn) => {
+    btn.addEventListener("click", () => downloadOmamori(btn.dataset.omamori));
+  });
+
+  omamoriBgModalClose?.addEventListener("click", closeOmamoriBgModal);
+
+  omamoriBgModal?.addEventListener("click", (event) => {
+    if (event.target === omamoriBgModal) closeOmamoriBgModal();
   });
 }
 
@@ -2820,7 +2873,135 @@ function runCoachMarks() {
   }
 }
 
-// ─── Omamori coach marks ─────────────────────────────────────
+// ─── Omamori message coach marks ──────────────────────────────
+
+const OMAMORI_MSG_COACH_KEY = "omamoriMessageCoachSeen";
+let omamoriMessageCoachShown = false;
+
+function runOmamoriMessageCoachMarks() {
+  // if (localStorage.getItem(OMAMORI_MSG_COACH_KEY)) return;
+  if (omamoriMessageCoachShown) return;
+  omamoriMessageCoachShown = true;
+
+  const overlay = document.querySelector("#coachOverlay");
+  const spotlight = document.querySelector("#coachSpotlight");
+  const bubble = document.querySelector("#coachBubble");
+  const coachText = document.querySelector("#coachText");
+  const coachStep = document.querySelector("#coachStep");
+  let nextBtn = document.querySelector("#coachNextBtn");
+  let skipBtn = document.querySelector("#coachSkipBtn");
+  if (!overlay || !spotlight || !bubble || !nextBtn) return;
+
+  // runCoachMarks() binds click handlers to these same shared controls once per
+  // page load and never removes them. Swap in clones so this sequence's handlers
+  // (with their own step counter) are the only ones listening.
+  nextBtn.replaceWith(nextBtn.cloneNode(true));
+  nextBtn = document.querySelector("#coachNextBtn");
+  if (skipBtn) {
+    skipBtn.replaceWith(skipBtn.cloneNode(true));
+    skipBtn = document.querySelector("#coachSkipBtn");
+  }
+
+  const t = UI_STRINGS[getRequestedLang()] || UI_STRINGS.ja;
+
+  // Steps: priest message → transcript
+  const STEPS = [
+    {
+      targetFn: () => document.querySelector("#omamoriMsgPlayer"),
+      text: t["omamori-coach-msg"],
+      pad: 10,
+      rect: true,
+    },
+    {
+      targetFn: () => omamoriTranscriptEl,
+      text: t["omamori-coach-transcript"],
+      pad: 10,
+      rect: true,
+      scrollTo: "#omamoriTranscript",
+    },
+  ];
+
+  let step = 0;
+  let spotlightReady = false;
+
+  function showStep(i) {
+    const s = STEPS[i];
+
+    if (s.scrollTo) {
+      const target = document.querySelector(s.scrollTo);
+      if (target) {
+        const pos = window.getComputedStyle(target).position;
+        if (pos !== "fixed" && pos !== "sticky") {
+          target.scrollIntoView({ behavior: "instant", block: "center" });
+        }
+      }
+      requestAnimationFrame(() => requestAnimationFrame(() => renderStep(i)));
+      return;
+    }
+
+    renderStep(i);
+  }
+
+  function renderStep(i) {
+    const s = STEPS[i];
+    const isLast = i === STEPS.length - 1;
+
+    const el = s.targetFn ? s.targetFn() : null;
+    if (!el) {
+      if (!isLast) { showStep(i + 1); return; }
+      finishCoach();
+      return;
+    }
+
+    const doRender = () => {
+      coachText.textContent = s.text;
+      coachStep.textContent = `${i + 1} / ${STEPS.length}`;
+      nextBtn.style.display = "";
+      nextBtn.textContent = isLast ? t["coach-done"] : t["coach-next"];
+      if (skipBtn) {
+        skipBtn.textContent = t["coach-skip"];
+        skipBtn.style.display = isLast ? "none" : "";
+      }
+      spotlightReady = positionCoachSpotlight(spotlight, bubble, el, s.pad, s.rect, spotlightReady);
+      bubble.style.opacity = "1";
+      overlay.classList.remove("hidden");
+      overlay.classList.add("is-active");
+    };
+
+    if (overlay.classList.contains("is-active")) {
+      bubble.style.opacity = "0";
+      setTimeout(doRender, 160);
+    } else {
+      bubble.style.opacity = "1";
+      doRender();
+    }
+  }
+
+  function finishCoach() {
+    bubble.style.opacity = "0";
+    setTimeout(() => {
+      overlay.classList.add("hidden");
+      overlay.classList.remove("is-active");
+    }, 160);
+    localStorage.setItem(OMAMORI_MSG_COACH_KEY, "1");
+  }
+
+  nextBtn.addEventListener("click", () => {
+    step++;
+    if (step >= STEPS.length) { finishCoach(); return; }
+    showStep(step);
+  });
+
+  skipBtn?.addEventListener("click", () => finishCoach());
+
+  overlay.addEventListener("click", (e) => {
+    if (e.target === overlay) { finishCoach(); }
+  });
+
+  setTimeout(() => showStep(0), 500);
+}
+
+// ─── Omamori picker coach marks ───────────────────────────────
 
 const OMAMORI_COACH_KEY = "omamoriCoachSeen";
 let omamoriCoachShown = false;
@@ -2851,27 +3032,14 @@ function runOmamoriCoachMarks() {
 
   const t = UI_STRINGS[getRequestedLang()] || UI_STRINGS.ja;
 
-  // Steps: priest message → transcript → omamori picker → save (one-per-visit) → close
+  // Steps: omamori picker → save (one-per-visit) → set as background → close
   const STEPS = [
     {
-      targetFn: () => document.querySelector("#omamoriMsgPlayer"),
-      text: t["omamori-coach-msg"],
-      pad: 10,
-      rect: true,
-    },
-    {
-      targetFn: () => omamoriTranscriptEl,
-      text: t["omamori-coach-transcript"],
-      pad: 10,
-      rect: true,
-      scrollTo: "#omamoriTranscript",
-    },
-    {
-      targetFn: () => document.querySelector(".omamori-grid"),
+      targetFn: () => document.querySelector(".omamori-list"),
       text: t["omamori-coach-grid"],
       pad: 12,
       rect: true,
-      scrollTo: ".omamori-grid",
+      scrollTo: ".omamori-list",
     },
     {
       targetFn: () => document.querySelector(".omamori-download-btn"),
