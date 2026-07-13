@@ -2030,6 +2030,66 @@ button:active {
   }
 }
 
+/* ─── Set-as-wallpaper instructions modal (image downloads only) ───── */
+
+/* .overlay-modal defaults to z-index 90, below .omamori-screen (200) — this
+   modal opens from a button inside that screen, so it must stack above it. */
+#omamoriBgModal {
+  z-index: 300;
+}
+
+.omamori-bg-modal-inner {
+  width: min(100%, 480px);
+}
+
+.omamori-bg-modal-body {
+  padding: 0.9rem 1rem 1.1rem;
+  display: grid;
+  gap: 1.1rem;
+  overflow-y: auto;
+  max-height: calc(100svh - 7.5rem);
+}
+
+.omamori-bg-modal-platform {
+  margin: 0 0 0.5rem;
+  font: 700 var(--tour-text-size) "Barlow", sans-serif;
+  letter-spacing: 0.04em;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.omamori-bg-modal-step {
+  margin: 0;
+  font: 500 var(--tour-text-size) / 1.55 "Manrope", sans-serif;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+/* ─── Video-saved confirmation toast ─────────────────── */
+
+.omamori-toast {
+  position: fixed;
+  left: 50%;
+  bottom: calc(2rem + env(safe-area-inset-bottom));
+  z-index: 310;
+  max-width: calc(100% - 2.4rem);
+  padding: 0.7rem 1.1rem;
+  border-radius: 999px;
+  background: rgba(17, 17, 20, 0.96);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #fff;
+  font: 600 var(--tour-text-size) "Manrope", sans-serif;
+  text-align: center;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.4);
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, 8px);
+  transition: opacity 200ms ease, transform 200ms ease;
+}
+
+.omamori-toast.is-visible {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
 /* ─── Tour settings overlay (language + font size) ───── */
 
 .settings-screen {

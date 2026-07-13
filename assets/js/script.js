@@ -66,6 +66,9 @@ const omamoriMsgUnmuteIcon = document.querySelector("#omamoriMsgUnmuteIcon");
 const omamoriMsgUnmuteLabel = document.querySelector("#omamoriMsgUnmuteLabel");
 const omamoriMsgSettings = document.querySelector("#omamoriMsgSettings");
 const mapEndBtn = document.querySelector("#mapEndBtn");
+const omamoriBgModal = document.querySelector("#omamoriBgModal");
+const omamoriBgModalClose = document.querySelector("#omamoriBgModalClose");
+const omamoriToast = document.querySelector("#omamoriToast");
 const omamoriTranscriptEl = document.getElementById("omamoriTranscript");
 
 const detailAudio = new Audio();
@@ -463,6 +466,14 @@ const UI_STRINGS = {
     "omamori-pink-name": "桃",
     "omamori-pink-desc": "良縁や健康を願う、桃色のお守りです。",
     "omamori-save-btn": "保存",
+    "omamori-save-image-btn": "画像を保存",
+    "omamori-save-video-btn": "動画を保存",
+    "omamori-video-saved-toast": "動画を保存しました。「写真」または「ファイル」アプリでご確認ください。",
+    "omamori-bg-title": "壁紙として設定する方法",
+    "omamori-bg-ios-label": "iPhoneの場合",
+    "omamori-bg-ios-1": "保存したファイルを開き、共有アイコンから「壁紙に設定」を選択してください。",
+    "omamori-bg-android-label": "Androidの場合",
+    "omamori-bg-android-1": "保存したファイルを開き、メニューから「壁紙に設定」を選択してください。",
     "omamori-transcript-label": "トランスクリプト",
     "omamori-transcript-q1": "羅漢さんの前に立ち止まった時、何を考えてほしいですか？",
     "omamori-transcript-a1": "いろんな気持ちが出てくると思うんですね。その時にこう、いろんな感情があると思うんですけども、その、感じられた気持ちをぜひね、大切にしていただきたい。素直に、驚いたのか、これは何だろうと疑問に思ったのかとかですね、あの、不思議な気持ちになったのかとか、いろんなこう、楽しい気持ちになったのかとか、それぞれのですね、まあ先、説明の中でも、以前、申しましたが、その、鏡のようにですね、自分と向き合うようなものなので、ぜひですね、その時感じられた、今のご自身の気持ちをですね、ぜひ大切にしていただきたい。で、機会があればぜひもう一度来ていただいてですね、またその時に感じられるもの、また別のものを感じられたらですね、さらに深まっていくのではないかと考えています。",
@@ -519,6 +530,14 @@ const UI_STRINGS = {
     "omamori-pink-name": "Momo Omamori",
     "omamori-pink-desc": "A pink omamori believed to nurture good relationships and health.",
     "omamori-save-btn": "Save",
+    "omamori-save-image-btn": "Save Image",
+    "omamori-save-video-btn": "Save Video",
+    "omamori-video-saved-toast": "Video saved. Check your Photos or Files app.",
+    "omamori-bg-title": "How to Set as Wallpaper",
+    "omamori-bg-ios-label": "On iPhone",
+    "omamori-bg-ios-1": "Open the saved file and choose \"Use as Wallpaper\" from the share icon.",
+    "omamori-bg-android-label": "On Android",
+    "omamori-bg-android-1": "Open the saved file and choose \"Set as wallpaper\" from the menu.",
     "omamori-transcript-label": "Transcript",
     "omamori-transcript-q1": "When people stop and stand in front of the Rakan statues, what do you hope crosses their minds?",
     "omamori-transcript-a1": "I believe a wide variety of emotions will naturally come up. When that happens, whatever it is you feel, I truly want you to cherish that feeling. Whether it's straightforward surprise, curiosity about what it is, a sense of wonder, or a feeling of joy—whatever it may be. As I mentioned earlier in my explanation, these statues act like a mirror reflecting your inner self. So please, hold onto and value whatever emotion you feel in that exact moment. And if you have the chance, I hope you will visit again. If you feel something entirely different on your next visit, I believe your experience and understanding will deepen even further.",
@@ -575,6 +594,14 @@ const UI_STRINGS = {
     "omamori-pink-name": "분홍 오마모리",
     "omamori-pink-desc": "좋은 인연과 건강을 기원하는 분홍 오마모리입니다.",
     "omamori-save-btn": "저장",
+    "omamori-save-image-btn": "이미지 저장",
+    "omamori-save-video-btn": "동영상 저장",
+    "omamori-video-saved-toast": "동영상이 저장되었습니다. 사진 또는 파일 앱에서 확인하세요.",
+    "omamori-bg-title": "배경화면으로 설정하는 방법",
+    "omamori-bg-ios-label": "아이폰의 경우",
+    "omamori-bg-ios-1": "저장된 파일을 열고 공유 아이콘에서 「배경화면으로 사용」을 선택하세요.",
+    "omamori-bg-android-label": "안드로이드의 경우",
+    "omamori-bg-android-1": "저장된 파일을 열고 메뉴에서 「배경화면으로 설정」을 선택하세요.",
     "omamori-transcript-label": "대화록",
     "omamori-transcript-q1": "나한상 앞에 멈춰 섰을 때, 사람들이 어떤 생각을 하길 바라시나요?",
     "omamori-transcript-a1": "다양한 감정들이 피어오를 것이라 생각합니다. 그럴 때 느끼시는 그 감정들을 꼭 소중히 여겨주셨으면 합니다. 솔직하게 놀란 감정인지, '이게 뭘까' 하는 의문인지, 신비로운 느낌인지, 아니면 즐거운 마음인지... 각자가 느끼는 감정 말이죠. 앞서 설명해 드렸듯이 나한상은 스스로를 마주하게 하는 거울과 같은 존재입니다. 그러니 그 순간 느끼신 지금 선 자리에서의 스스로의 마음을 꼭 소중히 간직해 주시길 바랍니다. 그리고 기회가 된다면 꼭 한 번 더 찾아주셔서, 그때 또 다른 감정을 느끼게 되신다면 더욱 깊어지지 않을까 생각합니다.",
@@ -631,6 +658,14 @@ const UI_STRINGS = {
     "omamori-pink-name": "粉色御守",
     "omamori-pink-desc": "粉色御守，寓意良缘美满、身体健康。",
     "omamori-save-btn": "保存",
+    "omamori-save-image-btn": "保存图片",
+    "omamori-save-video-btn": "保存视频",
+    "omamori-video-saved-toast": "视频已保存。请在「照片」或「文件」应用中查看。",
+    "omamori-bg-title": "如何设置为壁纸",
+    "omamori-bg-ios-label": "iPhone 用户",
+    "omamori-bg-ios-1": "打开已保存的文件，点击分享图标并选择「用作壁纸」。",
+    "omamori-bg-android-label": "Android 用户",
+    "omamori-bg-android-1": "打开已保存的文件，在菜单中选择「设为壁纸」。",
     "omamori-transcript-label": "文字记录",
     "omamori-transcript-q1": "当人们在罗汉像前停下脚步时，您希望他们心中浮现什么？",
     "omamori-transcript-a1": "我相信人们心中会涌现出各种各样的情感。当这些情绪出现时，无论是怎样的感受，都希望大家能好好珍惜。是直截了当的惊讶，还是「这是什么」的疑惑？是不可思议的好奇，还是心生欢喜？无论哪种皆可。正如我之前在采访中提到的，罗汉像像一面镜子，能让人审视内心。因此，请务必珍视那一刻您内心最真实的感受。如果以后有机会，希望您能再来走走。到那时，如果您产生了截然不同的新感受，我相信这份体验将会变得更加深厚。",
@@ -1895,6 +1930,21 @@ const OMAMORI_URLS = {
   pink: "https://stg-apirakanjicom-stgrakanji.kinsta.cloud/wp-content/uploads/2026/04/luck.mp4",
 };
 
+// Static image counterpart to OMAMORI_URLS, used only by the "Save Image"
+// button. Not every omamori has one yet.
+const OMAMORI_IMAGE_URLS = {
+  blue: "https://stg-apirakanjicom-stgrakanji.kinsta.cloud/wp-content/uploads/2026/07/omamori-1.png",
+  gold: "https://stg-apirakanjicom-stgrakanji.kinsta.cloud/wp-content/uploads/2026/07/videoframe_5356.png",
+  pink: "https://stg-apirakanjicom-stgrakanji.kinsta.cloud/wp-content/uploads/2026/07/videoframe_6031.png",
+};
+
+const OMAMORI_MIME_BY_EXT = {
+  mp4: "video/mp4",
+  png: "image/png",
+  jpg: "image/jpeg",
+  jpeg: "image/jpeg",
+};
+
 // Visitors may only keep one omamori total. Persisted so a page refresh can't
 // be used to bypass the limit and download a second one.
 const OMAMORI_DOWNLOAD_KEY = "omamoriDownloaded";
@@ -2408,6 +2458,10 @@ function bindEvents() {
       closeTermModal();
       return;
     }
+    if (!omamoriBgModal?.classList.contains("hidden")) {
+      closeOmamoriBgModal();
+      return;
+    }
     if (!stopPicker?.classList.contains("hidden")) {
       closeStopPicker();
       return;
@@ -2496,21 +2550,62 @@ function bindEvents() {
     lockOmamoriDownloads();
   }
 
-  async function downloadOmamori(key, btn) {
-    const url = OMAMORI_URLS[key];
+  function openOmamoriBgModal() {
+    omamoriBgModal?.classList.remove("hidden");
+  }
+
+  function closeOmamoriBgModal() {
+    omamoriBgModal?.classList.add("hidden");
+  }
+
+  omamoriBgModalClose?.addEventListener("click", closeOmamoriBgModal);
+
+  omamoriBgModal?.addEventListener("click", (event) => {
+    if (event.target === omamoriBgModal) closeOmamoriBgModal();
+  });
+
+  let omamoriToastTimer = null;
+
+  function showOmamoriToast(text) {
+    if (!omamoriToast) return;
+    omamoriToast.textContent = text;
+    omamoriToast.classList.add("is-visible");
+    clearTimeout(omamoriToastTimer);
+    omamoriToastTimer = setTimeout(() => {
+      omamoriToast.classList.remove("is-visible");
+    }, 3500);
+  }
+
+  // After a successful save: images point people at the wallpaper how-to,
+  // videos just get a quick confirmation of where to find the file.
+  function notifyOmamoriSaved(type) {
+    if (type === "image") {
+      openOmamoriBgModal();
+      return;
+    }
+    const t = UI_STRINGS[getRequestedLang()] || UI_STRINGS.ja;
+    showOmamoriToast(t["omamori-video-saved-toast"]);
+  }
+
+  async function downloadOmamori(key, type, btn) {
+    const url = type === "image" ? OMAMORI_IMAGE_URLS[key] : OMAMORI_URLS[key];
     if (!url) return;
     // Guard against double-taps firing overlapping fetch/share calls while
     // one is already in flight — a repeat cause of the "buggy" feel.
     if (btn) btn.disabled = true;
-    const filename = `omamori-${key}.mp4`;
+    const fallbackExt = type === "image" ? "jpg" : "mp4";
+    const ext = /\.([a-z0-9]+)(?:\?.*)?$/i.exec(url)?.[1]?.toLowerCase() || fallbackExt;
+    const mime = OMAMORI_MIME_BY_EXT[ext] || (type === "image" ? "image/jpeg" : "video/mp4");
+    const filename = `omamori-${key}-${type}.${ext}`;
     try {
       const res = await fetch(url);
       const blob = await res.blob();
-      const file = new File([blob], filename, { type: "video/mp4" });
+      const file = new File([blob], filename, { type: mime });
       // iOS Safari: use share sheet so user can save to Files/Photos
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
         await navigator.share({ files: [file], title: filename });
         lockOmamoriDownloads();
+        notifyOmamoriSaved(type);
         return;
       }
       // Desktop / Android: blob download
@@ -2523,6 +2618,7 @@ function bindEvents() {
       document.body.removeChild(a);
       setTimeout(() => URL.revokeObjectURL(objectUrl), 10000);
       lockOmamoriDownloads();
+      notifyOmamoriSaved(type);
     } catch {
       // Covers both a cancelled share sheet (expected, e.g. the user backed
       // out) and a genuine fetch failure. Either way, just let them try
@@ -2532,7 +2628,9 @@ function bindEvents() {
   }
 
   omamoriScreen?.querySelectorAll(".omamori-download-btn").forEach((btn) => {
-    btn.addEventListener("click", () => downloadOmamori(btn.dataset.omamori, btn));
+    btn.addEventListener("click", () =>
+      downloadOmamori(btn.dataset.omamori, btn.dataset.omamoriType || "video", btn),
+    );
   });
 }
 
