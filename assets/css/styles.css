@@ -2030,39 +2030,6 @@ button:active {
   }
 }
 
-/* ─── Set-as-background instructions modal ───────────── */
-
-/* .overlay-modal defaults to z-index 90, below .omamori-screen (200) — this
-   modal opens from a button inside that screen, so it must stack above it. */
-#omamoriBgModal {
-  z-index: 300;
-}
-
-.omamori-bg-modal-inner {
-  width: min(100%, 480px);
-}
-
-.omamori-bg-modal-body {
-  padding: 0.9rem 1rem 1.1rem;
-  display: grid;
-  gap: 1.1rem;
-  overflow-y: auto;
-  max-height: calc(100svh - 7.5rem);
-}
-
-.omamori-bg-modal-platform {
-  margin: 0 0 0.5rem;
-  font: 700 var(--tour-text-size) "Barlow", sans-serif;
-  letter-spacing: 0.04em;
-  color: rgba(255, 255, 255, 0.85);
-}
-
-.omamori-bg-modal-step {
-  margin: 0;
-  font: 500 var(--tour-text-size) / 1.55 "Manrope", sans-serif;
-  color: rgba(255, 255, 255, 0.65);
-}
-
 /* ─── Tour settings overlay (language + font size) ───── */
 
 .settings-screen {

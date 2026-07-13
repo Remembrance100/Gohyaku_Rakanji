@@ -66,8 +66,6 @@ const omamoriMsgUnmuteIcon = document.querySelector("#omamoriMsgUnmuteIcon");
 const omamoriMsgUnmuteLabel = document.querySelector("#omamoriMsgUnmuteLabel");
 const omamoriMsgSettings = document.querySelector("#omamoriMsgSettings");
 const mapEndBtn = document.querySelector("#mapEndBtn");
-const omamoriBgModal = document.querySelector("#omamoriBgModal");
-const omamoriBgModalClose = document.querySelector("#omamoriBgModalClose");
 const omamoriTranscriptEl = document.getElementById("omamoriTranscript");
 
 const detailAudio = new Audio();
@@ -455,14 +453,14 @@ const UI_STRINGS = {
     "map-end-btn": "ガイド終了",
     "omamori-priest-role": "住職より",
     "omamori-priest-quote": "「本日はご参拝いただき、誠にありがとうございます。この地に眠る御霊が、皆様の歩みをいつまでも見守っておられます。どうかお守りを携え、健やかな日々をお過ごしください。」",
-    "omamori-eyebrow": "記念品",
+    "omamori-eyebrow": "音声ガイド購入者限定",
     "omamori-title": "お守り",
-    "omamori-subtitle": "音声ガイドをご購入いただいた方は、記念にお守りを一つお選びいただけます。お守りとは、災厄を退け、福を招くとされる日本の伝統的な護符です。",
-    "omamori-blue-name": "蒼 Omamori",
+    "omamori-subtitle": "お守りを一つ選べます。お守りとは、災厄を退け、福を招くとされる日本の伝統的な護符です。",
+    "omamori-blue-name": "蒼",
     "omamori-blue-desc": "学業成就や旅行安全を願う、蒼色のお守りです。",
-    "omamori-gold-name": "金 Omamori",
+    "omamori-gold-name": "金",
     "omamori-gold-desc": "商売繁盛や金運上昇を願う、金色のお守りです。",
-    "omamori-pink-name": "桃 Omamori",
+    "omamori-pink-name": "桃",
     "omamori-pink-desc": "良縁や健康を願う、桃色のお守りです。",
     "omamori-save-btn": "保存",
     "omamori-transcript-label": "トランスクリプト",
@@ -487,11 +485,6 @@ const UI_STRINGS = {
     "omamori-coach-msg": "住職からの結びのメッセージです。スピーカーのアイコンをタップすると音声が流れます。",
     "omamori-coach-transcript": "気になる質問をタップすると、住職のインタビューをもっと読むことができます。",
     "omamori-continue-btn": "お守りを選択する",
-    "omamori-bg-title": "壁紙として設定する方法",
-    "omamori-bg-ios-label": "iPhoneの場合",
-    "omamori-bg-ios-1": "保存したファイルを開き、共有アイコンから「壁紙に設定」を選択してください。",
-    "omamori-bg-android-label": "Androidの場合",
-    "omamori-bg-android-1": "保存したファイルを開き、メニューから「壁紙に設定」を選択してください。",
   },
   en: {
     "audio-on": "Audio On",
@@ -516,9 +509,9 @@ const UI_STRINGS = {
     "map-end-btn": "End Tour",
     "omamori-priest-role": "From the Head Priest",
     "omamori-priest-quote": "\"Thank you for visiting today. May the souls resting here watch over your journey always. Please carry this omamori with you and live each day in good health.\"",
-    "omamori-eyebrow": "Memorial Gift",
+    "omamori-eyebrow": "Audio Guide Purchasers Only",
     "omamori-title": "Omamori",
-    "omamori-subtitle": "If you've purchased the audio guide, you may choose one omamori as a keepsake. An omamori is a traditional Japanese charm believed to ward off misfortune and bring good luck.",
+    "omamori-subtitle": "You may choose one omamori. An omamori is a traditional Japanese charm believed to ward off misfortune and bring good luck.",
     "omamori-blue-name": "Ao Omamori",
     "omamori-blue-desc": "A blue omamori believed to support academic success and watch over safe travels.",
     "omamori-gold-name": "Kin Omamori",
@@ -548,11 +541,6 @@ const UI_STRINGS = {
     "omamori-coach-msg": "This is a closing message from the head priest. Tap the speaker icon to hear it.",
     "omamori-coach-transcript": "Tap a question to read more from the priest's interview.",
     "omamori-continue-btn": "Choose an Omamori",
-    "omamori-bg-title": "How to Set as Wallpaper",
-    "omamori-bg-ios-label": "On iPhone",
-    "omamori-bg-ios-1": "Open the saved file and choose \"Use as Wallpaper\" from the share icon.",
-    "omamori-bg-android-label": "On Android",
-    "omamori-bg-android-1": "Open the saved file and choose \"Set as wallpaper\" from the menu.",
   },
   ko: {
     "audio-on": "음성 켜기",
@@ -577,9 +565,9 @@ const UI_STRINGS = {
     "map-end-btn": "투어 종료",
     "omamori-priest-role": "주지 스님의 말씀",
     "omamori-priest-quote": "「오늘 참배해 주셔서 진심으로 감사드립니다. 이곳에 잠든 영혼들이 여러분의 발걸음을 언제나 지켜보고 있습니다. 부디 오마모리를 간직하시고 건강한 나날을 보내시기 바랍니다.」",
-    "omamori-eyebrow": "기념품",
+    "omamori-eyebrow": "음성 가이드 구매자 한정",
     "omamori-title": "오마모리",
-    "omamori-subtitle": "음성 가이드를 구매하신 분은 기념으로 오마모리를 하나 선택하실 수 있습니다. 오마모리는 액운을 물리치고 행운을 불러온다고 여겨지는 일본의 전통 부적입니다.",
+    "omamori-subtitle": "오마모리를 하나 선택하실 수 있습니다. 오마모리는 액운을 물리치고 행운을 불러온다고 여겨지는 일본의 전통 부적입니다.",
     "omamori-blue-name": "파랑 오마모리",
     "omamori-blue-desc": "학업 성취와 여행 안전을 기원하는 파랑 오마모리입니다.",
     "omamori-gold-name": "금 오마모리",
@@ -609,11 +597,6 @@ const UI_STRINGS = {
     "omamori-coach-msg": "주지 스님이 전하는 마지막 메시지입니다. 스피커 아이콘을 탭하면 소리가 재생됩니다.",
     "omamori-coach-transcript": "궁금한 질문을 탭하면 주지 스님의 인터뷰를 더 읽을 수 있습니다.",
     "omamori-continue-btn": "오마모리 선택하기",
-    "omamori-bg-title": "배경화면으로 설정하는 방법",
-    "omamori-bg-ios-label": "아이폰의 경우",
-    "omamori-bg-ios-1": "저장된 파일을 열고 공유 아이콘에서 「배경화면으로 사용」을 선택하세요.",
-    "omamori-bg-android-label": "안드로이드의 경우",
-    "omamori-bg-android-1": "저장된 파일을 열고 메뉴에서 「배경화면으로 설정」을 선택하세요.",
   },
   zh: {
     "audio-on": "开启音频",
@@ -638,9 +621,9 @@ const UI_STRINGS = {
     "map-end-btn": "结束导览",
     "omamori-priest-role": "住持寄语",
     "omamori-priest-quote": "「感谢您今日的到访。长眠于此的灵魂将永远守护您的前行。请携带御守，祝您每天健康平安。」",
-    "omamori-eyebrow": "纪念礼品",
+    "omamori-eyebrow": "仅限语音导览购买者",
     "omamori-title": "御守",
-    "omamori-subtitle": "购买语音导览的用户可选择一款御守作为纪念。御守是日本传统护身符，被认为能辟邪祈福、带来好运。",
+    "omamori-subtitle": "您可以选择一款御守。御守是日本传统护身符，被认为能辟邪祈福、带来好运。",
     "omamori-blue-name": "蓝色御守",
     "omamori-blue-desc": "蓝色御守，寓意学业进步、旅途平安。",
     "omamori-gold-name": "金色御守",
@@ -670,11 +653,6 @@ const UI_STRINGS = {
     "omamori-coach-msg": "这是住持送上的结束寄语。点击喇叭图标即可播放声音。",
     "omamori-coach-transcript": "点击您感兴趣的问题，即可阅读住持访谈的更多内容。",
     "omamori-continue-btn": "选择御守",
-    "omamori-bg-title": "如何设置为壁纸",
-    "omamori-bg-ios-label": "iPhone 用户",
-    "omamori-bg-ios-1": "打开已保存的文件，点击分享图标并选择「用作壁纸」。",
-    "omamori-bg-android-label": "Android 用户",
-    "omamori-bg-android-1": "打开已保存的文件，在菜单中选择「设为壁纸」。",
   },
 };
 
@@ -2430,10 +2408,6 @@ function bindEvents() {
       closeTermModal();
       return;
     }
-    if (!omamoriBgModal?.classList.contains("hidden")) {
-      closeOmamoriBgModal();
-      return;
-    }
     if (!stopPicker?.classList.contains("hidden")) {
       closeStopPicker();
       return;
@@ -2522,17 +2496,12 @@ function bindEvents() {
     lockOmamoriDownloads();
   }
 
-  function openOmamoriBgModal() {
-    omamoriBgModal?.classList.remove("hidden");
-  }
-
-  function closeOmamoriBgModal() {
-    omamoriBgModal?.classList.add("hidden");
-  }
-
-  async function downloadOmamori(key) {
+  async function downloadOmamori(key, btn) {
     const url = OMAMORI_URLS[key];
     if (!url) return;
+    // Guard against double-taps firing overlapping fetch/share calls while
+    // one is already in flight — a repeat cause of the "buggy" feel.
+    if (btn) btn.disabled = true;
     const filename = `omamori-${key}.mp4`;
     try {
       const res = await fetch(url);
@@ -2542,7 +2511,6 @@ function bindEvents() {
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
         await navigator.share({ files: [file], title: filename });
         lockOmamoriDownloads();
-        openOmamoriBgModal();
         return;
       }
       // Desktop / Android: blob download
@@ -2555,20 +2523,16 @@ function bindEvents() {
       document.body.removeChild(a);
       setTimeout(() => URL.revokeObjectURL(objectUrl), 10000);
       lockOmamoriDownloads();
-      openOmamoriBgModal();
     } catch {
-      window.location.href = url;
+      // Covers both a cancelled share sheet (expected, e.g. the user backed
+      // out) and a genuine fetch failure. Either way, just let them try
+      // again instead of navigating away from the app.
+      if (btn) btn.disabled = false;
     }
   }
 
   omamoriScreen?.querySelectorAll(".omamori-download-btn").forEach((btn) => {
-    btn.addEventListener("click", () => downloadOmamori(btn.dataset.omamori));
-  });
-
-  omamoriBgModalClose?.addEventListener("click", closeOmamoriBgModal);
-
-  omamoriBgModal?.addEventListener("click", (event) => {
-    if (event.target === omamoriBgModal) closeOmamoriBgModal();
+    btn.addEventListener("click", () => downloadOmamori(btn.dataset.omamori, btn));
   });
 }
 
