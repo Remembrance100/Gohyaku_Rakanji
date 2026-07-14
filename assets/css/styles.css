@@ -2030,7 +2030,7 @@ button:active {
   }
 }
 
-/* ─── Set-as-wallpaper instructions modal (image downloads only) ───── */
+/* ─── Post-download instructions modal (wallpaper how-to / video how-to) ───── */
 
 /* .overlay-modal defaults to z-index 90, below .omamori-screen (200) — this
    modal opens from a button inside that screen, so it must stack above it. */
@@ -2063,31 +2063,8 @@ button:active {
   color: rgba(255, 255, 255, 0.65);
 }
 
-/* ─── Video-saved confirmation toast ─────────────────── */
-
-.omamori-toast {
-  position: fixed;
-  left: 50%;
-  bottom: calc(2rem + env(safe-area-inset-bottom));
-  z-index: 310;
-  max-width: calc(100% - 2.4rem);
-  padding: 0.7rem 1.1rem;
-  border-radius: 999px;
-  background: rgba(17, 17, 20, 0.96);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  color: #fff;
-  font: 600 var(--tour-text-size) "Manrope", sans-serif;
-  text-align: center;
-  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.4);
-  opacity: 0;
-  pointer-events: none;
-  transform: translate(-50%, 8px);
-  transition: opacity 200ms ease, transform 200ms ease;
-}
-
-.omamori-toast.is-visible {
-  opacity: 1;
-  transform: translate(-50%, 0);
+.omamori-bg-modal-step + .omamori-bg-modal-step {
+  margin-top: 0.4rem;
 }
 
 /* ─── Tour settings overlay (language + font size) ───── */

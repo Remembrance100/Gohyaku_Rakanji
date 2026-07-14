@@ -68,7 +68,7 @@ const omamoriMsgSettings = document.querySelector("#omamoriMsgSettings");
 const mapEndBtn = document.querySelector("#mapEndBtn");
 const omamoriBgModal = document.querySelector("#omamoriBgModal");
 const omamoriBgModalClose = document.querySelector("#omamoriBgModalClose");
-const omamoriToast = document.querySelector("#omamoriToast");
+const omamoriBgModalTitle = document.querySelector("#omamoriBgModalTitle");
 const omamoriTranscriptEl = document.getElementById("omamoriTranscript");
 
 const detailAudio = new Audio();
@@ -468,12 +468,17 @@ const UI_STRINGS = {
     "omamori-save-btn": "保存",
     "omamori-save-image-btn": "画像を保存",
     "omamori-save-video-btn": "動画を保存",
-    "omamori-video-saved-toast": "動画を保存しました。「写真」または「ファイル」アプリでご確認ください。",
     "omamori-bg-title": "壁紙として設定する方法",
     "omamori-bg-ios-label": "iPhoneの場合",
     "omamori-bg-ios-1": "保存したファイルを開き、共有アイコンから「壁紙に設定」を選択してください。",
     "omamori-bg-android-label": "Androidの場合",
     "omamori-bg-android-1": "保存したファイルを開き、メニューから「壁紙に設定」を選択してください。",
+    "omamori-bg-video-title": "ライブ壁紙として設定する方法",
+    "omamori-bg-video-ios-label": "iPhoneの場合",
+    "omamori-bg-video-ios-1": "1. Live Photo変換アプリ（Intensifyなど）で、保存した動画をLive Photoに変換します。",
+    "omamori-bg-video-ios-2": "2. 「設定」→「壁紙」→「新しい壁紙を追加」→「写真」から変換したLive Photoを選び、「ライブ」効果をオンにして設定してください。",
+    "omamori-bg-video-android-label": "Androidの場合",
+    "omamori-bg-video-android-1": "「設定」→「壁紙」から保存した動画を選び、壁紙として設定してください（対応は機種により異なります）。",
     "omamori-transcript-label": "トランスクリプト",
     "omamori-transcript-q1": "羅漢さんの前に立ち止まった時、何を考えてほしいですか？",
     "omamori-transcript-a1": "いろんな気持ちが出てくると思うんですね。その時にこう、いろんな感情があると思うんですけども、その、感じられた気持ちをぜひね、大切にしていただきたい。素直に、驚いたのか、これは何だろうと疑問に思ったのかとかですね、あの、不思議な気持ちになったのかとか、いろんなこう、楽しい気持ちになったのかとか、それぞれのですね、まあ先、説明の中でも、以前、申しましたが、その、鏡のようにですね、自分と向き合うようなものなので、ぜひですね、その時感じられた、今のご自身の気持ちをですね、ぜひ大切にしていただきたい。で、機会があればぜひもう一度来ていただいてですね、またその時に感じられるもの、また別のものを感じられたらですね、さらに深まっていくのではないかと考えています。",
@@ -532,12 +537,17 @@ const UI_STRINGS = {
     "omamori-save-btn": "Save",
     "omamori-save-image-btn": "Save Image",
     "omamori-save-video-btn": "Save Video",
-    "omamori-video-saved-toast": "Video saved. Check your Photos or Files app.",
     "omamori-bg-title": "How to Set as Wallpaper",
     "omamori-bg-ios-label": "On iPhone",
     "omamori-bg-ios-1": "Open the saved file and choose \"Use as Wallpaper\" from the share icon.",
     "omamori-bg-android-label": "On Android",
     "omamori-bg-android-1": "Open the saved file and choose \"Set as wallpaper\" from the menu.",
+    "omamori-bg-video-title": "How to Set as a Live Wallpaper",
+    "omamori-bg-video-ios-label": "On iPhone",
+    "omamori-bg-video-ios-1": "1. Convert the saved video to a Live Photo using a third-party app (e.g. Intensify).",
+    "omamori-bg-video-ios-2": "2. Go to Settings → Wallpaper → Add New Wallpaper → Photos, pick it, turn on the \"Live Photo\" effect, and set it.",
+    "omamori-bg-video-android-label": "On Android",
+    "omamori-bg-video-android-1": "Go to Settings → Wallpaper, choose the saved video, and set it as your wallpaper (steps vary by device).",
     "omamori-transcript-label": "Transcript",
     "omamori-transcript-q1": "When people stop and stand in front of the Rakan statues, what do you hope crosses their minds?",
     "omamori-transcript-a1": "I believe a wide variety of emotions will naturally come up. When that happens, whatever it is you feel, I truly want you to cherish that feeling. Whether it's straightforward surprise, curiosity about what it is, a sense of wonder, or a feeling of joy—whatever it may be. As I mentioned earlier in my explanation, these statues act like a mirror reflecting your inner self. So please, hold onto and value whatever emotion you feel in that exact moment. And if you have the chance, I hope you will visit again. If you feel something entirely different on your next visit, I believe your experience and understanding will deepen even further.",
@@ -596,12 +606,17 @@ const UI_STRINGS = {
     "omamori-save-btn": "저장",
     "omamori-save-image-btn": "이미지 저장",
     "omamori-save-video-btn": "동영상 저장",
-    "omamori-video-saved-toast": "동영상이 저장되었습니다. 사진 또는 파일 앱에서 확인하세요.",
     "omamori-bg-title": "배경화면으로 설정하는 방법",
     "omamori-bg-ios-label": "아이폰의 경우",
     "omamori-bg-ios-1": "저장된 파일을 열고 공유 아이콘에서 「배경화면으로 사용」을 선택하세요.",
     "omamori-bg-android-label": "안드로이드의 경우",
     "omamori-bg-android-1": "저장된 파일을 열고 메뉴에서 「배경화면으로 설정」을 선택하세요.",
+    "omamori-bg-video-title": "라이브 배경화면으로 설정하는 방법",
+    "omamori-bg-video-ios-label": "아이폰의 경우",
+    "omamori-bg-video-ios-1": "1. Live Photo 변환 앱(Intensify 등)으로 저장된 동영상을 Live Photo로 변환하세요.",
+    "omamori-bg-video-ios-2": "2. 「설정」→「배경화면」→「새로운 배경화면 추가」→「사진」에서 변환한 Live Photo를 선택하고 「라이브」 효과를 켠 후 설정하세요.",
+    "omamori-bg-video-android-label": "안드로이드의 경우",
+    "omamori-bg-video-android-1": "「설정」→「배경화면」에서 저장된 동영상을 선택해 배경화면으로 설정하세요(기기에 따라 지원 여부가 다를 수 있습니다).",
     "omamori-transcript-label": "대화록",
     "omamori-transcript-q1": "나한상 앞에 멈춰 섰을 때, 사람들이 어떤 생각을 하길 바라시나요?",
     "omamori-transcript-a1": "다양한 감정들이 피어오를 것이라 생각합니다. 그럴 때 느끼시는 그 감정들을 꼭 소중히 여겨주셨으면 합니다. 솔직하게 놀란 감정인지, '이게 뭘까' 하는 의문인지, 신비로운 느낌인지, 아니면 즐거운 마음인지... 각자가 느끼는 감정 말이죠. 앞서 설명해 드렸듯이 나한상은 스스로를 마주하게 하는 거울과 같은 존재입니다. 그러니 그 순간 느끼신 지금 선 자리에서의 스스로의 마음을 꼭 소중히 간직해 주시길 바랍니다. 그리고 기회가 된다면 꼭 한 번 더 찾아주셔서, 그때 또 다른 감정을 느끼게 되신다면 더욱 깊어지지 않을까 생각합니다.",
@@ -660,12 +675,17 @@ const UI_STRINGS = {
     "omamori-save-btn": "保存",
     "omamori-save-image-btn": "保存图片",
     "omamori-save-video-btn": "保存视频",
-    "omamori-video-saved-toast": "视频已保存。请在「照片」或「文件」应用中查看。",
     "omamori-bg-title": "如何设置为壁纸",
     "omamori-bg-ios-label": "iPhone 用户",
     "omamori-bg-ios-1": "打开已保存的文件，点击分享图标并选择「用作壁纸」。",
     "omamori-bg-android-label": "Android 用户",
     "omamori-bg-android-1": "打开已保存的文件，在菜单中选择「设为壁纸」。",
+    "omamori-bg-video-title": "如何设置为动态壁纸",
+    "omamori-bg-video-ios-label": "iPhone 用户",
+    "omamori-bg-video-ios-1": "1. 使用第三方应用（如 Intensify）将保存的视频转换为 Live Photo。",
+    "omamori-bg-video-ios-2": "2. 依次进入「设置」→「壁纸」→「添加新壁纸」→「照片」，选择转换后的 Live Photo，开启「动态」效果后设置。",
+    "omamori-bg-video-android-label": "Android 用户",
+    "omamori-bg-video-android-1": "依次进入「设置」→「壁纸」，选择已保存的视频并设置为壁纸（具体步骤因机型而异）。",
     "omamori-transcript-label": "文字记录",
     "omamori-transcript-q1": "当人们在罗汉像前停下脚步时，您希望他们心中浮现什么？",
     "omamori-transcript-a1": "我相信人们心中会涌现出各种各样的情感。当这些情绪出现时，无论是怎样的感受，都希望大家能好好珍惜。是直截了当的惊讶，还是「这是什么」的疑惑？是不可思议的好奇，还是心生欢喜？无论哪种皆可。正如我之前在采访中提到的，罗汉像像一面镜子，能让人审视内心。因此，请务必珍视那一刻您内心最真实的感受。如果以后有机会，希望您能再来走走。到那时，如果您产生了截然不同的新感受，我相信这份体验将会变得更加深厚。",
@@ -2574,8 +2594,20 @@ function bindEvents() {
   // re-enable every "Save" button even though a category was already chosen.
   applyOmamoriDownloadLocks();
 
-  function openOmamoriBgModal() {
-    omamoriBgModal?.classList.remove("hidden");
+  // Same popup for both formats; only the title + body swap with type —
+  // images get the wallpaper how-to, videos get a "where to find it" note.
+  function openOmamoriBgModal(type) {
+    if (!omamoriBgModal) return;
+    const titleKey = type === "video" ? "omamori-bg-video-title" : "omamori-bg-title";
+    const t = UI_STRINGS[getRequestedLang()] || UI_STRINGS.ja;
+    if (omamoriBgModalTitle) {
+      omamoriBgModalTitle.setAttribute("data-t", titleKey);
+      omamoriBgModalTitle.textContent = t[titleKey];
+    }
+    omamoriBgModal.querySelectorAll("[data-omamori-modal-body]").forEach((body) => {
+      body.classList.toggle("hidden", body.dataset.omamoriModalBody !== type);
+    });
+    omamoriBgModal.classList.remove("hidden");
   }
 
   function closeOmamoriBgModal() {
@@ -2588,27 +2620,9 @@ function bindEvents() {
     if (event.target === omamoriBgModal) closeOmamoriBgModal();
   });
 
-  let omamoriToastTimer = null;
-
-  function showOmamoriToast(text) {
-    if (!omamoriToast) return;
-    omamoriToast.textContent = text;
-    omamoriToast.classList.add("is-visible");
-    clearTimeout(omamoriToastTimer);
-    omamoriToastTimer = setTimeout(() => {
-      omamoriToast.classList.remove("is-visible");
-    }, 3500);
-  }
-
-  // After a successful save: images point people at the wallpaper how-to,
-  // videos just get a quick confirmation of where to find the file.
+  // After a successful save, show the matching instructions for that format.
   function notifyOmamoriSaved(type) {
-    if (type === "image") {
-      openOmamoriBgModal();
-      return;
-    }
-    const t = UI_STRINGS[getRequestedLang()] || UI_STRINGS.ja;
-    showOmamoriToast(t["omamori-video-saved-toast"]);
+    openOmamoriBgModal(type);
   }
 
   async function downloadOmamori(key, type, btn) {
