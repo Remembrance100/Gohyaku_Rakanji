@@ -1945,9 +1945,11 @@ const OMAMORI_MIME_BY_EXT = {
   jpeg: "image/jpeg",
 };
 
-// Visitors may only keep one omamori total. Persisted so a page refresh can't
-// be used to bypass the limit and download a second one.
-const OMAMORI_DOWNLOAD_KEY = "omamoriDownloaded";
+// Visitors may only keep one omamori *category* (blue/gold/pink), but once
+// chosen they can save both the image and the video for it. Persisted as
+// { key, downloaded: [...] } so a page refresh can't be used to unlock a
+// second category, while still remembering which formats were already saved.
+const OMAMORI_CHOSEN_KEY = "omamoriChosen";
 
 function renderOmamoriVideos() {
   omamoriScreen?.querySelectorAll("[data-omamori-video]").forEach((video) => {
@@ -2536,19 +2538,41 @@ function bindEvents() {
   });
   mapEndBtn?.addEventListener("click", openOmamoriMessage);
 
-  function lockOmamoriDownloads() {
-    omamoriScreen?.querySelectorAll(".omamori-download-btn").forEach((btn) => {
-      btn.disabled = true;
-      btn.classList.add("is-downloaded");
-    });
-    localStorage.setItem(OMAMORI_DOWNLOAD_KEY, "1");
+  function getOmamoriChosen() {
+    try {
+      return JSON.parse(localStorage.getItem(OMAMORI_CHOSEN_KEY) || "null");
+    } catch {
+      return null;
+    }
   }
 
-  // Restore the lock immediately on load — without this, a page refresh would
-  // re-enable all "Save" buttons even though one omamori was already kept.
-  if (localStorage.getItem(OMAMORI_DOWNLOAD_KEY)) {
-    lockOmamoriDownloads();
+  // Disables every button for categories other than the chosen one, and
+  // re-disables specific buttons whose format was already saved — but leaves
+  // the chosen category's not-yet-saved format (image or video) clickable.
+  function applyOmamoriDownloadLocks() {
+    const chosen = getOmamoriChosen();
+    if (!chosen) return;
+    omamoriScreen?.querySelectorAll(".omamori-download-btn").forEach((btn) => {
+      const key = btn.dataset.omamori;
+      const type = btn.dataset.omamoriType || "video";
+      if (key !== chosen.key || chosen.downloaded.includes(type)) {
+        btn.disabled = true;
+        btn.classList.add("is-downloaded");
+      }
+    });
   }
+
+  function recordOmamoriDownload(key, type) {
+    const existing = getOmamoriChosen();
+    const chosen = existing?.key === key ? existing : { key, downloaded: [] };
+    if (!chosen.downloaded.includes(type)) chosen.downloaded.push(type);
+    localStorage.setItem(OMAMORI_CHOSEN_KEY, JSON.stringify(chosen));
+    applyOmamoriDownloadLocks();
+  }
+
+  // Restore locks immediately on load — without this, a page refresh would
+  // re-enable every "Save" button even though a category was already chosen.
+  applyOmamoriDownloadLocks();
 
   function openOmamoriBgModal() {
     omamoriBgModal?.classList.remove("hidden");
@@ -2604,7 +2628,7 @@ function bindEvents() {
       // iOS Safari: use share sheet so user can save to Files/Photos
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
         await navigator.share({ files: [file], title: filename });
-        lockOmamoriDownloads();
+        recordOmamoriDownload(key, type);
         notifyOmamoriSaved(type);
         return;
       }
@@ -2617,7 +2641,7 @@ function bindEvents() {
       a.click();
       document.body.removeChild(a);
       setTimeout(() => URL.revokeObjectURL(objectUrl), 10000);
-      lockOmamoriDownloads();
+      recordOmamoriDownload(key, type);
       notifyOmamoriSaved(type);
     } catch {
       // Covers both a cancelled share sheet (expected, e.g. the user backed
