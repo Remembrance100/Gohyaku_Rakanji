@@ -2,7 +2,7 @@
 
 A plain language guide to how this project fits together: what each piece does, who owns it, and where to go when something breaks.
 
-Last verified: 14 July 2026
+Last verified: 15 July 2026
 
 ---
 
@@ -88,7 +88,7 @@ In one sentence: **Cloudflare serves the app, WordPress supplies the content, St
                                                         Stripe
 ```
 
-`error.html` is the fallback screen shown when something goes wrong.
+Errors are handled inline within the app; there is no separate error page.
 
 ---
 
@@ -181,7 +181,6 @@ Both are currently on the same commit, so nothing is broken today. But a push th
 | `tour.html` | The main tour experience. |
 | `pay-select.html` | Choose which omamori to buy. |
 | `pay.html` | Checkout screen. |
-| `error.html` | Shown when something fails. |
 | `assets/js/entry.js` | Logic for the entry screen. |
 | `assets/js/script.js` | Logic for the tour. The largest file in the project. |
 | `assets/css/` | Styling. |
@@ -189,8 +188,6 @@ Both are currently on the same commit, so nothing is broken today. But a push th
 | `functions/api/create-checkout.js` | Starts a Stripe payment. |
 | `functions/api/verify-session.js` | Confirms a Stripe payment was genuine. |
 | `wrangler.toml` | Cloudflare Pages configuration. |
-| `manifest.webmanifest` | Lets the site install like an app on a phone. |
-| `sw.js` | A cleanup script. It only clears out old browser caches. App style offline behaviour is currently switched off. |
 
 ---
 
