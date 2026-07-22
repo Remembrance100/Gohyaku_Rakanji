@@ -494,6 +494,10 @@ body {
   line-height: 1.2;
   font-weight: 800;
   text-wrap: pretty;
+  /* Only break at the <wbr> points inserted by titleWithBreaks() (before an
+     opening bracket / after a sentence ender), never mid-word for CJK. */
+  word-break: keep-all;
+  overflow-wrap: anywhere; /* last-resort: prevent overflow at max font scale */
   color: #f2f2f2;
 }
 
@@ -2061,6 +2065,10 @@ button:active {
   margin: 0;
   font: 500 var(--tour-text-size) / 1.55 "Manrope", sans-serif;
   color: rgba(255, 255, 255, 0.65);
+}
+
+.omamori-bg-modal-step:empty {
+  display: none;
 }
 
 .omamori-bg-modal-step + .omamori-bg-modal-step {
