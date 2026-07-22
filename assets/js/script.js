@@ -369,6 +369,37 @@ function escapeHtml(value) {
     .replace(/'/g, "&#39;");
 }
 
+// CJK text has no spaces, so browsers break titles at arbitrary characters —
+// which looks random as the senior font scale changes. Insert line-break
+// opportunities only at top-level Japanese phrase boundaries (before/after a
+// bracketed unit, or after a sentence ender), tracking bracket depth so a
+// break never lands *inside* a 「」 / （） pair — e.g. 魚鼓（ぎょこ）」 must stay
+// together as one unit rather than splitting at the nested （）. Paired with
+// `word-break: keep-all` in CSS, the title breaks ONLY at these points.
+function titleWithBreaks(value) {
+  const OPENERS = "（(「『【〔";
+  const CLOSERS = "）)」』】〕";
+  const ENDERS = "。．！？、";
+  let depth = 0;
+  let out = "";
+  for (const ch of escapeHtml(value)) {
+    if (OPENERS.includes(ch)) {
+      if (depth === 0) out += "<wbr>";
+      depth++;
+      out += ch;
+    } else if (CLOSERS.includes(ch)) {
+      depth = Math.max(0, depth - 1);
+      out += ch;
+      if (depth === 0) out += "<wbr>";
+    } else if (depth === 0 && ENDERS.includes(ch)) {
+      out += ch + "<wbr>";
+    } else {
+      out += ch;
+    }
+  }
+  return out;
+}
+
 function renderTermTokenHtml(keyRaw, labelRaw = "") {
   const label = toPlainText(labelRaw) || toPlainText(keyRaw) || "term";
   return escapeHtml(label);
@@ -459,11 +490,11 @@ const UI_STRINGS = {
     "omamori-eyebrow": "音声ガイド購入者限定",
     "omamori-title": "お守り",
     "omamori-subtitle": "お守りを一つ選べます。お守りとは、災厄を退け、福を招くとされる日本の伝統的な護符です。",
-    "omamori-blue-name": "蒼",
+    "omamori-blue-name": "再起",
     "omamori-blue-desc": "学業成就や旅行安全を願う、蒼色のお守りです。",
-    "omamori-gold-name": "金",
+    "omamori-gold-name": "宝寿",
     "omamori-gold-desc": "商売繁盛や金運上昇を願う、金色のお守りです。",
-    "omamori-pink-name": "桃",
+    "omamori-pink-name": "なんとかなる",
     "omamori-pink-desc": "良縁や健康を願う、桃色のお守りです。",
     "omamori-save-btn": "保存",
     "omamori-save-image-btn": "画像を保存",
@@ -473,12 +504,12 @@ const UI_STRINGS = {
     "omamori-bg-ios-1": "保存したファイルを開き、共有アイコンから「壁紙に設定」を選択してください。",
     "omamori-bg-android-label": "Androidの場合",
     "omamori-bg-android-1": "保存したファイルを開き、メニューから「壁紙に設定」を選択してください。",
-    "omamori-bg-video-title": "ライブ壁紙として設定する方法",
+    "omamori-bg-video-title": "動くお守り",
     "omamori-bg-video-ios-label": "iPhoneの場合",
-    "omamori-bg-video-ios-1": "1. Live Photo変換アプリ（Intensifyなど）で、保存した動画をLive Photoに変換します。",
-    "omamori-bg-video-ios-2": "2. 「設定」→「壁紙」→「新しい壁紙を追加」→「写真」から変換したLive Photoを選び、「ライブ」効果をオンにして設定してください。",
+    "omamori-bg-video-ios-1": "無料アプリ「intoLive」等で変換すると、動く壁紙としてご利用いただけます。",
+    "omamori-bg-video-ios-2": "",
     "omamori-bg-video-android-label": "Androidの場合",
-    "omamori-bg-video-android-1": "「設定」→「壁紙」から保存した動画を選び、壁紙として設定してください（対応は機種により異なります）。",
+    "omamori-bg-video-android-1": "保存した動画をそのまま壁紙に設定できます。",
     "omamori-transcript-label": "トランスクリプト",
     "omamori-transcript-q1": "羅漢さんの前に立ち止まった時、何を考えてほしいですか？",
     "omamori-transcript-a1": "いろんな気持ちが出てくると思うんですね。その時にこう、いろんな感情があると思うんですけども、その、感じられた気持ちをぜひね、大切にしていただきたい。素直に、驚いたのか、これは何だろうと疑問に思ったのかとかですね、あの、不思議な気持ちになったのかとか、いろんなこう、楽しい気持ちになったのかとか、それぞれのですね、まあ先、説明の中でも、以前、申しましたが、その、鏡のようにですね、自分と向き合うようなものなので、ぜひですね、その時感じられた、今のご自身の気持ちをですね、ぜひ大切にしていただきたい。で、機会があればぜひもう一度来ていただいてですね、またその時に感じられるもの、また別のものを感じられたらですね、さらに深まっていくのではないかと考えています。",
@@ -1811,7 +1842,7 @@ function setDetailStop(stop) {
 
   renderHeroSlideshow(stop);
   detailNumber.textContent = stop.number;
-  detailTitle.textContent = stop.title;
+  detailTitle.innerHTML = titleWithBreaks(stop.title);
   if (detailAudioTitle)
     detailAudioTitle.textContent = `${stop.number} ${stop.title}`;
   if (detailThumb) {
