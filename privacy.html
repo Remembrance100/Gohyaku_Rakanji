@@ -1,0 +1,336 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#08080c" />
+    <title>Memorial Tour Guide · Privacy Policy</title>
+    <link rel="icon" href="./assets/icons/icon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Barlow:wght@500;700;800&family=Manrope:wght@500;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --tour-font-scale: 1;
+        --tour-text-size: calc(1rem * var(--tour-font-scale));
+      }
+
+      *, *::before, *::after { box-sizing: border-box; }
+
+      html, body {
+        margin: 0;
+        min-height: 100%;
+      }
+
+      body {
+        font-family: "Manrope", sans-serif;
+        font-size: var(--tour-text-size);
+        background: #000;
+        color: #f2f2f2;
+        display: flex;
+        justify-content: center;
+        min-height: 100svh;
+        padding: 1.5rem;
+      }
+
+      .terms-card {
+        width: min(100%, 560px);
+        background: #111114;
+        border-top: 5px solid #f6515f;
+        border-radius: 4px;
+        padding: 2rem 1.6rem 1.8rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1.3rem;
+        box-shadow: 0 16px 48px rgba(0, 0, 0, 0.8);
+        margin: 1rem 0;
+      }
+
+      .terms-title {
+        margin: 0;
+        font: 800 calc(var(--tour-text-size) * 1.35) / 1.25 "Barlow", sans-serif;
+        color: #f6f6f6;
+      }
+
+      .terms-intro {
+        margin: 0;
+        font-size: var(--tour-text-size);
+        color: rgba(255, 255, 255, 0.6);
+        line-height: 1.55;
+      }
+
+      .terms-section {
+        display: flex;
+        flex-direction: column;
+        gap: 0.4rem;
+      }
+
+      .terms-section h2 {
+        margin: 0;
+        font: 800 var(--tour-text-size) "Barlow", sans-serif;
+        letter-spacing: 0.03em;
+        color: #f6f6f6;
+      }
+
+      .terms-section p {
+        margin: 0;
+        font-size: var(--tour-text-size);
+        line-height: 1.6;
+        color: rgba(255, 255, 255, 0.65);
+      }
+
+      .terms-callout {
+        border: 1px solid rgba(246, 81, 95, 0.35);
+        background: rgba(246, 81, 95, 0.1);
+        border-radius: 8px;
+        padding: 0.9rem 1rem;
+      }
+
+      .terms-callout h2 {
+        color: #f6828d;
+      }
+
+      .terms-callout p {
+        color: rgba(255, 255, 255, 0.8);
+      }
+
+      .terms-divider {
+        height: 1px;
+        background: rgba(255, 255, 255, 0.1);
+      }
+
+      .accept-btn {
+        display: block;
+        width: 100%;
+        height: 54px;
+        border-radius: 999px;
+        border: none;
+        background: linear-gradient(135deg, #f6515f, #db3f4c);
+        color: #fff;
+        font: 800 var(--tour-text-size) "Barlow", sans-serif;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        cursor: pointer;
+        box-shadow: 0 6px 20px rgba(219, 63, 76, 0.4);
+        transition: filter 150ms;
+      }
+
+      .accept-btn:hover {
+        filter: brightness(1.12);
+      }
+
+      .decline-link {
+        display: block;
+        text-align: center;
+        font-size: var(--tour-text-size);
+        color: rgba(255, 255, 255, 0.4);
+        text-decoration: none;
+      }
+
+      .decline-link:hover {
+        color: rgba(255, 255, 255, 0.7);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="terms-card">
+      <div>
+        <h1 class="terms-title" id="privacyTitle">Privacy Policy &amp; Terms of Service</h1>
+        <p class="terms-intro" id="privacyIntro">Please review the following before purchasing access to the Memorial Tour Guide.</p>
+      </div>
+
+      <div class="terms-section terms-callout">
+        <h2 id="refundHeading">Refund Policy</h2>
+        <p id="refundBody">As this is digital content available immediately upon purchase, all sales are final. We do not offer refunds for any reason once access has been purchased.</p>
+      </div>
+
+      <div class="terms-divider"></div>
+
+      <div class="terms-section">
+        <h2 id="accessHeading">Access Period</h2>
+        <p id="accessBody">Access is valid for 24 hours from your first use, with unlimited use during that window.</p>
+      </div>
+
+      <div class="terms-section">
+        <h2 id="collectHeading">Information We Collect</h2>
+        <p id="collectBody">We do not require an account. To provide the tour, we store your language and text-size preferences, and a temporary access token, in your browser's local storage — never on our servers.</p>
+      </div>
+
+      <div class="terms-section">
+        <h2 id="paymentHeading">Payment Information</h2>
+        <p id="paymentBody">Payments are processed directly by Stripe or PayPay. We never see or store your card or payment account details — only confirmation that a payment was completed.</p>
+      </div>
+
+      <div class="terms-section">
+        <h2 id="contentHeading">Tour Content</h2>
+        <p id="contentBody">Tour text, images, and audio are loaded from our content server as you browse. Viewing the tour does not require sharing any personal information with that server.</p>
+      </div>
+
+      <div class="terms-section">
+        <h2 id="useHeading">Permitted Use</h2>
+        <p id="useBody">The Service is intended for personal use by visitors to Gohyaku Rakanji during their visit.</p>
+      </div>
+
+      <div class="terms-section">
+        <h2 id="retentionHeading">Data Retention</h2>
+        <p id="retentionBody">Your access token expires automatically 24 hours after your first use and is not stored anywhere except your own device.</p>
+      </div>
+
+      <div class="terms-section">
+        <h2 id="contactHeading">Contact</h2>
+        <p id="contactBody">If you have any questions, please contact the temple office.</p>
+      </div>
+
+      <div class="terms-divider"></div>
+
+      <button class="accept-btn" id="acceptBtn" type="button">
+        <span id="acceptBtnLabel">Accept &amp; Continue</span>
+      </button>
+      <a class="decline-link" id="declineLink" href="./index.html">
+        <span id="declineLabel">Not now</span>
+      </a>
+    </div>
+
+    <script>
+      const STRINGS = {
+        ja: {
+          title: "プライバシーポリシー・利用規約",
+          intro: "音声ガイドへのアクセスをご購入いただく前に、以下の内容をご確認ください。",
+          refundHeading: "返金について",
+          refundBody: "本サービスはご購入後すぐにご利用いただけるデジタルコンテンツであるため、理由の如何を問わず、購入後の返金は一切承っておりません。ご購入前に内容を十分にご確認ください。",
+          accessHeading: "利用期間",
+          accessBody: "アクセス権は初回ご利用開始から24時間有効です。時間内であれば何度でもご利用いただけます。",
+          collectHeading: "取得する情報について",
+          collectBody: "会員登録は不要です。ツアーの提供のため、言語や文字サイズの設定、一時的なアクセストークンをお使いの端末内（ブラウザのローカルストレージ）に保存します。当社サーバーには保存されません。",
+          paymentHeading: "決済情報について",
+          paymentBody: "お支払いはStripeまたはPayPayが直接処理します。カード情報や決済アカウント情報を当サービスが確認・保存することはなく、決済完了の確認結果のみを受け取ります。",
+          contentHeading: "ツアーコンテンツについて",
+          contentBody: "ツアーの文章・画像・音声は、閲覧時にコンテンツサーバーから読み込まれます。ツアーの閲覧自体で個人情報を共有する必要はありません。",
+          useHeading: "ご利用にあたって",
+          useBody: "本サービスは、五百羅漢寺をご参拝される個人のお客様がご自身でご利用いただくためのものです。",
+          retentionHeading: "データの保持期間",
+          retentionBody: "アクセストークンは初回利用から24時間で自動的に失効し、お客様の端末以外には保存されません。",
+          contactHeading: "お問い合わせ",
+          contactBody: "ご不明な点がございましたら、寺務所までお問い合わせください。",
+          accept: "同意して次へ",
+          decline: "今はしない",
+        },
+        en: {
+          title: "Privacy Policy & Terms of Service",
+          intro: "Please review the following before purchasing access to the Memorial Tour Guide.",
+          refundHeading: "Refund Policy",
+          refundBody: "As the Service is digital content available immediately upon purchase, all sales are final. We do not offer refunds for any reason once access has been purchased. Please review the details carefully before completing your purchase.",
+          accessHeading: "Access Period",
+          accessBody: "Access is valid for 24 hours from your first use, with unlimited use during that window.",
+          collectHeading: "Information We Collect",
+          collectBody: "We do not require an account. To provide the tour, we store your language and text-size preferences, and a temporary access token, in your browser's local storage — never on our servers.",
+          paymentHeading: "Payment Information",
+          paymentBody: "Payments are processed directly by Stripe or PayPay. We never see or store your card or payment account details — only confirmation that a payment was completed.",
+          contentHeading: "Tour Content",
+          contentBody: "Tour text, images, and audio are loaded from our content server as you browse. Viewing the tour does not require sharing any personal information with that server.",
+          useHeading: "Permitted Use",
+          useBody: "The Service is intended for personal use by visitors to Gohyaku Rakanji during their visit.",
+          retentionHeading: "Data Retention",
+          retentionBody: "Your access token expires automatically 24 hours after your first use and is not stored anywhere except your own device.",
+          contactHeading: "Contact",
+          contactBody: "If you have any questions, please contact the temple office.",
+          accept: "Accept & Continue",
+          decline: "Not now",
+        },
+        ko: {
+          title: "개인정보처리방침 및 이용약관",
+          intro: "음성 가이드 이용권을 구매하시기 전에 다음 내용을 확인해 주세요.",
+          refundHeading: "환불 정책",
+          refundBody: "본 서비스는 구매 즉시 이용 가능한 디지털 콘텐츠이므로, 구매 후에는 어떠한 사유로도 환불이 불가능합니다. 구매 전 내용을 충분히 확인해 주시기 바랍니다.",
+          accessHeading: "이용 기간",
+          accessBody: "이용권은 최초 이용 시점부터 24시간 동안 유효하며, 해당 시간 내에는 횟수 제한 없이 이용하실 수 있습니다.",
+          collectHeading: "수집하는 정보",
+          collectBody: "별도의 회원가입이 필요하지 않습니다. 투어 제공을 위해 언어 및 글자 크기 설정, 임시 액세스 토큰을 고객님의 브라우저 로컬 저장소에 저장하며, 당사 서버에는 저장하지 않습니다.",
+          paymentHeading: "결제 정보",
+          paymentBody: "결제는 Stripe 또는 PayPay가 직접 처리합니다. 카드 또는 결제 계정 정보는 당사가 확인하거나 저장하지 않으며, 결제 완료 여부만 전달받습니다.",
+          contentHeading: "투어 콘텐츠",
+          contentBody: "투어의 텍스트, 이미지, 오디오는 열람 시 콘텐츠 서버에서 불러옵니다. 투어 열람 자체에는 개인정보 제공이 필요하지 않습니다.",
+          useHeading: "이용 안내",
+          useBody: "본 서비스는 오백나한사를 방문하시는 개인 이용객을 위한 서비스입니다.",
+          retentionHeading: "데이터 보관 기간",
+          retentionBody: "액세스 토큰은 최초 이용 후 24시간이 지나면 자동으로 만료되며, 고객님의 기기 외에는 저장되지 않습니다.",
+          contactHeading: "문의",
+          contactBody: "문의사항은 사원 사무소로 연락해 주세요.",
+          accept: "동의하고 계속하기",
+          decline: "나중에 하기",
+        },
+        zh: {
+          title: "隐私政策与服务条款",
+          intro: "在购买语音导览访问权限之前，请仔细阅读以下内容。",
+          refundHeading: "退款政策",
+          refundBody: "由于本服务为购买后即可立即使用的数字内容，一经购买，概不退款，恕不接受任何理由的退款申请。请在购买前仔细确认相关内容。",
+          accessHeading: "使用期限",
+          accessBody: "访问权限自首次使用起24小时内有效，期间可不限次数使用。",
+          collectHeading: "我们收集的信息",
+          collectBody: "无需注册账户。为提供导览服务，我们会将您的语言和字体大小偏好，以及临时访问令牌，保存在您浏览器的本地存储中——绝不会保存在我们的服务器上。",
+          paymentHeading: "支付信息",
+          paymentBody: "付款由 Stripe 或 PayPay 直接处理。我们不会查看或存储您的银行卡或支付账户信息，仅会收到付款是否完成的确认结果。",
+          contentHeading: "导览内容",
+          contentBody: "导览的文字、图片和音频会在您浏览时从内容服务器加载。仅浏览导览内容无需提供任何个人信息。",
+          useHeading: "使用须知",
+          useBody: "本服务仅供前来参拜五百罗汉寺的个人游客本人使用。",
+          retentionHeading: "数据保留期限",
+          retentionBody: "访问令牌将在您首次使用后24小时自动失效，且仅保存在您自己的设备上。",
+          contactHeading: "联系我们",
+          contactBody: "如有任何疑问，请联系寺院办公室。",
+          accept: "同意并继续",
+          decline: "暂不需要",
+        },
+      };
+
+      function getLang() {
+        try {
+          const prefs = JSON.parse(localStorage.getItem("tourPrefs") || "{}");
+          if (prefs.lang && STRINGS[prefs.lang]) return prefs.lang;
+        } catch {}
+        const browser = (navigator.language || "en").slice(0, 2).toLowerCase();
+        return STRINGS[browser] ? browser : "en";
+      }
+
+      const lang = getLang();
+      const t = STRINGS[lang];
+
+      const fontScales = { small: 1.14, normal: 1.14, large: 1.14, xlarge: 1.3, xxlarge: 1.5 };
+      try {
+        const prefs = JSON.parse(localStorage.getItem("tourPrefs") || "{}");
+        if (fontScales[prefs.size]) {
+          document.documentElement.style.setProperty("--tour-font-scale", String(fontScales[prefs.size]));
+        }
+      } catch {}
+
+      document.documentElement.lang = lang;
+      document.getElementById("privacyTitle").textContent = t.title;
+      document.getElementById("privacyIntro").textContent = t.intro;
+      document.getElementById("refundHeading").textContent = t.refundHeading;
+      document.getElementById("refundBody").textContent = t.refundBody;
+      document.getElementById("accessHeading").textContent = t.accessHeading;
+      document.getElementById("accessBody").textContent = t.accessBody;
+      document.getElementById("collectHeading").textContent = t.collectHeading;
+      document.getElementById("collectBody").textContent = t.collectBody;
+      document.getElementById("paymentHeading").textContent = t.paymentHeading;
+      document.getElementById("paymentBody").textContent = t.paymentBody;
+      document.getElementById("contentHeading").textContent = t.contentHeading;
+      document.getElementById("contentBody").textContent = t.contentBody;
+      document.getElementById("useHeading").textContent = t.useHeading;
+      document.getElementById("useBody").textContent = t.useBody;
+      document.getElementById("retentionHeading").textContent = t.retentionHeading;
+      document.getElementById("retentionBody").textContent = t.retentionBody;
+      document.getElementById("contactHeading").textContent = t.contactHeading;
+      document.getElementById("contactBody").textContent = t.contactBody;
+      document.getElementById("acceptBtnLabel").textContent = t.accept;
+      document.getElementById("declineLabel").textContent = t.decline;
+
+      document.getElementById("acceptBtn").addEventListener("click", () => {
+        window.location.href = "./pay-select.html";
+      });
+    </script>
+  </body>
+</html>

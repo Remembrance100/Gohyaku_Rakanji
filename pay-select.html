@@ -176,6 +176,33 @@
         color: rgba(255,255,255,0.3);
         text-align: center;
       }
+
+      .pay-error {
+        background: rgba(246, 81, 95, 0.12);
+        border: 1px solid rgba(246, 81, 95, 0.35);
+        border-radius: 8px;
+        padding: 0.65rem 0.85rem;
+        font-size: var(--tour-text-size);
+        color: #f6515f;
+        line-height: 1.45;
+      }
+
+      .pay-terms {
+        margin: 0;
+        font-size: var(--tour-text-size);
+        color: rgba(255,255,255,0.4);
+        line-height: 1.5;
+        text-align: center;
+      }
+
+      .pay-terms a {
+        color: rgba(255,255,255,0.65);
+        text-decoration: underline;
+      }
+
+      .pay-terms a:hover {
+        color: #fff;
+      }
     </style>
   </head>
   <body>
@@ -217,7 +244,7 @@
           </svg>
         </button>
 
-        <button class="method-btn" id="btnPaypay" type="button" disabled>
+        <button class="method-btn" id="btnPaypay" type="button">
           <div class="method-icon method-icon--paypay">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <text x="2" y="18" font-size="14" font-weight="900" font-family="Arial, sans-serif" fill="white">PP</text>
@@ -227,9 +254,15 @@
             <span class="method-name">PayPay</span>
             <span class="method-sub" id="paypaySubText">PayPay online payment</span>
           </div>
-          <span class="method-badge" id="paypayBadge">Coming Soon</span>
+          <svg class="method-arrow" width="7" height="12" viewBox="0 0 7 12" fill="none" aria-hidden="true">
+            <path d="M1 1l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
         </button>
       </div>
+
+      <div class="pay-error" id="payError" style="display:none"></div>
+
+      <p class="pay-terms" id="payTerms"></p>
 
       <div class="pay-secure">
         <svg width="11" height="13" viewBox="0 0 11 13" fill="none" aria-hidden="true">
@@ -248,8 +281,9 @@
           cardName: "クレジットカード",
           cardSub: "Visa・Mastercard他（Stripe決済）",
           paypaySubText: "PayPayオンライン決済",
-          badge: "近日公開",
           secure: "安全なチェックアウト · ¥1,000 · 24時間アクセス",
+          paypayError: "PayPay決済を開始できませんでした。もう一度お試しください。",
+          termsNotice: 'ご購入により、<a href="./privacy.html" target="_blank" rel="noopener">利用規約</a>（返金不可）に同意したものとみなされます。',
         },
         en: {
           title: "Select Payment Method",
@@ -257,8 +291,9 @@
           cardName: "Credit Card",
           cardSub: "Visa, Mastercard & more via Stripe",
           paypaySubText: "PayPay online payment",
-          badge: "Coming Soon",
           secure: "Secure checkout · ¥1,000 · 24-hour access",
+          paypayError: "Could not start PayPay checkout. Please try again.",
+          termsNotice: 'By purchasing, you agree to our <a href="./privacy.html" target="_blank" rel="noopener">Terms of Service</a> (no refunds).',
         },
         ko: {
           title: "결제 방법 선택",
@@ -266,8 +301,9 @@
           cardName: "신용카드",
           cardSub: "Visa, Mastercard 등 (Stripe 결제)",
           paypaySubText: "PayPay 온라인 결제",
-          badge: "출시 예정",
           secure: "안전한 결제 · ¥1,000 · 24시간 이용",
+          paypayError: "PayPay 결제를 시작할 수 없습니다. 다시 시도해 주세요.",
+          termsNotice: '구매 시 <a href="./privacy.html" target="_blank" rel="noopener">이용약관</a>(환불 불가)에 동의하는 것으로 간주됩니다.',
         },
         zh: {
           title: "选择支付方式",
@@ -275,8 +311,9 @@
           cardName: "信用卡",
           cardSub: "支持 Visa、Mastercard 等（Stripe 支付）",
           paypaySubText: "PayPay 在线支付",
-          badge: "即将推出",
           secure: "安全结账 · ¥1,000 · 24小时使用",
+          paypayError: "无法启动 PayPay 支付，请重试。",
+          termsNotice: '购买即表示您同意我们的<a href="./privacy.html" target="_blank" rel="noopener">服务条款</a>（不支持退款）。',
         },
       };
 
@@ -306,14 +343,35 @@
       document.getElementById("cardName").textContent = t.cardName;
       document.getElementById("cardSub").textContent = t.cardSub;
       document.getElementById("paypaySubText").textContent = t.paypaySubText;
-      document.getElementById("paypayBadge").textContent = t.badge;
       document.getElementById("secureLabel").textContent = t.secure;
+      document.getElementById("payTerms").innerHTML = t.termsNotice;
 
       document.getElementById("btnCard").addEventListener("click", () => {
         window.location.href = "./pay.html";
       });
 
-      // PayPay: no URL yet — button stays disabled
+      const btnPaypay = document.getElementById("btnPaypay");
+      const payError = document.getElementById("payError");
+
+      btnPaypay.addEventListener("click", async () => {
+        btnPaypay.disabled = true;
+        payError.style.display = "none";
+
+        try {
+          const res = await fetch("/api/create-paypay-payment", { method: "POST" });
+          const data = await res.json();
+
+          if (!res.ok || !data.url) {
+            throw new Error(data.error || t.paypayError);
+          }
+
+          window.location.href = data.url;
+        } catch (err) {
+          btnPaypay.disabled = false;
+          payError.textContent = err.message || t.paypayError;
+          payError.style.display = "block";
+        }
+      });
     </script>
   </body>
 </html>

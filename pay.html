@@ -193,6 +193,22 @@
         color: rgba(255,220,80,0.75);
         background: rgba(255,200,0,0.05);
       }
+
+      .pay-terms {
+        font-size: var(--tour-text-size);
+        color: rgba(255,255,255,0.4);
+        line-height: 1.5;
+        text-align: center;
+      }
+
+      .pay-terms a {
+        color: rgba(255,255,255,0.65);
+        text-decoration: underline;
+      }
+
+      .pay-terms a:hover {
+        color: #fff;
+      }
     </style>
   </head>
   <body>
@@ -218,6 +234,8 @@
 
       <div class="pay-error" id="payError"></div>
       <div class="pay-notice is-cancelled" id="cancelledNotice" style="display:none"></div>
+
+      <p class="pay-terms" id="payTerms"></p>
 
       <button class="pay-btn" id="payBtn" type="button">
         <span class="pay-btn-label" id="payBtnLabel">Purchase Access</span>
@@ -250,6 +268,7 @@
           cancelled: "決済がキャンセルされました。準備ができたら再度お試しください。",
           confirmed: "✓ 決済が完了しました — ツアーへ移動中…",
           error: "決済の確認中にエラーが発生しました。もう一度お試しいただくか、サポートにお問い合わせください。",
+          termsNotice: 'ご購入により、<a href="./privacy.html" target="_blank" rel="noopener">利用規約</a>（返金不可）に同意したものとみなされます。',
         },
         en: {
           title: "Memorial Tour Guide",
@@ -264,6 +283,7 @@
           cancelled: "Payment was cancelled. You can try again whenever you're ready.",
           confirmed: "✓ Payment confirmed — redirecting you to the tour…",
           error: "Something went wrong verifying your payment. Please try again or contact support.",
+          termsNotice: 'By purchasing, you agree to our <a href="./privacy.html" target="_blank" rel="noopener">Terms of Service</a> (no refunds).',
         },
         ko: {
           title: "메모리얼 투어 가이드",
@@ -278,6 +298,7 @@
           cancelled: "결제가 취소되었습니다. 준비가 되면 다시 시도해 주세요.",
           confirmed: "✓ 결제 완료 — 투어로 이동 중…",
           error: "결제 확인 중 오류가 발생했습니다. 다시 시도하거나 지원팀에 문의하세요.",
+          termsNotice: '구매 시 <a href="./privacy.html" target="_blank" rel="noopener">이용약관</a>(환불 불가)에 동의하는 것으로 간주됩니다.',
         },
         zh: {
           title: "纪念导览指南",
@@ -292,6 +313,7 @@
           cancelled: "付款已取消，准备好后可重新尝试。",
           confirmed: "✓ 付款成功 — 正在跳转至导览…",
           error: "验证付款时出错，请重试或联系客服。",
+          termsNotice: '购买即表示您同意我们的<a href="./privacy.html" target="_blank" rel="noopener">服务条款</a>（不支持退款）。',
         },
       };
 
@@ -329,6 +351,7 @@
       document.getElementById("payBtnLabel").textContent = t.btn;
       document.getElementById("paySecureLabel").textContent = t.secure;
       document.getElementById("accessNotice").textContent = t.confirmed;
+      document.getElementById("payTerms").innerHTML = t.termsNotice;
 
       const payBtn = document.getElementById("payBtn");
       const payError = document.getElementById("payError");

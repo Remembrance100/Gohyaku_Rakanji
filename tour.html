@@ -22,7 +22,8 @@
       }
     </script>
     <script>
-      // Access gate — must have a valid 24h token or a fresh Stripe session_id
+      // Access gate — must have a valid 24h token or a fresh payment reference
+      // (Stripe's session_id or PayPay's paypay_payment_id)
       (function () {
         const TOUR_TOKEN_KEY = "tourAccessToken";
         const TOUR_EXPIRY_KEY = "tourAccessExpiry";
@@ -33,37 +34,48 @@
         }
 
         function redirectToPay() {
-          window.location.replace("./pay-select.html");
+          window.location.replace("./privacy.html");
+        }
+
+        function unlockWithToken(data) {
+          if (!data.valid) { redirectToPay(); return; }
+          localStorage.setItem(TOUR_TOKEN_KEY, data.token);
+          localStorage.setItem(TOUR_EXPIRY_KEY, String(data.expiry));
+          window.location.replace("./index.html?skip_settings=1");
         }
 
         const params = new URLSearchParams(window.location.search);
         const sessionId = params.get("session_id");
+        const paypayPaymentId = params.get("paypay_payment_id");
 
         if (hasValidToken()) {
-          // Strip session_id from URL without reload
-          if (sessionId) {
+          // Strip payment reference params from the URL without reload
+          if (sessionId || paypayPaymentId) {
             params.delete("session_id");
+            params.delete("paypay_payment_id");
             const qs = params.toString();
             history.replaceState(null, "", qs ? "?" + qs : window.location.pathname);
           }
           return;
         }
 
-        if (!sessionId) {
-          redirectToPay();
+        if (sessionId) {
+          fetch("/api/verify-session?session_id=" + encodeURIComponent(sessionId))
+            .then((r) => r.json())
+            .then(unlockWithToken)
+            .catch(() => redirectToPay());
           return;
         }
 
-        // Verify the Stripe session server-side, then store a token
-        fetch("/api/verify-session?session_id=" + encodeURIComponent(sessionId))
-          .then((r) => r.json())
-          .then((data) => {
-            if (!data.valid) { redirectToPay(); return; }
-            localStorage.setItem(TOUR_TOKEN_KEY, data.token);
-            localStorage.setItem(TOUR_EXPIRY_KEY, String(data.expiry));
-            window.location.replace("./index.html?skip_settings=1");
-          })
-          .catch(() => redirectToPay());
+        if (paypayPaymentId) {
+          fetch("/api/verify-paypay-payment?merchantPaymentId=" + encodeURIComponent(paypayPaymentId))
+            .then((r) => r.json())
+            .then(unlockWithToken)
+            .catch(() => redirectToPay());
+          return;
+        }
+
+        redirectToPay();
       })();
     </script>
     <link rel="icon" href="./assets/icons/icon.svg" type="image/svg+xml" />
