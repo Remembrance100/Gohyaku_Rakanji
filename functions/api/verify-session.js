@@ -15,7 +15,8 @@ export async function onRequestGet(context) {
 
   const session = await res.json();
 
-  if (!res.ok || session.payment_status !== "paid") {
+  const paid = session.payment_status === "paid" || session.payment_status === "no_payment_required";
+  if (!res.ok || !paid) {
     return Response.json({ valid: false });
   }
 

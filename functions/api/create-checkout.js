@@ -40,6 +40,7 @@ export async function onRequestPost(context) {
   params.append("locale", locale);
   params.append("success_url", successUrl);
   params.append("cancel_url", cancelUrl);
+  params.append("allow_promotion_codes", "true");
   lineItems.forEach((item, i) => {
     if (item.price) {
       params.append(`line_items[${i}][price]`, item.price);
