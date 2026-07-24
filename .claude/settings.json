@@ -1,5 +1,14 @@
 {
   "permissions": {
-    "allow": []
+    "allow": [
+      "Bash(mkdir -p /Users/linusfujisawa/Desktop/Programming/SmartSenior/Gohyaku_Rakanji/functions/_lib *)",
+      "Bash(node --check functions/api/verify-session.js)",
+      "Bash(node --check functions/_lib/access-token.js)",
+      "Bash(node --check functions/api/create-paypay-payment.js)",
+      "Bash(node --check functions/api/verify-paypay-payment.js)"
+    ],
+    "additionalDirectories": [
+      "/Users/linusfujisawa/Desktop/Programming/SmartSenior/Gohyaku_Rakanji/functions"
+    ]
   }
 }

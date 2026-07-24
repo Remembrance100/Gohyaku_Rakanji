@@ -1,3 +1,5 @@
+import { issueAccessToken } from "../_lib/access-token.js";
+
 export async function onRequestGet(context) {
   const STRIPE_SECRET = context.env.STRIPE_SECRET_KEY;
   const url = new URL(context.request.url);
@@ -17,21 +19,8 @@ export async function onRequestGet(context) {
     return Response.json({ valid: false });
   }
 
-  // Issue a signed token: base64( expiry | sessionId ) + HMAC
-  const expiry = Date.now() + 24 * 60 * 60 * 1000; // 24 hours
-  const payload = `${expiry}|${sessionId}`;
   const secret = context.env.TOKEN_SECRET || STRIPE_SECRET;
-
-  const key = await crypto.subtle.importKey(
-    "raw",
-    new TextEncoder().encode(secret),
-    { name: "HMAC", hash: "SHA-256" },
-    false,
-    ["sign"],
-  );
-  const sig = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(payload));
-  const sigHex = Array.from(new Uint8Array(sig)).map((b) => b.toString(16).padStart(2, "0")).join("");
-  const token = btoa(`${payload}|${sigHex}`);
+  const { token, expiry } = await issueAccessToken(secret, sessionId);
 
   return Response.json({ valid: true, token, expiry });
 }

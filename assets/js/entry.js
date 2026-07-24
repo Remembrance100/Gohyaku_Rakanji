@@ -800,6 +800,11 @@ function applyFontScale(size) {
   );
 }
 
+function hasValidAccessToken() {
+  const expiry = parseInt(localStorage.getItem("tourAccessExpiry") || "0", 10);
+  return Boolean(localStorage.getItem("tourAccessToken")) && expiry > Date.now();
+}
+
 function initSettings(onLangChange) {
   const screen = document.getElementById("settingsScreen");
   const confirmBtn = document.getElementById("settingsConfirmBtn");
@@ -865,12 +870,10 @@ function initSettings(onLangChange) {
 
   confirmBtn?.addEventListener("click", () => {
     savePrefs({ lang: selectedLang, size: selectedSize });
-    const expiry = parseInt(localStorage.getItem("tourAccessExpiry") || "0", 10);
-    const hasToken = localStorage.getItem("tourAccessToken") && expiry > Date.now();
-    if (hasToken) {
+    if (hasValidAccessToken()) {
       hideSettings();
     } else {
-      window.location.href = "./pay-select.html";
+      window.location.href = "./privacy.html";
     }
   });
 
@@ -881,10 +884,12 @@ function initSettings(onLangChange) {
     syncFontBtns();
   });
 
-  // Skip settings if returning from payment (user already set prefs before paying)
+  // Skip settings if returning from payment (user already set prefs before paying).
+  // Requires an actual valid token — `?skip_settings=1` alone must not be able
+  // to bypass the paywall by itself, since Welcome is now gated behind payment.
   const skipSettings = new URLSearchParams(window.location.search).get("skip_settings") === "1";
-  if (skipSettings) {
-    history.replaceState(null, "", window.location.pathname);
+  if (skipSettings) history.replaceState(null, "", window.location.pathname);
+  if (skipSettings && hasValidAccessToken()) {
     screen.classList.add("is-hidden");
   } else {
     screen.classList.remove("is-hidden");
