@@ -489,7 +489,8 @@ const UI_STRINGS = {
     "omamori-priest-quote": "「本日はご参拝いただき、誠にありがとうございます。この地に眠る御霊が、皆様の歩みをいつまでも見守っておられます。どうかお守りを携え、健やかな日々をお過ごしください。」",
     "omamori-eyebrow": "音声ガイド購入者限定",
     "omamori-title": "お守り",
-    "omamori-subtitle": "お守りを一つ選べます。お守りとは、災厄を退け、福を招くとされる日本の伝統的な護符です。",
+    "omamori-subtitle": "お守りとは、災厄を退け、福を招くとされる日本の伝統的な護符です。",
+    "omamori-limit-badge": "⚠ 3種類の中から1つだけお選びください",
     "omamori-blue-name": "再起",
     "omamori-blue-desc": "学業成就や旅行安全を願う、蒼色のお守りです。",
     "omamori-gold-name": "宝寿",
@@ -558,7 +559,8 @@ const UI_STRINGS = {
     "omamori-priest-quote": "\"Thank you for visiting today. May the souls resting here watch over your journey always. Please carry this omamori with you and live each day in good health.\"",
     "omamori-eyebrow": "Audio Guide Purchasers Only",
     "omamori-title": "Omamori",
-    "omamori-subtitle": "You may choose one omamori. An omamori is a traditional Japanese charm believed to ward off misfortune and bring good luck.",
+    "omamori-subtitle": "An omamori is a traditional Japanese charm believed to ward off misfortune and bring good luck.",
+    "omamori-limit-badge": "⚠ You can only choose 1 out of the three",
     "omamori-blue-name": "Ao Omamori",
     "omamori-blue-desc": "A blue omamori believed to support academic success and watch over safe travels.",
     "omamori-gold-name": "Kin Omamori",
@@ -627,7 +629,8 @@ const UI_STRINGS = {
     "omamori-priest-quote": "「오늘 참배해 주셔서 진심으로 감사드립니다. 이곳에 잠든 영혼들이 여러분의 발걸음을 언제나 지켜보고 있습니다. 부디 오마모리를 간직하시고 건강한 나날을 보내시기 바랍니다.」",
     "omamori-eyebrow": "음성 가이드 구매자 한정",
     "omamori-title": "오마모리",
-    "omamori-subtitle": "오마모리를 하나 선택하실 수 있습니다. 오마모리는 액운을 물리치고 행운을 불러온다고 여겨지는 일본의 전통 부적입니다.",
+    "omamori-subtitle": "오마모리는 액운을 물리치고 행운을 불러온다고 여겨지는 일본의 전통 부적입니다.",
+    "omamori-limit-badge": "⚠ 세 가지 중 하나만 선택해 주세요",
     "omamori-blue-name": "파랑 오마모리",
     "omamori-blue-desc": "학업 성취와 여행 안전을 기원하는 파랑 오마모리입니다.",
     "omamori-gold-name": "금 오마모리",
@@ -696,7 +699,8 @@ const UI_STRINGS = {
     "omamori-priest-quote": "「感谢您今日的到访。长眠于此的灵魂将永远守护您的前行。请携带御守，祝您每天健康平安。」",
     "omamori-eyebrow": "仅限语音导览购买者",
     "omamori-title": "御守",
-    "omamori-subtitle": "您可以选择一款御守。御守是日本传统护身符，被认为能辟邪祈福、带来好运。",
+    "omamori-subtitle": "御守是日本传统护身符，被认为能辟邪祈福、带来好运。",
+    "omamori-limit-badge": "⚠ 请在三款中只选择一款",
     "omamori-blue-name": "蓝色御守",
     "omamori-blue-desc": "蓝色御守，寓意学业进步、旅途平安。",
     "omamori-gold-name": "金色御守",
@@ -1931,7 +1935,7 @@ function openAdjacentStop(step) {
   const activeIndex = getActiveStopIndex();
   if (activeIndex < 0) return;
   if (step > 0 && activeIndex >= tourStopsData.length - 1) {
-    openOmamori();
+    openOmamoriMessage();
     return;
   }
   const targetStop = tourStopsData[activeIndex + step];
