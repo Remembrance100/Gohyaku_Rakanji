@@ -50,7 +50,12 @@ export async function onRequestPost(context) {
   const data = await res.json();
 
   if (!res.ok || !data?.data?.url) {
-    return Response.json({ error: data?.resultInfo?.message || "PayPay error" }, { status: 502 });
+    const code = data?.resultInfo?.codeId || data?.resultInfo?.code;
+    const message = data?.resultInfo?.message || "PayPay error";
+    return Response.json(
+      { error: code ? `${message} (${code})` : message },
+      { status: 502 },
+    );
   }
 
   return Response.json({ url: data.data.url });
