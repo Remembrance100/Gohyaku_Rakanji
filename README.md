@@ -54,14 +54,14 @@ In one sentence: **Cloudflare serves the app, WordPress supplies the content, St
 
 ## 3. The pieces and who owns what
 
-| Piece | What it actually does | Where you manage it |
-|---|---|---|
-| **Squarespace** | Owns the domain name `rakanji.org`. That is all. It is the registrar. | account.squarespace.com |
-| **Kinsta DNS** | The address book. Tells the internet that `tour.rakanji.org` lives at Cloudflare. | MyKinsta → DNS management |
-| **Cloudflare Pages** | Hosts and serves the tour website. Project name `smartsenior-gohyakurakanji`. | dash.cloudflare.com → Workers and Pages |
-| **Kinsta WordPress** | The content brain. Holds every tour stop, video, image, and omamori item. | MyKinsta → Sites → `api.rakanji` |
-| **Stripe** | Processes the omamori payments. | dashboard.stripe.com |
-| **GitHub** | Stores the code. Pushing to `main` triggers a new deploy. | github.com |
+| Piece                | What it actually does                                                             | Where you manage it                     |
+| -------------------- | --------------------------------------------------------------------------------- | --------------------------------------- |
+| **Squarespace**      | Owns the domain name `rakanji.org`. That is all. It is the registrar.             | account.squarespace.com                 |
+| **Kinsta DNS**       | The address book. Tells the internet that `tour.rakanji.org` lives at Cloudflare. | MyKinsta → DNS management               |
+| **Cloudflare Pages** | Hosts and serves the tour website. Project name `smartsenior-gohyakurakanji`.     | dash.cloudflare.com → Workers and Pages |
+| **Kinsta WordPress** | The content brain. Holds every tour stop, video, image, and omamori item.         | MyKinsta → Sites → `api.rakanji`        |
+| **Stripe**           | Processes the omamori payments.                                                   | dashboard.stripe.com                    |
+| **GitHub**           | Stores the code. Pushing to `main` triggers a new deploy.                         | github.com                              |
 
 > **Important and easy to get wrong:** Squarespace shows a DNS editor with a list of records in it. **That editor does nothing.** The domain's nameservers point at Kinsta, so Kinsta is the only DNS that the internet actually reads. If you add a record in Squarespace it will look saved and will never take effect. Always edit DNS in **MyKinsta → DNS management**.
 
@@ -118,8 +118,8 @@ The website is static, so it cannot be trusted with a secret Stripe key. Two sma
 
 Two secrets make this work. They are **not** in the code and must never be committed:
 
-* `STRIPE_SECRET_KEY` lets the site talk to Stripe.
-* `TOKEN_SECRET` signs the proof that a visitor genuinely paid.
+- `STRIPE_SECRET_KEY` lets the site talk to Stripe.
+- `TOKEN_SECRET` signs the proof that a visitor genuinely paid.
 
 Locally they sit in `.dev.vars`. In production they are stored in the Cloudflare Pages project settings.
 
@@ -142,8 +142,8 @@ This is the part that caused confusion, so here it is in full.
 
 The record that makes the tour work is a single line in Kinsta DNS:
 
-| Type | Name | Points to |
-|---|---|---|
+| Type  | Name   | Points to                      |
+| ----- | ------ | ------------------------------ |
 | CNAME | `tour` | `memorialtoursystem.pages.dev` |
 
 Cloudflare then has to agree to answer for that name. It is registered under **Pages project → Custom domains** as `tour.rakanji.org`. Both halves are required. One without the other gives you a broken site.
@@ -166,8 +166,8 @@ There is no build step. The repository root is published exactly as it sits (`pa
 
 **One thing the team must know.** The code lives in two GitHub repositories:
 
-* `2fujisawa/MemorialTourSystemv2` is the `origin` remote on the working laptop.
-* `Remembrance100/Gohyaku_Rakanji` is the repository **Cloudflare actually watches and deploys from.**
+- `2fujisawa/MemorialTourSystemv2` is the `origin` remote on the working laptop.
+- `Remembrance100/Gohyaku_Rakanji` is the repository **Cloudflare actually watches and deploys from.**
 
 Both are currently on the same commit, so nothing is broken today. But a push that reaches only `2fujisawa/MemorialTourSystemv2` **will not deploy.** Before assuming a change is live, confirm it landed on `Remembrance100/Gohyaku_Rakanji`. Consolidating down to one repository would remove this trap entirely and is worth doing.
 
@@ -175,19 +175,19 @@ Both are currently on the same commit, so nothing is broken today. But a push th
 
 ## 8. File map
 
-| File | Purpose |
-|---|---|
-| `index.html` | Entry screen, Stop 0. Language selection. |
-| `tour.html` | The main tour experience. |
-| `pay-select.html` | Choose which omamori to buy. |
-| `pay.html` | Checkout screen. |
-| `assets/js/entry.js` | Logic for the entry screen. |
-| `assets/js/script.js` | Logic for the tour. The largest file in the project. |
-| `assets/css/` | Styling. |
-| `assets/icons/` | App icons. |
-| `functions/api/create-checkout.js` | Starts a Stripe payment. |
-| `functions/api/verify-session.js` | Confirms a Stripe payment was genuine. |
-| `wrangler.toml` | Cloudflare Pages configuration. |
+| File                               | Purpose                                              |
+| ---------------------------------- | ---------------------------------------------------- |
+| `index.html`                       | Entry screen, Stop 0. Language selection.            |
+| `tour.html`                        | The main tour experience.                            |
+| `pay-select.html`                  | Choose which omamori to buy.                         |
+| `pay.html`                         | Checkout screen.                                     |
+| `assets/js/entry.js`               | Logic for the entry screen.                          |
+| `assets/js/script.js`              | Logic for the tour. The largest file in the project. |
+| `assets/css/`                      | Styling.                                             |
+| `assets/icons/`                    | App icons.                                           |
+| `functions/api/create-checkout.js` | Starts a Stripe payment.                             |
+| `functions/api/verify-session.js`  | Confirms a Stripe payment was genuine.               |
+| `wrangler.toml`                    | Cloudflare Pages configuration.                      |
 
 ---
 
@@ -215,13 +215,15 @@ There is a `tour` CNAME sitting in the Squarespace DNS panel. It does nothing, b
 
 ## 10. Quick reference
 
-| Thing | Value |
-|---|---|
-| Live site | https://tour.rakanji.org |
-| Cloudflare fallback address | https://memorialtoursystem.pages.dev |
-| Cloudflare Pages project | `smartsenior-gohyakurakanji` |
-| Deploys from | `Remembrance100/Gohyaku_Rakanji`, branch `main` |
-| WordPress content API | `/?rest_route=/memorial/v1/tour` |
-| DNS provider | Kinsta |
-| Registrar | Squarespace |
-| Payments | Stripe |
+| Thing                       | Value                                           |
+| --------------------------- | ----------------------------------------------- |
+| Live site                   | https://tour.rakanji.org                        |
+| Cloudflare fallback address | https://memorialtoursystem.pages.dev            |
+| Cloudflare Pages project    | `smartsenior-gohyakurakanji`                    |
+| Deploys from                | `Remembrance100/Gohyaku_Rakanji`, branch `main` |
+| WordPress content API       | `/?rest_route=/memorial/v1/tour`                |
+| DNS provider                | Kinsta                                          |
+| Registrar                   | Squarespace                                     |
+| Payments                    | Stripe                                          |
+
+Stripe Check
