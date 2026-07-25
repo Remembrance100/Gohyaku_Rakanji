@@ -50,6 +50,22 @@
         box-shadow: 0 16px 48px rgba(0, 0, 0, 0.8);
       }
 
+      .nav-back {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        align-self: flex-start;
+        background: none;
+        border: none;
+        padding: 0;
+        color: rgba(255,255,255,0.55);
+        font: 700 var(--tour-text-size) "Manrope", sans-serif;
+        cursor: pointer;
+        transition: color 150ms;
+      }
+
+      .nav-back:hover { color: #fff; }
+
       .pay-title {
         margin: 0;
         font: 800 var(--tour-text-size) / 1.2 "Barlow", sans-serif;
@@ -214,6 +230,12 @@
   </head>
   <body>
     <div class="pay-card">
+      <button class="nav-back" id="navBack" type="button">
+        <svg width="8" height="13" viewBox="0 0 8 13" fill="none" aria-hidden="true">
+          <path d="M7 1 1.5 6.5 7 12" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span id="navBackLabel">Back</span>
+      </button>
       <div>
         <h1 class="pay-title" id="payTitle">Memorial Tour Guide</h1>
         <p class="pay-subtitle" id="paySubtitle">Full access to the interactive audio tour with maps, stop descriptions, and historical content.</p>
@@ -257,6 +279,7 @@
     <script>
       const STRINGS = {
         ja: {
+          back: "戻る",
           title: "天恩山 五百羅漢寺 音声ガイド",
           subtitle: "マップ・各スポットの説明・歴史コンテンツを含む音声ガイドへの完全アクセス。",
           feat1: "全スポットの音声ガイド",
@@ -272,6 +295,7 @@
           termsNotice: 'ご購入により、<a href="./privacy.html" target="_blank" rel="noopener">利用規約</a>（返金不可）に同意したものとみなされます。',
         },
         en: {
+          back: "Back",
           title: "Memorial Tour Guide",
           subtitle: "Full access to the interactive audio tour with maps, stop descriptions, and historical content.",
           feat1: "All tour stops with audio guides",
@@ -287,6 +311,7 @@
           termsNotice: 'By purchasing, you agree to our <a href="./privacy.html" target="_blank" rel="noopener">Terms of Service</a> (no refunds).',
         },
         ko: {
+          back: "뒤로",
           title: "메모리얼 투어 가이드",
           subtitle: "지도, 각 스팟 설명, 역사 콘텐츠를 포함한 인터랙티브 오디오 투어 전체 이용권.",
           feat1: "전 스팟 오디오 가이드",
@@ -302,6 +327,7 @@
           termsNotice: '구매 시 <a href="./privacy.html" target="_blank" rel="noopener">이용약관</a>(환불 불가)에 동의하는 것으로 간주됩니다.',
         },
         zh: {
+          back: "返回",
           title: "纪念导览指南",
           subtitle: "包含地图、景点说明及历史内容的互动语音导览完整使用权。",
           feat1: "全景点语音导览",
@@ -353,6 +379,11 @@
       document.getElementById("paySecureLabel").textContent = t.secure;
       document.getElementById("accessNotice").textContent = t.confirmed;
       document.getElementById("payTerms").innerHTML = t.termsNotice;
+
+      document.getElementById("navBackLabel").textContent = t.back;
+      document.getElementById("navBack").addEventListener("click", () => {
+        window.location.href = "./pay-select.html";
+      });
 
       const payBtn = document.getElementById("payBtn");
       const payError = document.getElementById("payError");

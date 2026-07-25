@@ -50,6 +50,22 @@
         margin: 1rem 0;
       }
 
+      .nav-back {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        align-self: flex-start;
+        background: none;
+        border: none;
+        padding: 0;
+        color: rgba(255, 255, 255, 0.55);
+        font: 700 var(--tour-text-size) "Manrope", sans-serif;
+        cursor: pointer;
+        transition: color 150ms;
+      }
+
+      .nav-back:hover { color: #fff; }
+
       .terms-title {
         margin: 0;
         font: 800 calc(var(--tour-text-size) * 1.35) / 1.25 "Barlow", sans-serif;
@@ -148,6 +164,12 @@
   </head>
   <body>
     <div class="terms-card">
+      <button class="nav-back" id="navBack" type="button">
+        <svg width="8" height="13" viewBox="0 0 8 13" fill="none" aria-hidden="true">
+          <path d="M7 1 1.5 6.5 7 12" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span id="navBackLabel">Back</span>
+      </button>
       <div>
         <h1 class="terms-title" id="privacyTitle">Privacy Policy &amp; Terms of Service</h1>
         <p class="terms-intro" id="privacyIntro">Please review the following before purchasing access to the Memorial Tour Guide.</p>
@@ -186,6 +208,7 @@
     <script>
       const STRINGS = {
         ja: {
+          back: "戻る",
           title: "プライバシーポリシー・利用規約",
           intro: "音声ガイドへのアクセスをご購入いただく前に、以下の内容をご確認ください。",
           refundHeading: "返金について",
@@ -200,6 +223,7 @@
           decline: "今はしない",
         },
         en: {
+          back: "Back",
           title: "Privacy Policy & Terms of Service",
           intro: "Please review the following before purchasing access to the Memorial Tour Guide.",
           refundHeading: "Refund Policy",
@@ -214,6 +238,7 @@
           decline: "Not now",
         },
         ko: {
+          back: "뒤로",
           title: "개인정보처리방침 및 이용약관",
           intro: "음성 가이드 이용권을 구매하시기 전에 다음 내용을 확인해 주세요.",
           refundHeading: "환불 정책",
@@ -228,6 +253,7 @@
           decline: "나중에 하기",
         },
         zh: {
+          back: "返回",
           title: "隐私政策与服务条款",
           intro: "在购买语音导览访问权限之前，请仔细阅读以下内容。",
           refundHeading: "退款政策",
@@ -276,6 +302,11 @@
       document.getElementById("useBody").innerHTML = t.useBody;
       document.getElementById("acceptBtnLabel").textContent = t.accept;
       document.getElementById("declineLabel").textContent = t.decline;
+
+      document.getElementById("navBackLabel").textContent = t.back;
+      document.getElementById("navBack").addEventListener("click", () => {
+        window.location.href = "./index.html";
+      });
 
       document.getElementById("acceptBtn").addEventListener("click", () => {
         window.location.href = "./pay-select.html";
