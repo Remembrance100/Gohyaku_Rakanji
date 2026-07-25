@@ -15,6 +15,16 @@ export async function onRequestPost(context) {
   const LOCALE_MAP = { ja: "ja", en: "en", ko: "ko", zh: "zh" };
   const locale = LOCALE_MAP[body.lang] || "auto";
 
+  // Localized product wording for the inline price path — falls back to Japanese
+  // for any unsupported/unknown language.
+  const PRODUCT = {
+    ja: { name: "天恩山 五百羅漢寺 音声ガイド", description: "インタラクティブ音声ガイドへの24時間アクセス" },
+    en: { name: "Memorial Tour Guide", description: "24-hour access to the interactive audio tour" },
+    ko: { name: "메모리얼 투어 가이드", description: "인터랙티브 오디오 투어 24시간 이용권" },
+    zh: { name: "纪念导览指南", description: "互动语音导览24小时使用权" },
+  };
+  const product = PRODUCT[body.lang] || PRODUCT.ja;
+
   const successUrl = `${origin}/tour.html?session_id={CHECKOUT_SESSION_ID}`;
   const cancelUrl = `${origin}/pay.html?cancelled=1`;
 
@@ -27,8 +37,8 @@ export async function onRequestPost(context) {
             currency: "jpy",
             unit_amount: 1000,
             product_data: {
-              name: "Memorial Tour Guide",
-              description: "24-hour access to the interactive audio tour",
+              name: product.name,
+              description: product.description,
             },
           },
           quantity: 1,

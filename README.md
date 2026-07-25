@@ -5,3 +5,7 @@
 - [ ] Set up PayPay
 - [ ] Website logo
 - [ ] Overall review
+
+## Changes
+
+- stripe payment page (Memorial Tour Guide 24-hour access to the interactive audio tour) wording to chage depending on language if not stick with japanese

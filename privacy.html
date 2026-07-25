@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#08080c" />
     <title>Memorial Tour Guide · Privacy Policy</title>
-    <link rel="icon" href="./assets/icons/icon.svg" type="image/svg+xml" />
+    <link rel="icon" href="./assets/icons/icon.png?v=20260725a" type="image/png" />
+    <link rel="apple-touch-icon" href="./assets/icons/icon.png?v=20260725a" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -80,6 +81,16 @@
         font-size: var(--tour-text-size);
         line-height: 1.5;
         color: rgba(255, 255, 255, 0.65);
+      }
+
+      .terms-section p a {
+        color: #f6828d;
+        text-decoration: underline;
+        word-break: break-word;
+      }
+
+      .terms-section p a:hover {
+        color: #f6515f;
       }
 
       .terms-callout {
@@ -159,7 +170,7 @@
 
       <div class="terms-section">
         <h2 id="useHeading">Permitted Use</h2>
-        <p id="useBody">Intended for personal use by visitors to Gohyaku Rakanji. Questions? Contact the temple office.</p>
+        <p id="useBody">Intended for personal use by visitors to Gohyaku Rakanji. Questions? Contact the temple office at <a href="https://rakan.or.jp/contactform" target="_blank" rel="noopener">rakan.or.jp/contactform</a>.</p>
       </div>
 
       <div class="terms-divider"></div>
@@ -184,7 +195,7 @@
           privacyHeading: "プライバシーとお支払い",
           privacyBody: "会員登録は不要です。言語や文字サイズの設定、一時的なアクセストークンはお使いの端末内にのみ保存され、当社サーバーには保存されません。お支払いはStripeまたはPayPayが直接処理し、カード情報を当社が確認・保存することはありません。",
           useHeading: "ご利用にあたって",
-          useBody: "本サービスは五百羅漢寺をご参拝される個人のお客様向けです。ご不明な点は寺務所までお問い合わせください。",
+          useBody: '本サービスは五百羅漢寺をご参拝される個人のお客様向けです。ご不明な点は寺務所（<a href="https://rakan.or.jp/contactform" target="_blank" rel="noopener">rakan.or.jp/contactform</a>）までお問い合わせください。',
           accept: "同意して次へ",
           decline: "今はしない",
         },
@@ -198,7 +209,7 @@
           privacyHeading: "Privacy & Payments",
           privacyBody: "No account is required. Your language/size preferences and a temporary access token are stored only in your browser, never on our servers. Payments are processed directly by Stripe or PayPay — we never see or store your card details, only confirmation that payment succeeded.",
           useHeading: "Permitted Use",
-          useBody: "Intended for personal use by visitors to Gohyaku Rakanji. Questions? Contact the temple office.",
+          useBody: 'Intended for personal use by visitors to Gohyaku Rakanji. Questions? Contact the temple office at <a href="https://rakan.or.jp/contactform" target="_blank" rel="noopener">rakan.or.jp/contactform</a>.',
           accept: "Accept & Continue",
           decline: "Not now",
         },
@@ -212,7 +223,7 @@
           privacyHeading: "개인정보 및 결제",
           privacyBody: "별도의 회원가입은 필요하지 않습니다. 언어 및 글자 크기 설정과 임시 액세스 토큰은 고객님의 브라우저에만 저장되며 당사 서버에는 저장되지 않습니다. 결제는 Stripe 또는 PayPay가 직접 처리하며, 당사는 카드 정보를 확인하거나 저장하지 않고 결제 완료 여부만 전달받습니다.",
           useHeading: "이용 안내",
-          useBody: "본 서비스는 오백나한사를 방문하시는 개인 이용객을 위한 것입니다. 문의사항은 사원 사무소로 연락해 주세요.",
+          useBody: '본 서비스는 오백나한사를 방문하시는 개인 이용객을 위한 것입니다. 문의사항은 사원 사무소(<a href="https://rakan.or.jp/contactform" target="_blank" rel="noopener">rakan.or.jp/contactform</a>)로 연락해 주세요.',
           accept: "동의하고 계속하기",
           decline: "나중에 하기",
         },
@@ -226,7 +237,7 @@
           privacyHeading: "隐私与支付",
           privacyBody: "无需注册账户。您的语言和字体大小偏好，以及临时访问令牌，仅保存在您的浏览器中，绝不会保存在我们的服务器上。付款由 Stripe 或 PayPay 直接处理，我们不会查看或存储您的银行卡信息，仅会收到付款是否成功的确认结果。",
           useHeading: "使用须知",
-          useBody: "本服务仅供前来参拜五百罗汉寺的个人游客使用。如有疑问，请联系寺院办公室。",
+          useBody: '本服务仅供前来参拜五百罗汉寺的个人游客使用。如有疑问，请通过 <a href="https://rakan.or.jp/contactform" target="_blank" rel="noopener">rakan.or.jp/contactform</a> 联系寺院办公室。',
           accept: "同意并继续",
           decline: "暂不需要",
         },
@@ -262,7 +273,7 @@
       document.getElementById("privacyHeading").textContent = t.privacyHeading;
       document.getElementById("privacyBody").textContent = t.privacyBody;
       document.getElementById("useHeading").textContent = t.useHeading;
-      document.getElementById("useBody").textContent = t.useBody;
+      document.getElementById("useBody").innerHTML = t.useBody;
       document.getElementById("acceptBtnLabel").textContent = t.accept;
       document.getElementById("declineLabel").textContent = t.decline;
 

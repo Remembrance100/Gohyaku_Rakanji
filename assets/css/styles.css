@@ -1723,18 +1723,15 @@ button:active {
 
 .omamori-limit-badge {
   margin: 0.6rem 0 0;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  width: fit-content;
+  display: block;
   font:
-    800 var(--tour-text-size) / 1.4 "Barlow",
+    700 var(--tour-text-size) / 1.55 "Barlow",
     sans-serif;
   color: #f6828d;
   background: rgba(246, 81, 95, 0.12);
   border: 1px solid rgba(246, 81, 95, 0.4);
-  border-radius: 999px;
-  padding: 0.45rem 0.9rem;
+  border-radius: 12px;
+  padding: 0.7rem 0.95rem;
 }
 
 .omamori-msg-player {
