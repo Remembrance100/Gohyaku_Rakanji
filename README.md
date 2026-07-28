@@ -1,17 +1,17 @@
 # Gohyaku Rakanji: Interactive Audio Tour Guide
 
-**Live: [tour.rakanji.org](https://tour.rakanji.org/)** (mobile, intended for on-site visitors)
+**Live:** [tour.rakanji.org](https://tour.rakanji.org/) (mobile-first, built for on-site visitors)
 
 A paid, multi-language interactive audio tour guide for [天恩山五百羅漢寺 (Tenonzan Gohyaku Rakanji)](https://rakan.or.jp), a Buddhist temple in Meguro, Tokyo established in 1695 and known as the birthplace of the "Rakan" (Arhat) belief. Visitors scan in on-site, pay once for 24-hour access, and walk the grounds following an interactive map with narrated audio at each stop.
 
-| Temple entrance                                                   | Live in use at Stop 9                                                    |
-| ------------------------------------------------------------------ | ------------------------------------------------------------------------ |
-| ![Gohyaku Rakanji Temple entrance](docs/screenshots/temple.jpg)    | ![The tour guide in use on-site at Stop 9](docs/screenshots/on-site.jpg) |
+| Temple entrance | Live in use at Stop 9 |
+| --- | --- |
+| ![Gohyaku Rakanji Temple entrance](docs/screenshots/temple.jpg) | ![The tour guide in use on-site at Stop 9](docs/screenshots/on-site.jpg) |
 
 ## Screenshots
 
-| Entry & rules                               | Payment                                              | Interactive map                            |
-| ------------------------------------------- | ----------------------------------------------------- | ------------------------------------------ |
+| Entry & rules | Payment | Interactive map |
+| --- | --- | --- |
 | ![Entry screen](docs/screenshots/entry.png) | ![Payment selector](docs/screenshots/pay-select.png) | ![Tour map](docs/screenshots/tour-map.png) |
 
 ## Highlights
@@ -48,7 +48,3 @@ functions/
     create-checkout.js   # Starts a Stripe Checkout session
     verify-session.js    # Verifies a Stripe session, issues the access token
 ```
-
-## My role
-
-I was the software engineer for this project. The WordPress/ACF content backend was set up separately for temple staff to manage stop content. I built the entire visitor-facing side: the interactive map and multi-language UI, the API integration layer consuming the WordPress REST route, and the payment/auth infrastructure connecting it all together.
