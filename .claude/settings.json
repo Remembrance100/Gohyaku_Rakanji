@@ -5,7 +5,9 @@
       "Bash(node --check functions/api/verify-session.js)",
       "Bash(node --check functions/_lib/access-token.js)",
       "Bash(node --check functions/api/create-paypay-payment.js)",
-      "Bash(node --check functions/api/verify-paypay-payment.js)"
+      "Bash(node --check functions/api/verify-paypay-payment.js)",
+      "Bash(node -e \"const {chromium} = require\\('playwright'\\); console.log\\('playwright lib ok'\\)\")",
+      "Bash(npx --yes playwright install --dry-run chromium)"
     ],
     "additionalDirectories": [
       "/Users/linusfujisawa/Desktop/Programming/SmartSenior/Gohyaku_Rakanji/functions"
