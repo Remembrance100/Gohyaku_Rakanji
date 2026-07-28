@@ -1,14 +1,20 @@
 # Gohyaku Rakanji — Interactive Audio Tour Guide
 
+**Live: [tour.rakanji.org](https://tour.rakanji.org/)** (mobile — intended for on-site visitors)
+
 A paid, multi-language interactive audio tour guide for [天恩山五百羅漢寺 (Tenonzan Gohyaku Rakanji)](https://rakan.or.jp), a Buddhist temple in Meguro, Tokyo established in 1695 and known as the birthplace of the "Rakan" (Arhat) belief. Visitors scan in on-site, pay once for 24-hour access, and walk the grounds following an interactive map with narrated audio at each stop.
 
 ![Gohyaku Rakanji Temple entrance](docs/screenshots/temple.jpg)
 
+Live in use at Stop 9 on the temple grounds:
+
+![The tour guide in use on-site at Stop 9](docs/screenshots/on-site.jpg)
+
 ## Screenshots
 
-| Entry & rules                               | Interactive map                            | Payment                                              |
-| ------------------------------------------- | ------------------------------------------ | ---------------------------------------------------- |
-| ![Entry screen](docs/screenshots/entry.png) | ![Tour map](docs/screenshots/tour-map.png) | ![Payment selector](docs/screenshots/pay-select.png) |
+| Entry & rules                               | Payment                                              | Interactive map                            |
+| ------------------------------------------- | ----------------------------------------------------- | ------------------------------------------ |
+| ![Entry screen](docs/screenshots/entry.png) | ![Payment selector](docs/screenshots/pay-select.png) | ![Tour map](docs/screenshots/tour-map.png) |
 
 ## Highlights
 
