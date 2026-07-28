@@ -7,3 +7,6 @@
 
 # Wrangler / Cloudflare local build cache & state
 .wrangler/
+
+# Local editor/tooling config
+.claude/
