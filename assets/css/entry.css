@@ -607,7 +607,31 @@ body {
   transition: filter 150ms;
 }
 
+.settings-contact-btn {
+  display: block;
+  width: 100%;
+  height: 44px;
+  line-height: 42px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: transparent;
+  color: rgba(255, 255, 255, 0.7);
+  font-family: "Barlow", sans-serif;
+  font-weight: 700;
+  font-size: calc(var(--tour-text-size) * 0.86);
+  letter-spacing: 0.06em;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: border-color 150ms, color 150ms;
+  flex: 0 0 auto;
+}
+
 @media (hover: hover) {
+  .settings-contact-btn:hover {
+    border-color: #f6515f;
+    color: #fff;
+  }
   .settings-confirm-btn:hover {
     filter: brightness(1.1);
   }

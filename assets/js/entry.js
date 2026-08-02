@@ -700,6 +700,7 @@ const TRANSLATIONS = {
     "notice-offering": "Please place offerings in the offering box, not on top of the statues.",
     "notice-pets": "Pets are not allowed inside the temple grounds.",
     "confirm-btn": "Start Tour",
+    "contact-btn": "Contact Us",
     "start-btn": "Guide Map",
   },
   ja: {
@@ -721,6 +722,7 @@ const TRANSLATIONS = {
     "notice-offering": "お賽銭はお賽銭箱にお入れください、像の上に置かないでください。",
     "notice-pets": "ペットの境内への持ち込みはご遠慮ください。",
     "confirm-btn": "ガイド開始",
+    "contact-btn": "お問い合わせ",
     "start-btn": "ガイドマップ",
   },
   ko: {
@@ -742,6 +744,7 @@ const TRANSLATIONS = {
     "notice-offering": "헌금은 헌금함에 넣어 주세요. 상 위에 올려놓지 말아 주세요.",
     "notice-pets": "반려동물의 경내 출입은 삼가 주세요.",
     "confirm-btn": "가이드 시작",
+    "contact-btn": "문의하기",
     "start-btn": "가이드 맵",
   },
   zh: {
@@ -763,6 +766,7 @@ const TRANSLATIONS = {
     "notice-offering": "请将香钱放入功德箱，勿置于雕像上。",
     "notice-pets": "禁止携带宠物进入境内。",
     "confirm-btn": "开始导览",
+    "contact-btn": "联系我们",
     "start-btn": "导览地图",
   },
 };
