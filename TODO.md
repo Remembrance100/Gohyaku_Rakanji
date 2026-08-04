@@ -1,45 +1,45 @@
 ## TODO
 
-1. PayPay — relay LIVE and reaching PayPay, Cloudflare side left
-   Root cause was never the code: PayPay restricts API access to whitelisted
-   IPs and Cloudflare Pages has no fixed egress IP, so every call returned
-   `08100016`. Kinsta's **Live** environment egresses from 161.33.186.30,
-   which PayPay already has on file, so the call now goes through a relay
-   there. See `wordpress/PAYPAY-RELAY.md`.
-   - [x] Relay written + signing verified byte-identical to the JS version
-   - [x] Live `wp-config.php`: five PAYPAY\_\* defines added
-   - [x] Live `wp-content/mu-plugins/paypay-relay.php` uploaded
-   - [x] **VERIFIED 2026-08-04** — signed status call returned
-         `01652075 "Dynamic QR payment not found"`, an ordinary business
-         error, so authentication and the IP check both passed. Unsigned and
-         bad-signature calls correctly 401. `08100016` is gone.
-   - [x] Cloudflare: PAYPAY_RELAY_URL + PAYPAY_RELAY_SECRET added and deployed
-   - [x] PayPay button re-enabled in `pay-select.html`
-   - [x] **END TO END WORKING 2026-08-04** — POST /api/create-paypay-payment
-         returns a live checkout URL in ~1.2s
-   - [ ] Walk one real payment through on a phone to confirm the return leg
-         (redirect back to tour.html, verify-paypay-payment, 24h token)
-   - [ ] **Rotate the PayPay API secret** — it was exposed in screenshots
-         during the original debugging. Deploying the existing one for now.
-   - [ ] Rotate the Live WP auth salts + DB password (pasted into a chat
-         2026-08-04): https://api.wordpress.org/secret-key/1.1/salt/
+1. **PayPay — test one real payment.** Everything up to the checkout URL is
+   working and live. Untested: what happens *after* paying — the redirect back
+   to `tour.html`, `verify-paypay-payment`, and the 24h token. Buy one tour on a
+   phone (¥1000, refundable from the PayPay merchant dashboard). If it lands on
+   the tour unlocked, done; if it asks to pay again, the return leg is broken.
 
-2. Verify the email that gets sent to 500@rakan.or.jp
+2. **Email to `500@rakan.or.jp`.** Pipeline works and is deployed, currently
+   delivering to the developer's inbox.
+   - [ ] Someone at the temple must click the verification link Cloudflare mails
+         to `500@rakan.or.jp` (Email Routing → Destination addresses)
+   - [ ] Then flip `destination_address` + `CONTACT_TO` in
+         `workers/contact/wrangler.toml` and run
+         `cd workers/contact && npx wrangler deploy` — this Worker deploys
+         separately, git push will not do it
 
-3. Positioning of the stops buttons on the map
+3. **Rotate two sets of credentials.**
+   - [ ] PayPay API secret — exposed in screenshots and a chat transcript
+   - [ ] Live WP auth salts + DB password — pasted into a chat 2026-08-04.
+         Fresh salts: https://api.wordpress.org/secret-key/1.1/salt/
 
-4. Email Direct sending
-   - [ ] Email Routing → Destination addresses → add `500@rakan.or.jp`, someone
-         at the temple must click the verification link Cloudflare mails there
-   - [ ] Once verified: flip `destination_address` and `CONTACT_TO` in
-         `workers/contact/wrangler.toml` to `500@rakan.or.jp`, then
-         `cd workers/contact && npx wrangler deploy` (NOT git push — this
-         Worker deploys separately from the Pages site)
+4. **Positioning of the stop buttons on the map.**
 
-5. Image resolution and page loading speed
-   - [x] Tour endpoint now returns display-sized images instead of 2560px
-         originals (`wordpress/memorial-tour-endpoint.php`) — measured 154MB →
-         73MB across the tour, 809KB → 397KB average
-   - [x] Frontend no longer strips the size suffix back off; sanitiser keeps
-         `srcset`/`sizes`; hero image gets fetch priority; next/previous stop
-         images preload while the visitor is listening
+5. **Page speed — remaining items.** Images are done: 154MB → 73MB across the
+   tour (809KB → 397KB average).
+   - [ ] Re-save 8 oversized PNG screenshots as JPEG (~30MB, one is 8.5MB)
+   - [ ] Optional: `sizes` on content images is WordPress's generic `100vw`
+         rather than the real 358px display width, so browsers fetch larger
+         files than needed — worth ~41% more on typical phones
+   - [ ] Low priority: Kinsta staging has no edge caching, Live does. Matters
+         less than first thought since the origin is already in Tokyo, and
+         moving is a full content migration rather than a toggle.
+
+---
+
+### Reference
+
+- PayPay architecture and setup: `wordpress/PAYPAY-RELAY.md`
+- Tour endpoint (image sizing): `wordpress/README.md`
+- PayPay's `08100016` was an **IP whitelist**, never the code. Calls now relay
+  through Kinsta Live (`161.33.186.30`), the IP PayPay has on file.
+- `TOKEN_SECRET` was never set on Cloudflare, so both payment providers sign
+  access tokens with `STRIPE_SECRET_KEY` via a fallback. Works, but setting a
+  real `TOKEN_SECRET` would be cleaner — change both verify endpoints together.
