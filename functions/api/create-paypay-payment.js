@@ -7,20 +7,30 @@ import { callPayPayRelay } from "../_lib/paypay-relay.js";
 // The amount and order description live on the relay, not here, so this
 // endpoint cannot be used to create a payment at a price of its own choosing.
 export async function onRequestPost(context) {
-  const origin = new URL(context.request.url).origin;
+  try {
+    const origin = new URL(context.request.url).origin;
 
-  const { ok, data } = await callPayPayRelay(context.env, "create", {
-    method: "POST",
-    body: { redirectUrl: `${origin}/tour.html` },
-  });
+    const { ok, data } = await callPayPayRelay(context.env, "create", {
+      method: "POST",
+      body: { redirectUrl: `${origin}/tour.html` },
+    });
 
-  if (!ok || !data?.url) {
-    const message = data?.error || "PayPay error";
+    if (!ok || !data?.url) {
+      const message = data?.error || "PayPay error";
+      return Response.json(
+        { error: data?.code ? `${message} (${data.code})` : message },
+        { status: 502 },
+      );
+    }
+
+    return Response.json({ url: data.url });
+  } catch (err) {
+    // An unhandled throw here surfaces as Cloudflare's bare "error code: 502"
+    // with no detail, which is undiagnosable from outside. Report the message
+    // instead — it never contains credentials, only the failure reason.
     return Response.json(
-      { error: data?.code ? `${message} (${data.code})` : message },
+      { error: `Relay call failed: ${err?.message || String(err)}` },
       { status: 502 },
     );
   }
-
-  return Response.json({ url: data.url });
 }

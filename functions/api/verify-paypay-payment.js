@@ -6,7 +6,10 @@ import { issueAccessToken } from "../_lib/access-token.js";
 // Cloudflare and the relay never sees it, so a compromised relay cannot hand
 // out tour access on its own.
 export async function onRequestGet(context) {
-  const TOKEN_SECRET = context.env.TOKEN_SECRET;
+  // Same fallback as verify-session.js: TOKEN_SECRET was never set on this
+  // project, so both providers sign with STRIPE_SECRET_KEY. They have to agree
+  // — a token minted under one key would not match one minted under the other.
+  const TOKEN_SECRET = context.env.TOKEN_SECRET || context.env.STRIPE_SECRET_KEY;
   const url = new URL(context.request.url);
   const merchantPaymentId = url.searchParams.get("merchantPaymentId");
 

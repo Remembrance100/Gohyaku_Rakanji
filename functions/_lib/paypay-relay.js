@@ -48,10 +48,17 @@ export async function callPayPayRelay(env, route, { method = "POST", body = null
 
   // The WordPress host serves REST via the ?rest_route= form, so the route and
   // any query string have to be folded into that parameter rather than the path.
-  const url = new URL(relayUrl);
-  const existing = url.searchParams.get("rest_route") || "";
-  url.searchParams.set("rest_route", `${existing}/${route}`.replace(/\/{2,}/g, "/"));
-  for (const [k, v] of Object.entries(query)) url.searchParams.set(k, v);
+  // A malformed PAYPAY_RELAY_URL throws here, which would otherwise become an
+  // opaque 502 at the edge — report it as a configuration problem instead.
+  let url;
+  try {
+    url = new URL(relayUrl);
+    const existing = url.searchParams.get("rest_route") || "";
+    url.searchParams.set("rest_route", `${existing}/${route}`.replace(/\/{2,}/g, "/"));
+    for (const [k, v] of Object.entries(query)) url.searchParams.set(k, v);
+  } catch {
+    return { ok: false, status: 500, data: { error: "PAYPAY_RELAY_URL is not a valid URL" } };
+  }
 
   const payload = body === null ? "" : JSON.stringify(body);
   const timestamp = Math.floor(Date.now() / 1000).toString();
