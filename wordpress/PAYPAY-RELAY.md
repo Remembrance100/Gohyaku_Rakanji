@@ -25,30 +25,37 @@ compromised relay cannot grant tour access by itself.
 
 ---
 
-## Step 0 — confirm the egress IP first (do this before anything else)
+## Which environment this goes on — Live, not Staging
 
-**The whole approach depends on this.** PayPay has `161.33.186.30` on file, which
-MyKinsta showed as the **Live** environment's "IP address for external
-connections". The tour endpoint currently runs on **Staging**, and a staging
-environment may egress from a different address.
+**The relay must run on the Live environment (`rakanji.org`).**
 
-In MyKinsta: switch the environment selector to **Staging** → **Info** → read
-**IP address for external connections**.
+PayPay has `161.33.186.30` whitelisted, which MyKinsta lists as the **Live**
+environment's "IP address for external connections". The Staging environment has
+**no such field at all** — that static outbound address is a Live-environment
+feature, so staging egresses from Kinsta's shared pool and PayPay would reject it
+with the same `08100016`.
 
-- **Matches `161.33.186.30`** → continue below.
-- **Different** → either run the relay on the Live environment instead, or ask
-  PayPay to add the staging IP. Don't skip this: if the IP is wrong you'll get
-  the same `08100016` and it will look like the relay failed when it didn't.
+This splits the two WordPress jobs across environments, which is fine because
+they're independent:
+
+| | Environment | Why |
+| --- | --- | --- |
+| Tour endpoint (`/memorial/v1/tour`) | Staging | where the tour content lives |
+| PayPay relay (`/memorial/v1/paypay/*`) | **Live** | needs the whitelisted egress IP |
+
+The relay needs no tour content — only WordPress, the relay code, and the
+constants below. Verified on Live: the REST API is up (`rakanji-tour`), and the
+`memorial/v1` namespace is unused there, so nothing collides.
 
 ---
 
-## Step 1 — install the relay
+## Step 1 — install the relay on Live
 
-Paste [`paypay-relay.php`](paypay-relay.php) into the same file as the tour
-endpoint (theme `functions.php` or the site-specific plugin). Skip its opening
-`<?php` line if the file already has one.
+Log into WordPress at **rakanji.org** (the Live site, *not* the staging one) and
+paste [`paypay-relay.php`](paypay-relay.php) into its theme `functions.php` or a
+site-specific plugin. Skip its opening `<?php` line if the file already has one.
 
-## Step 2 — credentials into `wp-config.php`
+## Step 2 — credentials into the Live site's `wp-config.php`
 
 Above the `/* That's all, stop editing! */` line:
 
@@ -83,8 +90,11 @@ Settings → Environment variables:
 
 | Name | Value |
 | --- | --- |
-| `PAYPAY_RELAY_URL` | `https://<wp-host>/?rest_route=/memorial/v1/paypay` |
+| `PAYPAY_RELAY_URL` | `https://rakanji.org/?rest_route=/memorial/v1/paypay` |
 | `PAYPAY_RELAY_SECRET` | same value as step 3 |
+
+Note this points at **rakanji.org** (Live), not the staging host the tour
+endpoint uses.
 
 `PAYPAY_API_KEY`, `PAYPAY_API_SECRET` and `PAYPAY_MERCHANT_ID` are no longer
 read by Cloudflare and can be removed once this works.
