@@ -1,14 +1,18 @@
 ## TODO
 
-1. PayPay — relay built, waiting on install
+1. PayPay — relay LIVE and reaching PayPay, Cloudflare side left
    Root cause was never the code: PayPay restricts API access to whitelisted
    IPs and Cloudflare Pages has no fixed egress IP, so every call returned
    `08100016`. Kinsta's **Live** environment egresses from 161.33.186.30,
    which PayPay already has on file, so the call now goes through a relay
    there. See `wordpress/PAYPAY-RELAY.md`.
    - [x] Relay written + signing verified byte-identical to the JS version
-   - [ ] Live `wp-config.php`: add the five PAYPAY_* defines
-   - [ ] Live `wp-content/mu-plugins/paypay-relay.php`: paste the relay
+   - [x] Live `wp-config.php`: five PAYPAY\_\* defines added
+   - [x] Live `wp-content/mu-plugins/paypay-relay.php` uploaded
+   - [x] **VERIFIED 2026-08-04** — signed status call returned
+         `01652075 "Dynamic QR payment not found"`, an ordinary business
+         error, so authentication and the IP check both passed. Unsigned and
+         bad-signature calls correctly 401. `08100016` is gone.
    - [ ] Cloudflare: add PAYPAY_RELAY_URL + PAYPAY_RELAY_SECRET, then REDEPLOY
          (env changes need a new deployment, editing alone does nothing)
    - [ ] Uncomment the PayPay option in `pay-select.html` once a test pays
