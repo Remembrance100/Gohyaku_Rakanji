@@ -192,16 +192,17 @@ function resolveMediaUrl(value) {
   return "";
 }
 
+// This used to strip WordPress's `-1024x768` size suffix to force the
+// full-resolution original. That was a large unforced cost: the originals are
+// 2560px `-scaled` files shown in slots around 360-760px wide, so visitors on
+// temple-grounds reception waited on roughly 50x more pixels than their screen
+// could render — measured at 154MB across the tour, averaging 809KB an image,
+// where the already-generated smaller variants average well under 200KB.
+//
+// The URL now passes through untouched so the size chosen server-side (see
+// wordpress/rakanji-tour-images.php) is the size actually requested.
 function normalizeWpImageUrl(url) {
-  const input = safeText(url, "");
-  if (!input) return "";
-
-  const [base, query = ""] = input.split("?");
-  const upgraded = base.replace(
-    /-\d+x\d+(?=\.(jpe?g|png|webp|gif|avif)$)/i,
-    "",
-  );
-  return query ? `${upgraded}?${query}` : upgraded;
+  return safeText(url, "");
 }
 
 function resolveImageUrl(value) {
@@ -968,12 +969,23 @@ function sanitizeRichInlineHtml(rawHtml) {
       ) {
         return;
       }
+      // srcset/sizes carry the responsive variants the tour endpoint attaches
+      // (wordpress/rakanji-tour-images.php); dropping them here would silently
+      // put every visitor back on the full-size file. width/height are kept so
+      // the browser can reserve the right box and the text below an image stops
+      // jumping while it loads. srcset values are URL-validated below, the same
+      // way src is.
       if (
         node.tagName === "IMG" &&
         (name === "src" ||
           name === "alt" ||
           name === "title" ||
-          name === "loading")
+          name === "loading" ||
+          name === "srcset" ||
+          name === "sizes" ||
+          name === "width" ||
+          name === "height" ||
+          name === "decoding")
       ) {
         return;
       }
@@ -1006,8 +1018,31 @@ function sanitizeRichInlineHtml(rawHtml) {
         src.startsWith("/");
       if (!safeSrc) {
         node.remove();
-      } else if (!node.getAttribute("loading")) {
+        return;
+      }
+      if (!node.getAttribute("loading")) {
         node.setAttribute("loading", "lazy");
+      }
+
+      // Hold every candidate to the same scheme rule as src. One bad entry
+      // drops the whole attribute rather than the image — src is already
+      // known-good, so the picture still renders, just not responsively.
+      const srcset = safeText(node.getAttribute("srcset"), "");
+      if (srcset) {
+        const candidatesSafe = srcset
+          .split(",")
+          .map((part) => part.trim().split(/\s+/)[0])
+          .filter(Boolean)
+          .every(
+            (url) =>
+              url.startsWith("http://") ||
+              url.startsWith("https://") ||
+              url.startsWith("/"),
+          );
+        if (!candidatesSafe) {
+          node.removeAttribute("srcset");
+          node.removeAttribute("sizes");
+        }
       }
     }
   });
@@ -1056,12 +1091,23 @@ function sanitizeTermModalHtml(rawHtml) {
         return;
       }
 
+      // srcset/sizes carry the responsive variants the tour endpoint attaches
+      // (wordpress/rakanji-tour-images.php); dropping them here would silently
+      // put every visitor back on the full-size file. width/height are kept so
+      // the browser can reserve the right box and the text below an image stops
+      // jumping while it loads. srcset values are URL-validated below, the same
+      // way src is.
       if (
         node.tagName === "IMG" &&
         (name === "src" ||
           name === "alt" ||
           name === "title" ||
-          name === "loading")
+          name === "loading" ||
+          name === "srcset" ||
+          name === "sizes" ||
+          name === "width" ||
+          name === "height" ||
+          name === "decoding")
       ) {
         return;
       }
@@ -1095,8 +1141,31 @@ function sanitizeTermModalHtml(rawHtml) {
         src.startsWith("/");
       if (!safeSrc) {
         node.remove();
-      } else if (!node.getAttribute("loading")) {
+        return;
+      }
+      if (!node.getAttribute("loading")) {
         node.setAttribute("loading", "lazy");
+      }
+
+      // Hold every candidate to the same scheme rule as src. One bad entry
+      // drops the whole attribute rather than the image — src is already
+      // known-good, so the picture still renders, just not responsively.
+      const srcset = safeText(node.getAttribute("srcset"), "");
+      if (srcset) {
+        const candidatesSafe = srcset
+          .split(",")
+          .map((part) => part.trim().split(/\s+/)[0])
+          .filter(Boolean)
+          .every(
+            (url) =>
+              url.startsWith("http://") ||
+              url.startsWith("https://") ||
+              url.startsWith("/"),
+          );
+        if (!candidatesSafe) {
+          node.removeAttribute("srcset");
+          node.removeAttribute("sizes");
+        }
       }
     }
   });
@@ -1817,6 +1886,10 @@ function renderHeroSlideshow(stop) {
   img.className =
     "detail-hero-slide detail-hero-media detail-hero-image active";
   img.alt = `${stop.title} image 1`;
+  // This is the one image the visitor is actively waiting on after tapping a
+  // stop, so it outranks anything else the browser has queued.
+  img.fetchPriority = "high";
+  img.decoding = "async";
   const setOrientationClass = () => {
     const isPortrait = img.naturalHeight > img.naturalWidth * 1.08;
     img.classList.toggle("is-portrait", isPortrait);
@@ -1911,11 +1984,46 @@ function setDetailStop(stop) {
   }
 
   updateDetailStopNavState();
+
+  // Deferred so the current stop's own image and audio claim the connection
+  // first; these are only speculative fetches for where the visitor goes next.
+  if (typeof requestIdleCallback === "function") {
+    requestIdleCallback(warmAdjacentStopImages, { timeout: 3000 });
+  } else {
+    setTimeout(warmAdjacentStopImages, 1200);
+  }
 }
 
 function getActiveStopIndex() {
   if (!activeStop?.id) return -1;
   return tourStopsData.findIndex((item) => item.id === activeStop.id);
+}
+
+// Visitors walk the tour in order and spend a while listening at each stop, so
+// the neighbouring hero images are very likely to be needed next and there is
+// dead air to fetch them in. Warming them here turns the tap on "next" from a
+// multi-second wait on temple-grounds reception into an instant swap.
+// Deliberately low priority so this never delays the image already on screen.
+const warmedHeroImages = new Set();
+
+function warmAdjacentStopImages() {
+  const activeIndex = getActiveStopIndex();
+  if (activeIndex < 0) return;
+
+  [activeIndex + 1, activeIndex - 1].forEach((index) => {
+    const stop = tourStopsData[index];
+    if (!stop || stop.videoUrl) return;
+
+    const url =
+      (Array.isArray(stop.media) && stop.media.find(Boolean)) || stop.thumb || "";
+    if (!url || warmedHeroImages.has(url)) return;
+
+    warmedHeroImages.add(url);
+    const warm = new Image();
+    warm.decoding = "async";
+    warm.fetchPriority = "low";
+    warm.src = url;
+  });
 }
 
 function updateDetailStopNavState() {

@@ -82,6 +82,15 @@
     <link rel="apple-touch-icon" href="./assets/icons/icon.png?v=20260725a" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Every stop image, audio file and the tour JSON come from here. Opening the
+         connection during head parsing saves a DNS + TLS round trip on the first
+         request, which is worth several hundred ms on the weak mobile reception
+         visitors actually have on the temple grounds. -->
+    <link
+      rel="preconnect"
+      href="https://stg-apirakanjicom-stgrakanji.kinsta.cloud"
+      crossorigin
+    />
     <link
       href="https://fonts.googleapis.com/css2?family=Barlow:wght@500;700;800&family=Manrope:wght@500;700;800&display=swap"
       rel="stylesheet"
