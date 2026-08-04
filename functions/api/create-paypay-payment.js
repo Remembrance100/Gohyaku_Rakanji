@@ -10,6 +10,36 @@ export async function onRequestPost(context) {
   try {
     const origin = new URL(context.request.url).origin;
 
+    // TEMPORARY diagnostic. `?debug=1` reports which stage the request reaches
+    // and whether config is present, without contacting PayPay. Reports only
+    // presence and lengths — never a credential value. Remove once the relay
+    // is confirmed working end to end.
+    if (new URL(context.request.url).searchParams.get("debug") === "1") {
+      const relayUrl = context.env.PAYPAY_RELAY_URL || "";
+      const relaySecret = context.env.PAYPAY_RELAY_SECRET || "";
+      let probe = null;
+      try {
+        const r = await fetch("https://rakanji.org/?rest_route=/memorial/v1/paypay/create", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: "{}",
+        });
+        probe = { reached: true, status: r.status };
+      } catch (e) {
+        probe = { reached: false, error: e?.message || String(e) };
+      }
+      return Response.json({
+        handlerRan: true,
+        origin,
+        relayUrlSet: Boolean(relayUrl),
+        relayUrlHost: relayUrl ? new URL(relayUrl).host : null,
+        relayUrlLength: relayUrl.length,
+        relaySecretSet: Boolean(relaySecret),
+        relaySecretLength: relaySecret.length,
+        directFetchProbe: probe,
+      });
+    }
+
     const { ok, data } = await callPayPayRelay(context.env, "create", {
       method: "POST",
       body: { redirectUrl: `${origin}/tour.html` },
