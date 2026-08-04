@@ -28,6 +28,50 @@ export async function onRequestPost(context) {
       } catch (e) {
         probe = { reached: false, error: e?.message || String(e) };
       }
+      // Walk the same steps callPayPayRelay takes, reporting each, so the
+      // failing one is identifiable without another deploy per hypothesis.
+      const steps = {};
+      try {
+        const u = new URL(relayUrl);
+        const existing = u.searchParams.get("rest_route") || "";
+        u.searchParams.set("rest_route", `${existing}/create`.replace(/\/{2,}/g, "/"));
+        steps.urlBuilt = u.toString();
+
+        const payload = JSON.stringify({ redirectUrl: `${origin}/tour.html` });
+        const ts = Math.floor(Date.now() / 1000).toString();
+        steps.payloadLength = payload.length;
+
+        const key = await crypto.subtle.importKey(
+          "raw",
+          new TextEncoder().encode(relaySecret),
+          { name: "HMAC", hash: "SHA-256" },
+          false,
+          ["sign"],
+        );
+        const sig = await crypto.subtle.sign(
+          "HMAC",
+          key,
+          new TextEncoder().encode(`${ts}\n${payload}`),
+        );
+        let bin = "";
+        for (const b of new Uint8Array(sig)) bin += String.fromCharCode(b);
+        steps.signed = true;
+
+        const r = await fetch(u.toString(), {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Relay-Timestamp": ts,
+            "X-Relay-Signature": btoa(bin),
+          },
+          body: payload,
+        });
+        steps.fetchStatus = r.status;
+        steps.fetchBody = (await r.text()).slice(0, 400);
+      } catch (e) {
+        steps.threw = e?.message || String(e);
+      }
+
       return Response.json({
         handlerRan: true,
         origin,
@@ -37,6 +81,7 @@ export async function onRequestPost(context) {
         relaySecretSet: Boolean(relaySecret),
         relaySecretLength: relaySecret.length,
         directFetchProbe: probe,
+        steps,
       });
     }
 
