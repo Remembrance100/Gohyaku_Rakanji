@@ -82,18 +82,24 @@ function base64(input) {
   return btoa(binary);
 }
 
-// RFC 2047 encoded-word, so Japanese subjects survive the header. Each word has
-// to stay under 75 chars including the =?UTF-8?B? wrapper, and a multi-byte
-// character must never be split across two of them.
-function encodeHeaderValue(value) {
-  if (/^[\x20-\x7E]*$/.test(value)) return value;
+// RFC 2047 encoded-word, so Japanese header values survive as e.g.
+// "Subject: =?UTF-8?B?...?=". A multi-byte character must never be split
+// across two encoded words, and every physical line (continuation lines get
+// a single leading space, the first line gets "<fieldName>: ") must stay at
+// or under 76 chars, or some mail servers will mangle the fold.
+function encodeHeaderValue(fieldName, value) {
+  if (/^[\x20-\x7E]*$/.test(value)) return `${fieldName}: ${value}`;
 
   const encoder = new TextEncoder();
   const chunks = [];
   let chunk = "";
 
   for (const char of value) {
-    if (encoder.encode(chunk + char).length > 45) {
+    const prefixLen = chunks.length === 0 ? fieldName.length + 2 : 1;
+    const candidateBytes = encoder.encode(chunk + char).length;
+    const encodedWordLen = 10 + Math.ceil(candidateBytes / 3) * 4 + 2; // =?UTF-8?B? + base64 + ?=
+
+    if (prefixLen + encodedWordLen > 76) {
       chunks.push(chunk);
       chunk = char;
     } else {
@@ -102,7 +108,8 @@ function encodeHeaderValue(value) {
   }
   if (chunk) chunks.push(chunk);
 
-  return chunks.map((part) => `=?UTF-8?B?${base64(part)}?=`).join("\r\n ");
+  const words = chunks.map((part) => `=?UTF-8?B?${base64(part)}?=`);
+  return `${fieldName}: ${words[0]}${words.slice(1).map((w) => `\r\n ${w}`).join("")}`;
 }
 
 function buildMimeMessage({ fromName, fromAddr, toAddr, replyTo, subject, text }) {
@@ -110,7 +117,7 @@ function buildMimeMessage({ fromName, fromAddr, toAddr, replyTo, subject, text }
     `From: ${fromName} <${fromAddr}>`,
     `To: ${toAddr}`,
     `Reply-To: ${replyTo}`,
-    `Subject: ${encodeHeaderValue(subject)}`,
+    encodeHeaderValue("Subject", subject),
     `Message-ID: <${crypto.randomUUID()}@rakanji.org>`,
     `Date: ${new Date().toUTCString()}`,
     "MIME-Version: 1.0",
@@ -176,7 +183,7 @@ export default {
       fromAddr: env.CONTACT_FROM,
       toAddr: env.CONTACT_TO,
       replyTo: stripNewlines(email),
-      subject: stripNewlines(`【音声ガイド】${categoryLabel} — ${name}`),
+      subject: stripNewlines(`お問い合わせ【羅漢寺音声ガイド】${categoryLabel} — ${name}`),
       text: [
         "【お問い合わせ詳細】",
         "-".repeat(40),
