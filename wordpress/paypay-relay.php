@@ -195,7 +195,10 @@ add_action(
 
 					list( $status, $data ) = paypay_request( 'POST', '/v2/codes', $body );
 
-					if ( 200 !== $status || empty( $data['data']['url'] ) ) {
+					// PayPay answers /v2/codes with 201 Created, not 200 — accept
+					// any 2xx. resultInfo.codeId 08100001 with message "Success"
+					// is the success case and must not be treated as an error.
+					if ( $status < 200 || $status >= 300 || empty( $data['data']['url'] ) ) {
 						return new WP_REST_Response(
 							array(
 								'error' => isset( $data['resultInfo']['message'] ) ? $data['resultInfo']['message'] : 'PayPay error',
@@ -235,7 +238,7 @@ add_action(
 
 					list( $status, $data ) = paypay_request( 'GET', "/v2/codes/payments/{$payment_id}" );
 
-					if ( 200 !== $status ) {
+					if ( $status < 200 || $status >= 300 ) {
 						return new WP_REST_Response(
 							array(
 								'status' => null,
