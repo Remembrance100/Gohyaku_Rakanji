@@ -1,45 +1,25 @@
-import { buildPayPayAuthHeader } from "../_lib/paypay-auth.js";
+import { callPayPayRelay } from "../_lib/paypay-relay.js";
 import { issueAccessToken } from "../_lib/access-token.js";
 
-const BASE_URLS = {
-  PROD: "https://apigw.paypay.ne.jp",
-  STAGING: "https://apigw.stg.paypay.ne.jp",
-};
-
+// Status comes from the WordPress relay (see functions/_lib/paypay-relay.js for
+// why), but the access token is still minted here — TOKEN_SECRET stays on
+// Cloudflare and the relay never sees it, so a compromised relay cannot hand
+// out tour access on its own.
 export async function onRequestGet(context) {
-  const API_KEY = context.env.PAYPAY_API_KEY;
-  const API_SECRET = context.env.PAYPAY_API_SECRET;
-  const MERCHANT_ID = context.env.PAYPAY_MERCHANT_ID;
   const TOKEN_SECRET = context.env.TOKEN_SECRET;
-  const baseUrl = BASE_URLS[context.env.PAYPAY_ENV === "STAGING" ? "STAGING" : "PROD"];
-
   const url = new URL(context.request.url);
   const merchantPaymentId = url.searchParams.get("merchantPaymentId");
 
-  if (!merchantPaymentId || !API_KEY || !API_SECRET || !MERCHANT_ID || !TOKEN_SECRET) {
+  if (!merchantPaymentId || !TOKEN_SECRET) {
     return Response.json({ valid: false }, { status: 400 });
   }
 
-  const path = `/v2/codes/payments/${merchantPaymentId}`;
-
-  const { header } = await buildPayPayAuthHeader({
-    apiKey: API_KEY,
-    apiSecret: API_SECRET,
+  const { ok, data } = await callPayPayRelay(context.env, "status", {
     method: "GET",
-    path,
-    body: "",
+    query: { merchantPaymentId },
   });
 
-  const res = await fetch(`${baseUrl}${path}`, {
-    headers: {
-      Authorization: header,
-      "X-ASSUME-MERCHANT": MERCHANT_ID,
-    },
-  });
-
-  const result = await res.json();
-
-  if (!res.ok || result?.data?.status !== "COMPLETED") {
+  if (!ok || data?.status !== "COMPLETED") {
     return Response.json({ valid: false });
   }
 

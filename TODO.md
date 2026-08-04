@@ -21,9 +21,3 @@
    - [x] Frontend no longer strips the size suffix back off; sanitiser keeps
          `srcset`/`sizes`; hero image gets fetch priority; next/previous stop
          images preload while the visitor is listening
-   - [ ] Kinsta: images are served with `x-kinsta-cache: BYPASS` from a *staging*
-         environment, so nothing is cached at the edge and every image round-trips
-         to origin — the biggest remaining win for weak reception on the grounds.
-         Check MyKinsta → WordPress Sites → environment switcher for whether a
-         live environment exists before moving anything.
-   - [ ] Re-save the 8 oversized PNG screenshots as JPEG (~30MB, one is 8.5MB)
