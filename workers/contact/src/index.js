@@ -24,6 +24,7 @@ const CATEGORY_LABELS = {
 };
 
 const ALLOWED_ORIGINS = ["https://tour.rakanji.org"];
+const FROM_NAME = "羅漢寺音声ガイド";
 
 function clean(value, max) {
   return typeof value === "string" ? value.trim().slice(0, max) : "";
@@ -33,6 +34,45 @@ function clean(value, max) {
 // inject extra headers into the outgoing mail.
 function stripNewlines(value) {
   return value.replace(/[\r\n]+/g, " ");
+}
+
+// Full-width kana/kanji render at roughly 2x the width of ASCII in any font a
+// mail client would plausibly use — treat them as such so the label columns
+// in the body actually line up.
+function visualWidth(str) {
+  let width = 0;
+  for (const ch of str) {
+    const code = ch.codePointAt(0);
+    const isWide =
+      (code >= 0x1100 && code <= 0x115f) ||
+      (code >= 0x2e80 && code <= 0xa4cf) ||
+      (code >= 0xac00 && code <= 0xd7a3) ||
+      (code >= 0xf900 && code <= 0xfaff) ||
+      (code >= 0xff00 && code <= 0xff60) ||
+      (code >= 0xffe0 && code <= 0xffe6);
+    width += isWide ? 2 : 1;
+  }
+  return width;
+}
+
+function padLabel(label, targetWidth) {
+  return label + " ".repeat(Math.max(targetWidth - visualWidth(label), 1));
+}
+
+function formatJstTimestamp(date) {
+  const parts = new Intl.DateTimeFormat("ja-JP", {
+    timeZone: "Asia/Tokyo",
+    year: "numeric",
+    month: "numeric",
+    day: "numeric",
+    weekday: "narrow",
+    hour: "numeric",
+    minute: "2-digit",
+    hourCycle: "h23",
+  }).formatToParts(date);
+
+  const get = (type) => parts.find((p) => p.type === type)?.value ?? "";
+  return `${get("year")}年${get("month")}月${get("day")}日(${get("weekday")}) ${get("hour")}:${get("minute")}`;
 }
 
 function base64(input) {
@@ -132,18 +172,24 @@ export default {
     const categoryLabel = CATEGORY_LABELS[category] || category || "その他";
 
     const raw = buildMimeMessage({
-      fromName: "Rakanji Audio Guide",
+      fromName: FROM_NAME,
       fromAddr: env.CONTACT_FROM,
       toAddr: env.CONTACT_TO,
       replyTo: stripNewlines(email),
       subject: stripNewlines(`【音声ガイド】${categoryLabel} — ${name}`),
       text: [
-        `お名前: ${name}`,
-        `メールアドレス: ${email}`,
-        `カテゴリー: ${categoryLabel}`,
-        `表示言語: ${lang}`,
+        "【お問い合わせ詳細】",
+        "-".repeat(40),
+        `${padLabel("日時:", 10)}${formatJstTimestamp(new Date())}`,
+        `${padLabel("送信元:", 10)}${FROM_NAME} ${env.CONTACT_FROM}`,
         "",
-        "--- メッセージ ---",
+        "お客様情報:",
+        `・${padLabel("お名前:", 14)}${name}`,
+        `・${padLabel("メール:", 14)}${email}`,
+        `・${padLabel("カテゴリー:", 14)}${categoryLabel}`,
+        `・${padLabel("言語設定:", 14)}${lang}`,
+        "",
+        "お問い合わせ内容:",
         message,
       ].join("\n"),
     });
