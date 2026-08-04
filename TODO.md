@@ -6,15 +6,24 @@
 
 3. Positioning of the stops buttons on the map
 
-4. Email Direct sending — code done in `workers/contact/` (standalone Worker, free
-   Email Routing `send_email` binding — the Email Sending REST API needs the $5/mo
-   Workers Paid plan, the binding does not). Remaining manual steps:
-   - [x] Migrate rakanji.org DNS from Route 53 to Cloudflare nameservers
-   - [ ] Email Routing → finish onboarding rakanji.org
-   - [ ] Email Routing → Destination addresses → add `500@rakan.or.jp`, click the
-         verification link Cloudflare mails there
-   - [ ] Email Routing → Custom addresses → create `contact@rakanji.org`
-   - [ ] Deploy: `cd workers/contact && npx wrangler deploy` (NOT git push — this
+4. Email Direct sending
+   - [ ] Email Routing → Destination addresses → add `500@rakan.or.jp`, someone
+         at the temple must click the verification link Cloudflare mails there
+   - [ ] Once verified: flip `destination_address` and `CONTACT_TO` in
+         `workers/contact/wrangler.toml` to `500@rakan.or.jp`, then
+         `cd workers/contact && npx wrangler deploy` (NOT git push — this
          Worker deploys separately from the Pages site)
 
-5. Image Resultion shifter, and the pages loading speed
+5. Image resolution and page loading speed
+   - [x] Tour endpoint now returns display-sized images instead of 2560px
+         originals (`wordpress/memorial-tour-endpoint.php`) — measured 154MB →
+         73MB across the tour, 809KB → 397KB average
+   - [x] Frontend no longer strips the size suffix back off; sanitiser keeps
+         `srcset`/`sizes`; hero image gets fetch priority; next/previous stop
+         images preload while the visitor is listening
+   - [ ] Kinsta: images are served with `x-kinsta-cache: BYPASS` from a *staging*
+         environment, so nothing is cached at the edge and every image round-trips
+         to origin — the biggest remaining win for weak reception on the grounds.
+         Check MyKinsta → WordPress Sites → environment switcher for whether a
+         live environment exists before moving anything.
+   - [ ] Re-save the 8 oversized PNG screenshots as JPEG (~30MB, one is 8.5MB)
