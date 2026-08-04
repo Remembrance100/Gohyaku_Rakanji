@@ -10,3 +10,7 @@
 
 # Local editor/tooling config
 .claude/
+
+# SFTP deploy config — holds the Kinsta server password in plain text.
+# .vscode/settings.json is tracked, so this must be excluded explicitly.
+.vscode/sftp.json
