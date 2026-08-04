@@ -47,4 +47,25 @@ functions/
   api/
     create-checkout.js   # Starts a Stripe Checkout session
     verify-session.js    # Verifies a Stripe session, issues the access token
+workers/
+  contact/               # Standalone Worker — deploys separately from Pages
+    src/index.js         # Contact form → email, via Email Routing send binding
 ```
+
+### Contact form email
+
+`contact.html` POSTs to `/api/contact`, which is served by a standalone Worker
+(`workers/contact/`) rather than a Pages Function — the free Email Routing
+`send_email` binding is Workers-only, while the equivalent Pages-compatible REST
+API requires the paid Workers plan. A route on `tour.rakanji.org/api/contact`
+keeps it same-origin with the site.
+
+Deploy it separately from the Pages site:
+
+```
+cd workers/contact && npx wrangler deploy
+```
+
+Setup it depends on (Cloudflare dashboard → Email Routing, zone `rakanji.org`):
+`contact@rakanji.org` as a custom address, and `500@rakan.or.jp` added *and
+verified* as a destination address.

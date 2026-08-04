@@ -136,6 +136,25 @@
         background: rgba(255, 255, 255, 0.1);
       }
 
+      .contact-error {
+        display: none;
+        margin: 0;
+        border: 1px solid rgba(246, 81, 95, 0.35);
+        background: rgba(246, 81, 95, 0.1);
+        border-radius: 8px;
+        padding: 0.7rem 0.85rem;
+        font-size: calc(var(--tour-text-size) * 0.9);
+        line-height: 1.5;
+        color: #f6828d;
+      }
+
+      .contact-error.is-visible { display: block; }
+
+      .submit-btn:disabled {
+        opacity: 0.6;
+        cursor: default;
+      }
+
       .submit-btn {
         display: block;
         width: 100%;
@@ -241,6 +260,8 @@
 
         <div class="contact-divider"></div>
 
+        <p class="contact-error" id="contactError" role="alert"></p>
+
         <button class="submit-btn" id="submitBtn" type="submit">
           <span id="submitBtnLabel">Send Message</span>
         </button>
@@ -270,10 +291,11 @@
           placeholderMessage:
             "通信環境、端末の不具合、コンテンツ等は返金は致しかねます",
           submit: "送信する",
-          mailSubject: "【音声ガイド】",
-          successTitle: "メールアプリが開きます",
-          successBody:
-            "ご入力いただいた内容をメールに反映しました。内容をご確認のうえ、そのまま送信してください。メールアプリが開かない場合は、500@rakan.or.jp まで直接お送りください。",
+          sending: "送信中…",
+          errorBody:
+            "送信に失敗しました。通信環境をご確認のうえ、しばらくしてからもう一度お試しください。うまくいかない場合は 500@rakan.or.jp まで直接お送りください。",
+          successTitle: "メッセージを受け付けました",
+          successBody: "お問い合わせいただきありがとうございます。担当者より追ってご連絡いたします。",
         },
         en: {
           back: "Back",
@@ -290,10 +312,11 @@
           placeholderMessage:
             "We cannot issue refunds for network conditions, device malfunctions, or the content itself.",
           submit: "Send Message",
-          mailSubject: "[Audio Guide]",
-          successTitle: "Your mail app is opening",
-          successBody:
-            "We've filled in your message for you. Please review it and press send. If your mail app didn't open, write to us directly at 500@rakan.or.jp.",
+          sending: "Sending…",
+          errorBody:
+            "We couldn't send your message. Please check your connection and try again in a moment. If it still doesn't work, write to us directly at 500@rakan.or.jp.",
+          successTitle: "Message received",
+          successBody: "Thank you for reaching out. We'll get back to you as soon as we can.",
         },
         ko: {
           back: "뒤로",
@@ -310,10 +333,11 @@
           placeholderMessage:
             "통신 환경, 단말기 오류, 콘텐츠 등을 이유로 한 환불은 불가합니다.",
           submit: "메시지 보내기",
-          mailSubject: "[오디오 가이드]",
-          successTitle: "메일 앱이 열립니다",
-          successBody:
-            "입력하신 내용을 메일에 담았습니다. 내용을 확인하신 후 그대로 보내주세요. 메일 앱이 열리지 않으면 500@rakan.or.jp 로 직접 보내주시기 바랍니다.",
+          sending: "전송 중…",
+          errorBody:
+            "메시지를 보내지 못했습니다. 통신 환경을 확인하신 후 잠시 뒤에 다시 시도해 주세요. 계속 실패하면 500@rakan.or.jp 로 직접 보내주시기 바랍니다.",
+          successTitle: "메시지가 접수되었습니다",
+          successBody: "문의해 주셔서 감사합니다. 담당자가 곧 연락드리겠습니다.",
         },
         zh: {
           back: "返回",
@@ -330,10 +354,11 @@
           placeholderMessage:
             "因网络环境、设备故障、内容等原因，恕不办理退款。",
           submit: "发送留言",
-          mailSubject: "[语音导览]",
-          successTitle: "邮件应用即将打开",
-          successBody:
-            "我们已将您填写的内容填入邮件。请确认后直接发送。如果邮件应用未能打开，请直接发送至 500@rakan.or.jp。",
+          sending: "发送中…",
+          errorBody:
+            "留言发送失败。请检查网络连接后稍后再试。如果仍然失败，请直接发送至 500@rakan.or.jp。",
+          successTitle: "留言已收到",
+          successBody: "感谢您的留言，我们会尽快与您联系。",
         },
       };
 
@@ -384,38 +409,40 @@
         }
       });
 
-      // No backend: the form hands off to the visitor's own mail app with
-      // everything pre-filled, so the message arrives from their address.
-      const CONTACT_ADDRESS = "500@rakan.or.jp";
       const form = document.getElementById("contactForm");
+      const submitBtn = document.getElementById("submitBtn");
+      const submitLabel = document.getElementById("submitBtnLabel");
+      const errorBox = document.getElementById("contactError");
 
-      form.addEventListener("submit", (e) => {
+      form.addEventListener("submit", async (e) => {
         e.preventDefault();
+        errorBox.classList.remove("is-visible");
+        submitBtn.disabled = true;
+        submitLabel.textContent = t.sending;
 
-        const name = document.getElementById("contactName").value.trim();
-        const email = document.getElementById("contactEmail").value.trim();
-        const categorySelect = document.getElementById("contactCategory");
-        const category =
-          categorySelect.options[categorySelect.selectedIndex].textContent;
-        const message = document.getElementById("contactMessage").value.trim();
+        try {
+          const res = await fetch("/api/contact", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              name: document.getElementById("contactName").value,
+              email: document.getElementById("contactEmail").value,
+              category: document.getElementById("contactCategory").value,
+              message: document.getElementById("contactMessage").value,
+              lang,
+            }),
+          });
+          if (!res.ok) throw new Error(`send failed: ${res.status}`);
 
-        const subject = `${t.mailSubject} ${category} — ${name}`;
-        const body = [
-          `${t.labelName}: ${name}`,
-          `${t.labelEmail}: ${email}`,
-          `${t.labelCategory}: ${category}`,
-          "",
-          `${t.labelMessage}:`,
-          message,
-        ].join("\n");
-
-        window.location.href =
-          `mailto:${CONTACT_ADDRESS}` +
-          `?subject=${encodeURIComponent(subject)}` +
-          `&body=${encodeURIComponent(body)}`;
-
-        form.classList.add("is-hidden");
-        document.getElementById("contactSuccess").classList.add("is-visible");
+          form.classList.add("is-hidden");
+          document.getElementById("contactSuccess").classList.add("is-visible");
+        } catch (err) {
+          console.error(err);
+          errorBox.textContent = t.errorBody;
+          errorBox.classList.add("is-visible");
+          submitBtn.disabled = false;
+          submitLabel.textContent = t.submit;
+        }
       });
     </script>
   </body>
