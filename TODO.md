@@ -13,9 +13,12 @@
          `01652075 "Dynamic QR payment not found"`, an ordinary business
          error, so authentication and the IP check both passed. Unsigned and
          bad-signature calls correctly 401. `08100016` is gone.
-   - [ ] Cloudflare: add PAYPAY_RELAY_URL + PAYPAY_RELAY_SECRET, then REDEPLOY
-         (env changes need a new deployment, editing alone does nothing)
-   - [ ] Uncomment the PayPay option in `pay-select.html` once a test pays
+   - [x] Cloudflare: PAYPAY_RELAY_URL + PAYPAY_RELAY_SECRET added and deployed
+   - [x] PayPay button re-enabled in `pay-select.html`
+   - [x] **END TO END WORKING 2026-08-04** — POST /api/create-paypay-payment
+         returns a live checkout URL in ~1.2s
+   - [ ] Walk one real payment through on a phone to confirm the return leg
+         (redirect back to tour.html, verify-paypay-payment, 24h token)
    - [ ] **Rotate the PayPay API secret** — it was exposed in screenshots
          during the original debugging. Deploying the existing one for now.
    - [ ] Rotate the Live WP auth salts + DB password (pasted into a chat
