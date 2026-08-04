@@ -14,3 +14,28 @@
 # SFTP deploy config — holds the Kinsta server password in plain text.
 # .vscode/settings.json is tracked, so this must be excluded explicitly.
 .vscode/sftp.json
+
+# WordPress core, pulled down by accident if the SFTP extension syncs the
+# remote root instead of browsing it. This repo is the Cloudflare Pages site,
+# not the WordPress install — nothing under here belongs in it, and
+# wp-config.php carries database credentials and auth salts.
+/wp-admin/
+/wp-content/
+/wp-includes/
+/wp-config.php
+/wp-config-sample.php
+/wp-activate.php
+/wp-blog-header.php
+/wp-comments-post.php
+/wp-cron.php
+/wp-links-opml.php
+/wp-load.php
+/wp-login.php
+/wp-mail.php
+/wp-settings.php
+/wp-signup.php
+/wp-trackback.php
+/xmlrpc.php
+/index.php
+/license.txt
+/readme.html
