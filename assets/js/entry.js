@@ -365,15 +365,13 @@ function pickLangHalf(raw, lang) {
   return ja;
 }
 
+// Kept in step with the identical function in script.js: the URL passes
+// through untouched so the size chosen by the tour endpoint is the size
+// actually requested. Stripping the `-1024x768` suffix here asked for an
+// original that does not exist wherever WordPress stored a `-scaled` file,
+// which 404'd 11 of the 77 images this screen loads.
 function normalizeWpImageUrl(url) {
-  const input = safeText(url, "");
-  if (!input) return "";
-  const [base, query = ""] = input.split("?");
-  const upgraded = base.replace(
-    /-\d+x\d+(?=\.(jpe?g|png|webp|gif|avif)$)/i,
-    "",
-  );
-  return query ? `${upgraded}?${query}` : upgraded;
+  return safeText(url, "");
 }
 
 function resolveImageUrl(value) {
