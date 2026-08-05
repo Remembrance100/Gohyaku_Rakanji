@@ -95,7 +95,7 @@
       href="https://fonts.googleapis.com/css2?family=Barlow:wght@500;700;800&family=Manrope:wght@500;700;800&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./assets/css/styles.css?v=20260804a" />
+    <link rel="stylesheet" href="./assets/css/styles.css?v=20260804b" />
   </head>
   <body>
     <!-- Persistent chrome around the tour experience. -->
@@ -351,19 +351,22 @@
             <path d="M4 7h16M4 17h16"/>
           </svg>
         </button>
-        <div
-          class="omamori-msg-scrub"
-          id="omamoriMsgScrub"
-          role="slider"
-          tabindex="0"
-          aria-label="動画の再生位置"
-          aria-valuemin="0"
-          aria-valuemax="100"
-          aria-valuenow="0"
-        >
-          <div class="omamori-msg-scrub-track">
-            <div class="omamori-msg-scrub-fill" id="omamoriMsgScrubFill"></div>
-            <div class="omamori-msg-scrub-knob" id="omamoriMsgScrubKnob"></div>
+        <div class="omamori-msg-controls">
+          <button class="omamori-msg-playpause" id="omamoriMsgPlayPause" type="button" aria-label="再生/一時停止"></button>
+          <div
+            class="omamori-msg-scrub"
+            id="omamoriMsgScrub"
+            role="slider"
+            tabindex="0"
+            aria-label="動画の再生位置"
+            aria-valuemin="0"
+            aria-valuemax="100"
+            aria-valuenow="0"
+          >
+            <div class="omamori-msg-scrub-track">
+              <div class="omamori-msg-scrub-fill" id="omamoriMsgScrubFill"></div>
+              <div class="omamori-msg-scrub-knob" id="omamoriMsgScrubKnob"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -701,6 +704,6 @@
       </div>
     </div>
 
-    <script src="./assets/js/script.js?v=20260804a"></script>
+    <script src="./assets/js/script.js?v=20260804b"></script>
   </body>
 </html>

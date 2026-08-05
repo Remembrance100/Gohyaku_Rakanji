@@ -1830,21 +1830,46 @@ button:active {
   -webkit-backdrop-filter: blur(6px);
 }
 
-/* Lets a visitor scrub to any point in the priest's message instead of only
-   watching it straight through — the video previously had no way to control
-   playback position at all. The tappable strip is taller than the visible
-   track so it stays draggable with a thumb on a phone; the track itself
-   stays thin so it doesn't compete with the video. */
-.omamori-msg-scrub {
+/* Lets a visitor pause, and scrub to any point in, the priest's message
+   instead of only watching it straight through on autoplay — previously
+   there was no way to control playback at all beyond mute. The tappable
+   scrub strip is taller than its visible track so it stays draggable with a
+   thumb on a phone; the track itself stays thin so it doesn't compete with
+   the video. */
+.omamori-msg-controls {
   position: absolute;
   left: 0;
   right: 0;
   bottom: 0;
   z-index: 4;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
   padding: 14px 0.7rem 0.6rem;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.55), transparent);
+}
+
+.omamori-msg-playpause {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: #fff;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.omamori-msg-scrub {
+  position: relative;
+  flex: 1;
+  padding: 10px 0;
   cursor: pointer;
   touch-action: none;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.55), transparent);
 }
 
 .omamori-msg-scrub-track {

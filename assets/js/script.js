@@ -65,6 +65,7 @@ const omamoriMsgUnmute = document.querySelector("#omamoriMsgUnmute");
 const omamoriMsgUnmuteIcon = document.querySelector("#omamoriMsgUnmuteIcon");
 const omamoriMsgUnmuteLabel = document.querySelector("#omamoriMsgUnmuteLabel");
 const omamoriMsgSettings = document.querySelector("#omamoriMsgSettings");
+const omamoriMsgPlayPause = document.querySelector("#omamoriMsgPlayPause");
 const omamoriMsgScrub = document.querySelector("#omamoriMsgScrub");
 const omamoriMsgScrubFill = document.querySelector("#omamoriMsgScrubFill");
 const omamoriMsgScrubKnob = document.querySelector("#omamoriMsgScrubKnob");
@@ -2211,6 +2212,31 @@ omamoriMsgUnmute?.addEventListener("click", () => {
   if (!omamoriMsgVideo) return;
   omamoriMsgVideo.muted = !omamoriMsgVideo.muted;
   syncOmamoriAudioBtn();
+});
+
+// Reflects actual playback state rather than assuming — autoplay can be
+// silently blocked by the browser, and dragging the scrub bar below pauses
+// and resumes the video itself, so listening to the video's own play/pause
+// events keeps this correct without every caller having to remember to
+// update it too.
+function syncPlayPauseBtn() {
+  if (!omamoriMsgPlayPause || !omamoriMsgVideo) return;
+  omamoriMsgPlayPause.innerHTML = omamoriMsgVideo.paused
+    ? playIconHtml(15)
+    : pauseIconHtml(15);
+}
+
+omamoriMsgVideo?.addEventListener("play", syncPlayPauseBtn);
+omamoriMsgVideo?.addEventListener("pause", syncPlayPauseBtn);
+syncPlayPauseBtn();
+
+omamoriMsgPlayPause?.addEventListener("click", () => {
+  if (!omamoriMsgVideo) return;
+  if (omamoriMsgVideo.paused) {
+    omamoriMsgVideo.play().catch(() => {});
+  } else {
+    omamoriMsgVideo.pause();
+  }
 });
 
 // ─── Priest message video scrub bar ──────────────────────────────────────
