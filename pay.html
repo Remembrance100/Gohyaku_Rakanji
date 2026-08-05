@@ -32,22 +32,20 @@
         background: #000;
         color: #f2f2f2;
         display: flex;
-        align-items: center;
         justify-content: center;
         min-height: 100svh;
-        padding: 1.5rem;
       }
 
+      /* No card. The page itself is the surface, so the content runs to the
+         edges of the screen instead of sitting in a raised box with the page
+         background showing around it. The width cap still keeps this a readable
+         column on a desktop; the padding is a reading gutter, not a container. */
       .pay-card {
         width: min(100%, 420px);
-        background: #111114;
-        border-top: 5px solid #f6515f;
-        border-radius: 4px;
-        padding: 2rem 1.6rem 1.6rem;
+        padding: 1.5rem 1.25rem 2rem;
         display: flex;
         flex-direction: column;
         gap: 1.2rem;
-        box-shadow: 0 16px 48px rgba(0, 0, 0, 0.8);
       }
 
       .nav-back {
@@ -437,6 +435,16 @@
       function hideError() {
         payError.classList.remove("is-visible");
       }
+
+      // Same fix as pay-select.html: a tap on Purchase Access disables the
+      // button and shows the spinner while it leaves for Stripe. If the visitor
+      // hits Back instead of completing checkout, the browser can restore this
+      // exact page — spinner included — from its back/forward cache rather than
+      // loading it fresh, leaving the button permanently stuck. `persisted` is
+      // only true for that cached restore.
+      window.addEventListener("pageshow", (e) => {
+        if (e.persisted) setLoading(false);
+      });
     </script>
   </body>
 </html>
