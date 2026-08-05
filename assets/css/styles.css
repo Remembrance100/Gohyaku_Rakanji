@@ -1830,6 +1830,56 @@ button:active {
   -webkit-backdrop-filter: blur(6px);
 }
 
+/* Lets a visitor scrub to any point in the priest's message instead of only
+   watching it straight through — the video previously had no way to control
+   playback position at all. The tappable strip is taller than the visible
+   track so it stays draggable with a thumb on a phone; the track itself
+   stays thin so it doesn't compete with the video. */
+.omamori-msg-scrub {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 4;
+  padding: 14px 0.7rem 0.6rem;
+  cursor: pointer;
+  touch-action: none;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.55), transparent);
+}
+
+.omamori-msg-scrub-track {
+  position: relative;
+  width: 100%;
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.28);
+}
+
+.omamori-msg-scrub-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 0%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #f6515f, #db3f4c);
+}
+
+.omamori-msg-scrub-knob {
+  position: absolute;
+  top: 50%;
+  left: 0%;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+  transform: translate(-50%, -50%);
+  transition: transform 120ms;
+}
+
+.omamori-msg-scrub.is-dragging .omamori-msg-scrub-knob {
+  transform: translate(-50%, -50%) scale(1.25);
+}
+
 
 /* ─── Omamori transcript accordion ───────────────────── */
 

@@ -65,6 +65,9 @@ const omamoriMsgUnmute = document.querySelector("#omamoriMsgUnmute");
 const omamoriMsgUnmuteIcon = document.querySelector("#omamoriMsgUnmuteIcon");
 const omamoriMsgUnmuteLabel = document.querySelector("#omamoriMsgUnmuteLabel");
 const omamoriMsgSettings = document.querySelector("#omamoriMsgSettings");
+const omamoriMsgScrub = document.querySelector("#omamoriMsgScrub");
+const omamoriMsgScrubFill = document.querySelector("#omamoriMsgScrubFill");
+const omamoriMsgScrubKnob = document.querySelector("#omamoriMsgScrubKnob");
 const mapEndBtn = document.querySelector("#mapEndBtn");
 const omamoriBgModal = document.querySelector("#omamoriBgModal");
 const omamoriBgModalClose = document.querySelector("#omamoriBgModalClose");
@@ -2210,12 +2213,91 @@ omamoriMsgUnmute?.addEventListener("click", () => {
   syncOmamoriAudioBtn();
 });
 
+// ─── Priest message video scrub bar ──────────────────────────────────────
+// The message previously had no way to control playback position at all —
+// just watch it straight through or not. This lets a visitor drag/tap to
+// any point, and re-watch a specific answer without sitting through the
+// whole thing again.
+
+function setScrubProgress(fraction) {
+  const pct = `${Math.min(100, Math.max(0, fraction * 100))}%`;
+  if (omamoriMsgScrubFill) omamoriMsgScrubFill.style.width = pct;
+  if (omamoriMsgScrubKnob) omamoriMsgScrubKnob.style.left = pct;
+  omamoriMsgScrub?.setAttribute("aria-valuenow", String(Math.round(fraction * 100)));
+}
+
+function hasScrubbableDuration() {
+  return Boolean(omamoriMsgVideo) && isFinite(omamoriMsgVideo.duration) && omamoriMsgVideo.duration > 0;
+}
+
+function scrubFractionFromEvent(e) {
+  const rect = omamoriMsgScrub.getBoundingClientRect();
+  if (!rect.width) return 0;
+  return Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width));
+}
+
+let scrubDragging = false;
+let scrubWasPlaying = false;
+
+omamoriMsgVideo?.addEventListener("timeupdate", () => {
+  if (scrubDragging || !hasScrubbableDuration()) return;
+  setScrubProgress(omamoriMsgVideo.currentTime / omamoriMsgVideo.duration);
+});
+
+omamoriMsgScrub?.addEventListener("pointerdown", (e) => {
+  if (!hasScrubbableDuration()) return;
+  scrubDragging = true;
+  scrubWasPlaying = !omamoriMsgVideo.paused;
+  omamoriMsgVideo.pause();
+  omamoriMsgScrub.classList.add("is-dragging");
+  omamoriMsgScrub.setPointerCapture(e.pointerId);
+  const fraction = scrubFractionFromEvent(e);
+  setScrubProgress(fraction);
+  omamoriMsgVideo.currentTime = fraction * omamoriMsgVideo.duration;
+});
+
+omamoriMsgScrub?.addEventListener("pointermove", (e) => {
+  if (!scrubDragging || !hasScrubbableDuration()) return;
+  const fraction = scrubFractionFromEvent(e);
+  setScrubProgress(fraction);
+  omamoriMsgVideo.currentTime = fraction * omamoriMsgVideo.duration;
+});
+
+function endScrubDrag(e) {
+  if (!scrubDragging) return;
+  scrubDragging = false;
+  omamoriMsgScrub?.classList.remove("is-dragging");
+  try {
+    omamoriMsgScrub?.releasePointerCapture(e.pointerId);
+  } catch {}
+  if (scrubWasPlaying) omamoriMsgVideo?.play().catch(() => {});
+}
+
+omamoriMsgScrub?.addEventListener("pointerup", endScrubDrag);
+omamoriMsgScrub?.addEventListener("pointercancel", endScrubDrag);
+
+// Arrow-key seeking, per the ARIA slider pattern this element's role implies.
+omamoriMsgScrub?.addEventListener("keydown", (e) => {
+  if (!hasScrubbableDuration()) return;
+  const step = e.shiftKey ? 10 : 5;
+  if (e.key === "ArrowLeft") {
+    omamoriMsgVideo.currentTime = Math.max(0, omamoriMsgVideo.currentTime - step);
+  } else if (e.key === "ArrowRight") {
+    omamoriMsgVideo.currentTime = Math.min(omamoriMsgVideo.duration, omamoriMsgVideo.currentTime + step);
+  } else {
+    return;
+  }
+  e.preventDefault();
+  setScrubProgress(omamoriMsgVideo.currentTime / omamoriMsgVideo.duration);
+});
+
 function initMsgPlayer() {
   if (msgPlayerInit || !omamoriMsgVideo) return;
   msgPlayerInit = true;
 
   omamoriMsgVideo.muted = true;
   syncOmamoriAudioBtn();
+  setScrubProgress(0);
   omamoriMsgVideo.src = MSG_VIDEO_URLS[getLangKey()] ?? MSG_VIDEO_URLS.ja;
   omamoriMsgVideo.load();
   omamoriMsgVideo.play().catch(() => {});
@@ -2227,12 +2309,14 @@ function resetMsgPlayer() {
     omamoriMsgVideo.pause();
     omamoriMsgVideo.src = "";
   }
+  setScrubProgress(0);
 }
 
 function reloadMsgPlayerForLang() {
   if (!msgPlayerInit || !omamoriMsgVideo) return;
   omamoriMsgVideo.src = MSG_VIDEO_URLS[getLangKey()] ?? MSG_VIDEO_URLS.ja;
   omamoriMsgVideo.muted = true;
+  setScrubProgress(0);
   omamoriMsgVideo.load();
   omamoriMsgVideo.play().catch(() => {});
   syncOmamoriAudioBtn();
