@@ -6,7 +6,7 @@ A paid, multi-language interactive audio tour guide for [天恩山五百羅漢�
 
 | Temple entrance | Live in use at Stop 9 |
 | --- | --- |
-| ![Gohyaku Rakanji Temple entrance](docs/screenshots/temple.jpg) | ![The tour guide in use on-site at Stop 9](docs/screenshots/on-site.jpg) |
+| ![Gohyaku Rakanji Temple entrance](docs/screenshots/templeentrance.jpg) | ![The tour guide in use on-site at Stop 9](docs/screenshots/on-site.jpg) |
 
 ## Screenshots
 
