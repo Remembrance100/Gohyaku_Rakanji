@@ -203,10 +203,83 @@ function resolveMediaUrl(value) {
 // could render — measured at 154MB across the tour, averaging 809KB an image,
 // where the already-generated smaller variants average well under 200KB.
 //
-// The URL now passes through untouched so the size chosen server-side (see
-// wordpress/rakanji-tour-images.php) is the size actually requested.
+// The URL now passes through at the size chosen server-side (see
+// wordpress/memorial-tour-endpoint.php), and is re-pointed at this origin's
+// own /img/ route.
+//
+// That last part is not cosmetic. The images live on the WordPress host behind
+// DATA_URL, which answers every single request with `ki-cf-cache-status:
+// BYPASS` — that environment has edge caching switched off — so all ~105
+// images the tour shows come uncached from origin at roughly 450ms TTFB each,
+// on exactly the weak temple-grounds reception this is built for. /img/ puts
+// them behind Cloudflare's cache (functions/img/[[path]].js) and makes them
+// same-origin with the page, which also drops a separate DNS + TLS handshake
+// off the critical path. Anything that isn't an upload on that host is left
+// alone.
+const WP_UPLOADS_BASE = `${new URL(DATA_URL).origin}/wp-content/uploads/`;
+const IMAGE_PROXY_PREFIX = "/img/";
+
 function normalizeWpImageUrl(url) {
-  return safeText(url, "");
+  const value = safeText(url, "");
+  if (!value.startsWith(WP_UPLOADS_BASE)) {
+    return value;
+  }
+  return IMAGE_PROXY_PREFIX + value.slice(WP_UPLOADS_BASE.length);
+}
+
+// Widest variant worth sending to a phone.
+//
+// The app shell is capped at 560px and transcript images at 420px tall, so
+// nothing near this is resolvable on screen. WordPress still attaches
+// `sizes="(max-width: 1024px) 100vw, 1024px"`, which a 390px DPR-3 phone
+// multiplies out to ~1170px and answers with the 1536w candidate — 367KB in
+// place of the 158KB file the endpoint deliberately selected, and 683KB where
+// it reaches for 2048w. The srcset was handing back the retina budget the
+// server had just declined to spend (see the note on RAKANJI_IMAGE_SIZE in
+// wordpress/memorial-tour-endpoint.php).
+//
+// Measured across all 21 stops, for a 390px DPR-3 phone:
+//
+//   no cap (today)   79.0 MB
+//   cap 1024w        61.5 MB   still lets portrait -1024x1536 variants through
+//   cap 768w         48.0 MB
+//   no srcset at all 55.2 MB   every phone falls back to the 1024w src
+//
+// 768w wins outright, and beating the drop-srcset option is the useful part:
+// capping keeps the step down to 300w that low-density and small screens get,
+// which is why it lands below the src-only figure rather than between them.
+// 768 device px across a ~390px container is still just under 2x density.
+const MAX_IMAGE_CANDIDATE_WIDTH = 768;
+
+// Re-point every candidate at /img/ and drop the ones too large to render.
+// Returns "" when any candidate fails the scheme check, so one bad entry drops
+// the whole attribute rather than the image — src is validated separately and
+// still displays, just without responsive variants.
+function rewriteImageSrcset(srcset) {
+  const kept = [];
+
+  for (const part of safeText(srcset, "").split(",")) {
+    const [candidateUrl, descriptor = ""] = part.trim().split(/\s+/);
+    if (!candidateUrl) continue;
+    if (
+      !candidateUrl.startsWith("http://") &&
+      !candidateUrl.startsWith("https://") &&
+      !candidateUrl.startsWith("/")
+    ) {
+      return "";
+    }
+
+    const width = /^(\d+)w$/.exec(descriptor);
+    if (width && Number(width[1]) > MAX_IMAGE_CANDIDATE_WIDTH) {
+      continue;
+    }
+
+    kept.push(
+      [normalizeWpImageUrl(candidateUrl), descriptor].filter(Boolean).join(" "),
+    );
+  }
+
+  return kept.join(", ");
 }
 
 function resolveImageUrl(value) {
@@ -1024,36 +1097,31 @@ function sanitizeRichInlineHtml(rawHtml) {
         node.remove();
         return;
       }
+      node.setAttribute("src", normalizeWpImageUrl(src));
+
       // This function only ever renders into the stop the visitor already has
       // open (setDetailStop -> renderRichBlocks) — never content further down
-      // a page they may not reach. `loading="lazy"` gated the fetch behind
-      // scroll intersection, so on the temple's patchy signal an image sat
-      // un-requested until it was scrolled near, then visibly popped in.
-      // Fetching eagerly starts the download the moment the stop opens;
-      // "low" priority keeps it from competing with the hero image above it.
-      if (!node.getAttribute("loading")) {
-        node.setAttribute("loading", "eager");
-      }
+      // a page they may not reach. `loading="lazy"` gates the fetch behind
+      // scroll intersection, so on the temple's patchy signal an image sits
+      // un-requested until it is scrolled near, then visibly pops in.
+      //
+      // This has to overwrite rather than fill in a missing value: WordPress
+      // stamps `loading="lazy"` on everything it emits — all 419 img tags in
+      // the live tour response carry it and none omit it — so a default that
+      // only applied when the attribute was absent never once fired. Fetching
+      // eagerly starts the download the moment the stop opens; "low" priority
+      // keeps it from competing with the hero image above it.
+      node.setAttribute("loading", "eager");
       if (!node.getAttribute("fetchpriority")) {
         node.setAttribute("fetchpriority", "low");
       }
 
-      // Hold every candidate to the same scheme rule as src. One bad entry
-      // drops the whole attribute rather than the image — src is already
-      // known-good, so the picture still renders, just not responsively.
       const srcset = safeText(node.getAttribute("srcset"), "");
       if (srcset) {
-        const candidatesSafe = srcset
-          .split(",")
-          .map((part) => part.trim().split(/\s+/)[0])
-          .filter(Boolean)
-          .every(
-            (url) =>
-              url.startsWith("http://") ||
-              url.startsWith("https://") ||
-              url.startsWith("/"),
-          );
-        if (!candidatesSafe) {
+        const rewritten = rewriteImageSrcset(srcset);
+        if (rewritten) {
+          node.setAttribute("srcset", rewritten);
+        } else {
           node.removeAttribute("srcset");
           node.removeAttribute("sizes");
         }
@@ -1157,26 +1225,21 @@ function sanitizeTermModalHtml(rawHtml) {
         node.remove();
         return;
       }
+      node.setAttribute("src", normalizeWpImageUrl(src));
+
+      // Unlike the stop detail above, term modal bodies scroll and their images
+      // sit below the fold in a carousel the visitor may never swipe through,
+      // so lazy is the right call here — keep whatever WordPress sent.
       if (!node.getAttribute("loading")) {
         node.setAttribute("loading", "lazy");
       }
 
-      // Hold every candidate to the same scheme rule as src. One bad entry
-      // drops the whole attribute rather than the image — src is already
-      // known-good, so the picture still renders, just not responsively.
       const srcset = safeText(node.getAttribute("srcset"), "");
       if (srcset) {
-        const candidatesSafe = srcset
-          .split(",")
-          .map((part) => part.trim().split(/\s+/)[0])
-          .filter(Boolean)
-          .every(
-            (url) =>
-              url.startsWith("http://") ||
-              url.startsWith("https://") ||
-              url.startsWith("/"),
-          );
-        if (!candidatesSafe) {
+        const rewritten = rewriteImageSrcset(srcset);
+        if (rewritten) {
+          node.setAttribute("srcset", rewritten);
+        } else {
           node.removeAttribute("srcset");
           node.removeAttribute("sizes");
         }
@@ -2029,18 +2092,33 @@ function getActiveStopIndex() {
 // the same head start or the visitor just trades one pop-in for another.
 const warmedStopImages = new Set();
 
-function collectStopImageUrls(stop) {
-  const urls = [
-    (Array.isArray(stop.media) && stop.media.find(Boolean)) || stop.thumb || "",
-  ];
+// textBlocks/transcriptBlocks have already been through sanitizeRichInlineHtml,
+// so the src and srcset read here are the rewritten ones the <img> will render
+// with — the warm and the render agree by construction.
+function collectStopImageSources(stop) {
+  const sources = [];
+
+  const lead =
+    (Array.isArray(stop.media) && stop.media.find(Boolean)) || stop.thumb || "";
+  if (lead) {
+    sources.push({ src: lead, srcset: "", sizes: "" });
+  }
+
   [...(stop.textBlocks || []), ...(stop.transcriptBlocks || [])].forEach(
     (html) => {
-      for (const match of html.matchAll(/<img\b[^>]*\bsrc=["']([^"']+)["']/gi)) {
-        urls.push(match[1]);
+      for (const [tag] of html.matchAll(/<img\b[^>]*>/gi)) {
+        const src = /\ssrc=["']([^"']+)["']/i.exec(tag)?.[1] || "";
+        if (!src) continue;
+        sources.push({
+          src,
+          srcset: /\ssrcset=["']([^"']+)["']/i.exec(tag)?.[1] || "",
+          sizes: /\ssizes=["']([^"']+)["']/i.exec(tag)?.[1] || "",
+        });
       }
     },
   );
-  return urls.filter(Boolean);
+
+  return sources;
 }
 
 function warmAdjacentStopImages() {
@@ -2051,13 +2129,31 @@ function warmAdjacentStopImages() {
     const stop = tourStopsData[index];
     if (!stop || stop.videoUrl) return;
 
-    collectStopImageUrls(stop).forEach((url) => {
-      if (warmedStopImages.has(url)) return;
-      warmedStopImages.add(url);
-      const warm = new Image();
-      warm.decoding = "async";
-      warm.fetchPriority = "low";
-      warm.src = url;
+    collectStopImageSources(stop).forEach((source) => {
+      const key = source.srcset || source.src;
+      if (warmedStopImages.has(key)) return;
+      warmedStopImages.add(key);
+
+      // `new Image()` fetched whatever `src` said, but the browser picks from
+      // `srcset` when it actually renders — a different file for 43 of this
+      // tour's images on a DPR-3 phone. The warm downloaded bytes that were
+      // then thrown away, and the visitor still waited on the real one.
+      // rel=preload with imagesrcset/imagesizes runs the identical selection
+      // the <img> will run, so what gets warmed is what gets used. A browser
+      // too old for imagesrcset falls back to preloading href, which is no
+      // worse than what this did before.
+      const link = document.createElement("link");
+      link.rel = "preload";
+      link.as = "image";
+      link.setAttribute("fetchpriority", "low");
+      link.href = source.src;
+      if (source.srcset) {
+        link.setAttribute("imagesrcset", source.srcset);
+        if (source.sizes) {
+          link.setAttribute("imagesizes", source.sizes);
+        }
+      }
+      document.head.appendChild(link);
     });
   });
 }

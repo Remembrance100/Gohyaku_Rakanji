@@ -70,26 +70,47 @@ function rakanji_attachment_id_from_url( $url ) {
 		return $memo[ $url ];
 	}
 
-	$cache_key = 'rakanji_att_' . md5( $url );
+	// Cache key is versioned (`att2`) so deploying this file invalidates the
+	// day-long negative cache below. Without that bump, every URL this function
+	// used to fail on would keep returning its cached 0 for up to 24 hours and
+	// the fix would look like it had not worked.
+	$cache_key = 'rakanji_att2_' . md5( $url );
 	$cached    = get_transient( $cache_key );
 	if ( false !== $cached ) {
 		$memo[ $url ] = (int) $cached;
 		return (int) $cached;
 	}
 
-	$candidates = array( $url );
-
-	// `-1024x768.jpg` -> `.jpg`
-	$stripped = preg_replace( '/-\d+x\d+(?=\.[A-Za-z0-9]+$)/', '', $url );
-	if ( $stripped !== $url ) {
-		$candidates[] = $stripped;
+	// Rich-text URLs percent-encode non-ASCII filenames
+	// (`.../%E2%91%A0-scaled.jpg`) while `_wp_attached_file` stores the raw
+	// UTF-8 name (`.../①-scaled.jpg`), and attachment_url_to_postid() compares
+	// the two as plain strings. Every image on this tour with a Japanese
+	// filename missed on that alone — 48 of 105, each left pointing at its
+	// full-size `-scaled` original, 22.6MB of avoidable payload — while every
+	// ASCII-named one resolved. Try the decoded spelling alongside the literal.
+	$bases   = array( $url );
+	$decoded = rawurldecode( $url );
+	if ( $decoded !== $url ) {
+		$bases[] = $decoded;
 	}
 
-	// `-scaled.jpg` -> `.jpg` (WordPress stores the pre-scale original).
-	$unscaled = preg_replace( '/-scaled(?=\.[A-Za-z0-9]+$)/', '', $stripped );
-	if ( $unscaled !== $stripped ) {
-		$candidates[] = $unscaled;
+	$candidates = array();
+	foreach ( $bases as $base ) {
+		$candidates[] = $base;
+
+		// `-1024x768.jpg` -> `.jpg`
+		$stripped = preg_replace( '/-\d+x\d+(?=\.[A-Za-z0-9]+$)/', '', $base );
+		if ( $stripped !== $base ) {
+			$candidates[] = $stripped;
+		}
+
+		// `-scaled.jpg` -> `.jpg` (WordPress stores the pre-scale original).
+		$unscaled = preg_replace( '/-scaled(?=\.[A-Za-z0-9]+$)/', '', $stripped );
+		if ( $unscaled !== $stripped ) {
+			$candidates[] = $unscaled;
+		}
 	}
+	$candidates = array_unique( $candidates );
 
 	$id = 0;
 	foreach ( $candidates as $candidate ) {
