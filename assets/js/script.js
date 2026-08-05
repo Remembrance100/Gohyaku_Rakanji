@@ -1528,27 +1528,31 @@ function remapStopsForLang() {
 
 // Percentage positions [left%, top%] for stops 1–20 derived from the map image.
 // These are calibrated to the temple grounds map provided.
+// Calibrated against a phone-shaped viewport (see tools/map-calibrate.html).
+// The map uses `object-fit: cover`, so these percentages are relative to the
+// container, not the image — the crop, and therefore the apparent position,
+// shifts with the screen's aspect ratio. Phones are what matter here.
 const MAP_PIN_POSITIONS = {
-  1: [54, 97.4],
-  2: [56.1, 78.7],
-  3: [56.2, 70.4],
-  4: [59.2, 71.7],
-  5: [69.2, 71.4],
-  6: [70.8, 61.6],
-  7: [58.6, 49],
-  8: [60.2, 53.5],
-  9: [61.1, 35.3],
-  10: [73, 20.9],
-  11: [35.3, 28.3],
-  12: [34.1, 22.8],
-  13: [36.9, 16.8],
-  14: [47.7, 16.6],
-  15: [50.8, 22.9],
-  16: [29.7, 43.2],
-  17: [41.4, 39.4],
-  18: [40.6, 49.6],
-  19: [33.3, 50],
-  20: [26.9, 60.9],
+  1: [54.6, 93.3],
+  2: [54.9, 78.9],
+  3: [54.7, 70.8],
+  4: [62.5, 69.9],
+  5: [72.9, 69.8],
+  6: [74.9, 61.3],
+  7: [58.9, 48.8],
+  8: [64.2, 52.7],
+  9: [62.6, 35.3],
+  10: [74.4, 21],
+  11: [36.7, 28.7],
+  12: [34.3, 21.2],
+  13: [36.9, 15.2],
+  14: [45.9, 15.5],
+  15: [48.2, 21.5],
+  16: [26.7, 42.1],
+  17: [41.4, 40],
+  18: [38.7, 50.5],
+  19: [27.2, 51.1],
+  20: [25.5, 61.4],
 };
 
 const MAP_IMAGE_URL = "";
