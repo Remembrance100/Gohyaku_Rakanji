@@ -5,17 +5,13 @@ compatibility_date = "2024-09-23"
 # Free Email Routing send binding (the paid Email Sending REST API is not used).
 # destination_address locks the binding so this Worker can only ever mail one
 # address, even if the code above were compromised.
-#
-# TEMPORARY — pointed at the developer's inbox to test the pipeline end to end.
-# Switch both values below to 500@rakan.or.jp once the temple office has clicked
-# the destination-address verification link, then redeploy.
 [[send_email]]
 name = "EMAIL"
-destination_address = "linusfujisawa@gmail.com"
+destination_address = "500@rakan.or.jp"
 
 [vars]
 CONTACT_FROM = "contact@rakanji.org"
-CONTACT_TO = "linusfujisawa@gmail.com"
+CONTACT_TO = "500@rakan.or.jp"
 
 # Same origin as the site, so contact.html keeps POSTing to /api/contact.
 # This route takes precedence over the Pages project for this exact path only.
