@@ -129,9 +129,15 @@ is still wrong (revisit step 0) rather than anything being broken in the code.
 
 ## If PayPay drops the IP restriction
 
-`functions/_lib/paypay-auth.js` and `crypto-md5.js` are kept for exactly that
-case — the Pages Functions can go back to calling PayPay directly and this relay
-can be deleted.
+The Pages Functions can go back to calling PayPay directly and this relay can be
+deleted. The JS signing they would need — `functions/_lib/paypay-auth.js` and its
+hand-rolled MD5, since Workers' Web Crypto has none — was removed once the relay
+took over, rather than left in the tree unused. Recover it with:
+
+```
+git show 259b622:functions/_lib/paypay-auth.js
+git show 259b622:functions/_lib/crypto-md5.js
+```
 
 ## Outstanding
 
