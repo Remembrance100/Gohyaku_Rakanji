@@ -56,6 +56,16 @@ body {
   width: min(100%, 560px);
 }
 
+/* On a phone the shell is already 94vh; the footer plus the body's 0.9rem gap
+   pushes the page past the viewport, so the whole thing scrolls and the tour
+   shifts under the reader's thumb. The label is decorative — drop it where
+   the space is worth more than the branding. */
+@media (max-width: 700px) {
+  .site-footer {
+    display: none;
+  }
+}
+
 .site-header-inner {
   display: flex;
   align-items: center;
@@ -330,6 +340,10 @@ body {
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior-y: contain;
+  /* Swapping stops replaces this whole subtree. Scroll anchoring would try to
+     hold the previous reading position steady as the new content lays out,
+     which is exactly wrong here — every stop should open at its top. */
+  overflow-anchor: none;
   transform: translateX(100%);
   opacity: 0.25;
   z-index: 3;

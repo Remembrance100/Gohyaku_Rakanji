@@ -2057,7 +2057,25 @@ function openAdjacentStop(step) {
   const targetStop = tourStopsData[activeIndex + step];
   if (!targetStop) return;
   setDetailStop(targetStop);
-  detailView?.scrollTo({ top: 0, behavior: "smooth" });
+  resetDetailScroll();
+}
+
+// Jump to the top of a newly opened stop, instantly.
+//
+// A smooth scroll loses this race: setDetailStop() has just replaced the
+// content, and as the new hero image and text lay out, the browser's scroll
+// anchoring adjusts scrollTop to keep the visible content stable — which
+// fights the animation and can leave the reader stranded partway down, or at
+// the bottom when the new stop is shorter than the scroll position they came
+// from. Setting scrollTop directly is synchronous and cannot be overridden
+// mid-flight. It also matches what a page navigation should feel like.
+function resetDetailScroll() {
+  if (!detailView) return;
+  detailView.scrollTop = 0;
+  // Re-assert after layout, in case late-loading media shifts things.
+  requestAnimationFrame(() => {
+    detailView.scrollTop = 0;
+  });
 }
 
 function openOmamoriMessage() {
@@ -2197,7 +2215,7 @@ function openDetailById(stopId) {
   if (!stop) return;
   setDetailStop(stop);
   appShell.classList.add("is-detail");
-  detailView.scrollTo({ top: 0, behavior: "smooth" });
+  resetDetailScroll();
   history.pushState({ stopId }, "", `?stop=${stop.number}`);
 }
 
