@@ -5,13 +5,9 @@
    - [ ] Temple verifies `500@rakan.or.jp` (Email Routing → Destination addresses)
    - [ ] Flip `destination_address` + `CONTACT_TO` in `workers/contact/wrangler.toml`, then `cd workers/contact && npx wrangler deploy`
 
-3. **Rotate credentials.**
-   - [ ] PayPay API secret — exposed in screenshots and chat
-   - [ ] Live WP salts + DB password — https://api.wordpress.org/secret-key/1.1/salt/
+3. **Map stop buttons.** Fix positioning.
 
-4. **Map stop buttons.** Fix positioning.
-
-5. **Page speed — done 2026-08-04.** Images 154MB → 73MB (809KB → 397KB average).
+4. **Page speed — done 2026-08-04.** Images 154MB → 73MB (809KB → 397KB average).
    - [x] Tour endpoint serves 1024px images instead of 2560px originals
    - [x] App no longer strips the size suffix back off (`script.js` + `entry.js`)
    - [x] Sanitiser keeps `srcset`/`sizes`/`width`/`height` instead of dropping them
