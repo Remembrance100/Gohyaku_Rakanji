@@ -127,6 +127,14 @@
       .terms-divider {
         height: 1px;
         background: rgba(255, 255, 255, 0.1);
+        /* The card stretches to the viewport, but this text is short enough on a
+           desktop screen to leave a band of empty card below the buttons, which
+           reads as an unfinished box rather than as page background. The auto
+           margin hands that slack to the divider instead, so the divider and the
+           two actions after it settle on the bottom edge and the card looks
+           filled. On a phone the text already overruns the viewport, there is no
+           slack to absorb, and this changes nothing. */
+        margin-top: auto;
       }
 
       .accept-btn {

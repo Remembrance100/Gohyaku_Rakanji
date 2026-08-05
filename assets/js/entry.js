@@ -845,12 +845,21 @@ function initSettings(onLangChange) {
   syncLangBtns();
   syncFontBtns();
 
-  // Language selection
+  // Language and size are persisted on every click, not just on Confirm.
+  //
+  // The Contact link sits on this screen, directly above the Confirm button, and
+  // it navigates away without passing through it. contact.html, privacy.html and
+  // the two payment pages are separate documents that can only learn the choice
+  // by reading these prefs back out of localStorage — so a language picked but
+  // not yet confirmed used to leave them showing the previous visit's language,
+  // or the browser's. Saving on click is also what the in-tour settings in
+  // script.js already do; this brings the entry screen in line.
   langGrid?.addEventListener("click", (e) => {
     const btn = e.target.closest(".settings-lang-btn");
     if (!btn) return;
     selectedLang = btn.dataset.lang;
     applyLang(selectedLang);
+    savePrefs({ lang: selectedLang, size: selectedSize });
     syncLangBtns();
     updateUnmuteBtn();
     onLangChange?.(selectedLang);
@@ -861,6 +870,7 @@ function initSettings(onLangChange) {
     btn.addEventListener("click", () => {
       selectedSize = btn.dataset.size;
       applyFontScale(selectedSize);
+      savePrefs({ lang: selectedLang, size: selectedSize });
       syncFontBtns();
     });
   });

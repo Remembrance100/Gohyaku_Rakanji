@@ -362,13 +362,17 @@
         },
       };
 
+      // Falls back to Japanese, not to the browser's language, because this is
+      // the one page reachable before a language has ever been chosen: the
+      // Contact link sits on the entry settings screen, which itself opens in
+      // Japanese. Guessing from navigator.language there would send a visitor
+      // from a Japanese screen to an English one for no reason they can see.
       function getLang() {
         try {
           const prefs = JSON.parse(localStorage.getItem("tourPrefs") || "{}");
           if (prefs.lang && STRINGS[prefs.lang]) return prefs.lang;
         } catch {}
-        const browser = (navigator.language || "en").slice(0, 2).toLowerCase();
-        return STRINGS[browser] ? browser : "en";
+        return "ja";
       }
 
       const lang = getLang();
