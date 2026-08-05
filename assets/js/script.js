@@ -2326,7 +2326,11 @@ function initMsgPlayer() {
   setScrubProgress(0);
   omamoriMsgVideo.src = MSG_VIDEO_URLS[getLangKey()] ?? MSG_VIDEO_URLS.ja;
   omamoriMsgVideo.load();
-  omamoriMsgVideo.play().catch(() => {});
+  // Starts paused — the play/pause button is the only thing that should
+  // start it, now that there's one. preload="none" means the browser won't
+  // fetch anything (including duration) until playback is actually
+  // requested, so the scrub bar stays inert until the first tap of play.
+  syncPlayPauseBtn();
 }
 
 function resetMsgPlayer() {
@@ -2344,7 +2348,9 @@ function reloadMsgPlayerForLang() {
   omamoriMsgVideo.muted = true;
   setScrubProgress(0);
   omamoriMsgVideo.load();
-  omamoriMsgVideo.play().catch(() => {});
+  // Switching language swaps in a different file, so treat it the same as a
+  // fresh open: starts paused, waiting for a tap on play.
+  syncPlayPauseBtn();
   syncOmamoriAudioBtn();
 }
 
