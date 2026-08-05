@@ -352,33 +352,46 @@
         return STRINGS[browser] ? browser : "en";
       }
 
-      const lang = getLang();
-      const t = STRINGS[lang];
+      let lang = getLang();
+      let t = STRINGS[lang];
 
-      // Apply font scale from prefs
       const fontScales = { small: 1.14, normal: 1.14, large: 1.14, xlarge: 1.3, xxlarge: 1.5 };
-      try {
-        const prefs = JSON.parse(localStorage.getItem("tourPrefs") || "{}");
-        if (fontScales[prefs.size]) {
-          document.documentElement.style.setProperty("--tour-font-scale", String(fontScales[prefs.size]));
-        }
-      } catch {}
 
-      // Apply translations
-      document.documentElement.lang = lang;
-      document.getElementById("payTitle").textContent = t.title;
-      document.getElementById("paySubtitle").textContent = t.subtitle;
-      document.getElementById("feat1").textContent = t.feat1;
-      document.getElementById("feat2").textContent = t.feat2;
-      document.getElementById("feat3").textContent = t.feat3;
-      document.getElementById("feat4").textContent = t.feat4;
-      document.getElementById("payPriceNote").textContent = t.priceNote;
-      document.getElementById("payBtnLabel").textContent = t.btn;
-      document.getElementById("paySecureLabel").textContent = t.secure;
-      document.getElementById("accessNotice").textContent = t.confirmed;
-      document.getElementById("payTerms").innerHTML = t.termsNotice;
+      // Reads localStorage and repaints every piece of text on the page. Called
+      // once below, and again on a bfcache restore (see the pageshow listener
+      // further down): a visitor can change language in Settings, then land
+      // back on this exact page via the browser's Back/Forward buttons rather
+      // than a fresh navigation. That restores the page's DOM exactly as it
+      // was, without re-running any script — so a language picked after this
+      // page was first opened would otherwise never show up here.
+      function applyPrefs() {
+        lang = getLang();
+        t = STRINGS[lang];
 
-      document.getElementById("navBackLabel").textContent = t.back;
+        try {
+          const prefs = JSON.parse(localStorage.getItem("tourPrefs") || "{}");
+          if (fontScales[prefs.size]) {
+            document.documentElement.style.setProperty("--tour-font-scale", String(fontScales[prefs.size]));
+          }
+        } catch {}
+
+        document.documentElement.lang = lang;
+        document.getElementById("payTitle").textContent = t.title;
+        document.getElementById("paySubtitle").textContent = t.subtitle;
+        document.getElementById("feat1").textContent = t.feat1;
+        document.getElementById("feat2").textContent = t.feat2;
+        document.getElementById("feat3").textContent = t.feat3;
+        document.getElementById("feat4").textContent = t.feat4;
+        document.getElementById("payPriceNote").textContent = t.priceNote;
+        document.getElementById("payBtnLabel").textContent = t.btn;
+        document.getElementById("paySecureLabel").textContent = t.secure;
+        document.getElementById("accessNotice").textContent = t.confirmed;
+        document.getElementById("payTerms").innerHTML = t.termsNotice;
+        document.getElementById("navBackLabel").textContent = t.back;
+      }
+
+      applyPrefs();
+
       document.getElementById("navBack").addEventListener("click", () => {
         window.location.href = "./pay-select.html";
       });
@@ -441,9 +454,12 @@
       // hits Back instead of completing checkout, the browser can restore this
       // exact page — spinner included — from its back/forward cache rather than
       // loading it fresh, leaving the button permanently stuck. `persisted` is
-      // only true for that cached restore.
+      // only true for that cached restore. Language prefs can also have
+      // changed while the visitor was away, so re-apply those too.
       window.addEventListener("pageshow", (e) => {
-        if (e.persisted) setLoading(false);
+        if (!e.persisted) return;
+        setLoading(false);
+        applyPrefs();
       });
     </script>
   </body>

@@ -373,34 +373,53 @@
         return "ja";
       }
 
-      const lang = getLang();
-      const t = STRINGS[lang];
+      let lang = getLang();
+      let t = STRINGS[lang];
 
       const fontScales = { small: 1.14, normal: 1.14, large: 1.14, xlarge: 1.3, xxlarge: 1.5 };
-      try {
-        const prefs = JSON.parse(localStorage.getItem("tourPrefs") || "{}");
-        if (fontScales[prefs.size]) {
-          document.documentElement.style.setProperty("--tour-font-scale", String(fontScales[prefs.size]));
-        }
-      } catch {}
 
-      document.documentElement.lang = lang;
-      document.getElementById("contactTitle").textContent = t.title;
-      document.getElementById("contactIntro").textContent = t.intro;
-      document.getElementById("labelName").textContent = t.labelName;
-      document.getElementById("labelEmail").textContent = t.labelEmail;
-      document.getElementById("labelCategory").textContent = t.labelCategory;
-      document.getElementById("optPayment").textContent = t.optPayment;
-      document.getElementById("optTechnical").textContent = t.optTechnical;
-      document.getElementById("optGeneral").textContent = t.optGeneral;
-      document.getElementById("optOther").textContent = t.optOther;
-      document.getElementById("labelMessage").textContent = t.labelMessage;
-      document.getElementById("contactMessage").placeholder = t.placeholderMessage;
-      document.getElementById("submitBtnLabel").textContent = t.submit;
-      document.getElementById("successTitle").textContent = t.successTitle;
-      document.getElementById("successBody").textContent = t.successBody;
+      // Reads localStorage and repaints every piece of text on the page. Called
+      // once below for the normal case, and again on a bfcache restore (see the
+      // pageshow listener at the bottom of this script): a visitor can change
+      // language in Settings, then land back on this exact page via the
+      // browser's Back/Forward buttons rather than a fresh click on the Contact
+      // link. That restores the page's DOM exactly as it was, without re-running
+      // any script — so a language picked after this page was first opened
+      // would otherwise never show up here.
+      function applyPrefs() {
+        lang = getLang();
+        t = STRINGS[lang];
 
-      document.getElementById("navBackLabel").textContent = t.back;
+        try {
+          const prefs = JSON.parse(localStorage.getItem("tourPrefs") || "{}");
+          if (fontScales[prefs.size]) {
+            document.documentElement.style.setProperty("--tour-font-scale", String(fontScales[prefs.size]));
+          }
+        } catch {}
+
+        document.documentElement.lang = lang;
+        document.getElementById("contactTitle").textContent = t.title;
+        document.getElementById("contactIntro").textContent = t.intro;
+        document.getElementById("labelName").textContent = t.labelName;
+        document.getElementById("labelEmail").textContent = t.labelEmail;
+        document.getElementById("labelCategory").textContent = t.labelCategory;
+        document.getElementById("optPayment").textContent = t.optPayment;
+        document.getElementById("optTechnical").textContent = t.optTechnical;
+        document.getElementById("optGeneral").textContent = t.optGeneral;
+        document.getElementById("optOther").textContent = t.optOther;
+        document.getElementById("labelMessage").textContent = t.labelMessage;
+        document.getElementById("contactMessage").placeholder = t.placeholderMessage;
+        document.getElementById("submitBtnLabel").textContent = t.submit;
+        document.getElementById("successTitle").textContent = t.successTitle;
+        document.getElementById("successBody").textContent = t.successBody;
+        document.getElementById("navBackLabel").textContent = t.back;
+      }
+
+      applyPrefs();
+      window.addEventListener("pageshow", (e) => {
+        if (e.persisted) applyPrefs();
+      });
+
       document.getElementById("navBack").addEventListener("click", () => {
         // Reachable from both the entry settings and the in-tour settings, so
         // return to whichever screen the visitor came from.

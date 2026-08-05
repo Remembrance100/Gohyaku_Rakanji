@@ -324,27 +324,42 @@
         return STRINGS[browser] ? browser : "en";
       }
 
-      const lang = getLang();
-      const t = STRINGS[lang];
+      let lang = getLang();
+      let t = STRINGS[lang];
 
       const fontScales = { small: 1.14, normal: 1.14, large: 1.14, xlarge: 1.3, xxlarge: 1.5 };
-      try {
-        const prefs = JSON.parse(localStorage.getItem("tourPrefs") || "{}");
-        if (fontScales[prefs.size]) {
-          document.documentElement.style.setProperty("--tour-font-scale", String(fontScales[prefs.size]));
-        }
-      } catch {}
 
-      document.documentElement.lang = lang;
-      document.getElementById("selTitle").textContent = t.title;
-      document.getElementById("selSubtitle").textContent = t.subtitle;
-      document.getElementById("cardName").textContent = t.cardName;
-      document.getElementById("cardSub").textContent = t.cardSub;
-      document.getElementById("paypaySubText").textContent = t.paypaySubText;
-      document.getElementById("secureLabel").textContent = t.secure;
-      document.getElementById("payTerms").innerHTML = t.termsNotice;
+      // Reads localStorage and repaints every piece of text on the page. Called
+      // once below, and again on a bfcache restore (see the pageshow listener
+      // further down): a visitor can change language in Settings, then land
+      // back on this exact page via the browser's Back/Forward buttons rather
+      // than a fresh navigation. That restores the page's DOM exactly as it
+      // was, without re-running any script — so a language picked after this
+      // page was first opened would otherwise never show up here.
+      function applyPrefs() {
+        lang = getLang();
+        t = STRINGS[lang];
 
-      document.getElementById("navBackLabel").textContent = t.back;
+        try {
+          const prefs = JSON.parse(localStorage.getItem("tourPrefs") || "{}");
+          if (fontScales[prefs.size]) {
+            document.documentElement.style.setProperty("--tour-font-scale", String(fontScales[prefs.size]));
+          }
+        } catch {}
+
+        document.documentElement.lang = lang;
+        document.getElementById("selTitle").textContent = t.title;
+        document.getElementById("selSubtitle").textContent = t.subtitle;
+        document.getElementById("cardName").textContent = t.cardName;
+        document.getElementById("cardSub").textContent = t.cardSub;
+        document.getElementById("paypaySubText").textContent = t.paypaySubText;
+        document.getElementById("secureLabel").textContent = t.secure;
+        document.getElementById("payTerms").innerHTML = t.termsNotice;
+        document.getElementById("navBackLabel").textContent = t.back;
+      }
+
+      applyPrefs();
+
       document.getElementById("navBack").addEventListener("click", () => {
         window.location.href = "./privacy.html";
       });
@@ -384,9 +399,12 @@
       // the visit even though Card still works, which reads as PayPay being
       // broken. `persisted` is true only for that cached restore, not a normal
       // load, so this can't re-enable the button while a request is genuinely
-      // in flight.
+      // in flight. Language prefs can also have changed while the visitor was
+      // away, so re-apply those too.
       window.addEventListener("pageshow", (e) => {
-        if (e.persisted) btnPaypay.disabled = false;
+        if (!e.persisted) return;
+        btnPaypay.disabled = false;
+        applyPrefs();
       });
     </script>
   </body>
