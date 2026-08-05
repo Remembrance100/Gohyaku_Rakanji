@@ -1020,8 +1020,18 @@ function sanitizeRichInlineHtml(rawHtml) {
         node.remove();
         return;
       }
+      // This function only ever renders into the stop the visitor already has
+      // open (setDetailStop -> renderRichBlocks) — never content further down
+      // a page they may not reach. `loading="lazy"` gated the fetch behind
+      // scroll intersection, so on the temple's patchy signal an image sat
+      // un-requested until it was scrolled near, then visibly popped in.
+      // Fetching eagerly starts the download the moment the stop opens;
+      // "low" priority keeps it from competing with the hero image above it.
       if (!node.getAttribute("loading")) {
-        node.setAttribute("loading", "lazy");
+        node.setAttribute("loading", "eager");
+      }
+      if (!node.getAttribute("fetchpriority")) {
+        node.setAttribute("fetchpriority", "low");
       }
 
       // Hold every candidate to the same scheme rule as src. One bad entry
@@ -2004,11 +2014,30 @@ function getActiveStopIndex() {
 }
 
 // Visitors walk the tour in order and spend a while listening at each stop, so
-// the neighbouring hero images are very likely to be needed next and there is
-// dead air to fetch them in. Warming them here turns the tap on "next" from a
-// multi-second wait on temple-grounds reception into an instant swap.
+// the neighbouring stop's images are very likely to be needed next and there
+// is dead air to fetch them in. Warming them here turns the tap on "next"
+// from a multi-second wait on temple-grounds reception into an instant swap.
 // Deliberately low priority so this never delays the image already on screen.
-const warmedHeroImages = new Set();
+//
+// This covers every image the next stop will show, not just its hero: the
+// text and transcript blocks are WordPress rich content and can carry their
+// own inline <img> tags (the priest's transcript especially), and those need
+// the same head start or the visitor just trades one pop-in for another.
+const warmedStopImages = new Set();
+
+function collectStopImageUrls(stop) {
+  const urls = [
+    (Array.isArray(stop.media) && stop.media.find(Boolean)) || stop.thumb || "",
+  ];
+  [...(stop.textBlocks || []), ...(stop.transcriptBlocks || [])].forEach(
+    (html) => {
+      for (const match of html.matchAll(/<img\b[^>]*\bsrc=["']([^"']+)["']/gi)) {
+        urls.push(match[1]);
+      }
+    },
+  );
+  return urls.filter(Boolean);
+}
 
 function warmAdjacentStopImages() {
   const activeIndex = getActiveStopIndex();
@@ -2018,15 +2047,14 @@ function warmAdjacentStopImages() {
     const stop = tourStopsData[index];
     if (!stop || stop.videoUrl) return;
 
-    const url =
-      (Array.isArray(stop.media) && stop.media.find(Boolean)) || stop.thumb || "";
-    if (!url || warmedHeroImages.has(url)) return;
-
-    warmedHeroImages.add(url);
-    const warm = new Image();
-    warm.decoding = "async";
-    warm.fetchPriority = "low";
-    warm.src = url;
+    collectStopImageUrls(stop).forEach((url) => {
+      if (warmedStopImages.has(url)) return;
+      warmedStopImages.add(url);
+      const warm = new Image();
+      warm.decoding = "async";
+      warm.fetchPriority = "low";
+      warm.src = url;
+    });
   });
 }
 
