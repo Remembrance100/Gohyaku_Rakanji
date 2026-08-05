@@ -22,3 +22,11 @@
 - PayPay `08100016` was an IP whitelist, never the code — calls relay through Kinsta Live (`161.33.186.30`)
 - `TOKEN_SECRET` is unset on Cloudflare; both providers sign tokens with `STRIPE_SECRET_KEY` via fallback
 - The contact Worker deploys separately — git push does not deploy it
+
+- When scrolled to the button and click next at stop 4 and 15 it goes to the bottom of the page instead of the top of stop 5 and 16
+
+- Also while on the page the bottom webpage shows the website name forever this takes up a lot of space so can you make it hide
+
+- Top image load time
+
+For the contact page, whwen the user clicks the certain language makes sure that the contact page reflects teh language
