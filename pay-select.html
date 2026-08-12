@@ -134,10 +134,6 @@
         background: #e0001b;
       }
 
-      .method-icon--cash {
-        background: rgba(255,255,255,0.08);
-      }
-
       .method-text {
         flex: 1;
       }
@@ -256,21 +252,6 @@
             <path d="M1 1l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
         </button>
-
-        <button class="method-btn" id="btnCash" type="button">
-          <div class="method-icon method-icon--cash">
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-              <text x="3" y="15" font-size="14" font-weight="900" font-family="Arial, sans-serif" fill="white">¥</text>
-            </svg>
-          </div>
-          <div class="method-text">
-            <span class="method-name" id="cashName">Cash</span>
-            <span class="method-sub" id="cashSub">Pay at the front desk</span>
-          </div>
-          <svg class="method-arrow" width="7" height="12" viewBox="0 0 7 12" fill="none" aria-hidden="true">
-            <path d="M1 1l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </button>
       </div>
 
       <div class="pay-error" id="payError" style="display:none"></div>
@@ -295,8 +276,6 @@
           cardName: "クレジットカード",
           cardSub: "Visa・Mastercard他（Stripe決済）",
           paypaySubText: "PayPayオンライン決済",
-          cashName: "現金",
-          cashSub: "受付にてお支払い",
           secure: "安全なチェックアウト · ¥1,000 · 24時間アクセス",
           paypayError: "PayPay決済を開始できませんでした。もう一度お試しください。",
           termsNotice: 'ご購入により、<a href="./privacy.html" target="_blank" rel="noopener">利用規約</a>（返金不可）に同意したものとみなされます。',
@@ -308,8 +287,6 @@
           cardName: "Credit Card",
           cardSub: "Visa, Mastercard & more via Stripe",
           paypaySubText: "PayPay online payment",
-          cashName: "Cash",
-          cashSub: "Pay at the front desk",
           secure: "Secure checkout · ¥1,000 · 24-hour access",
           paypayError: "Could not start PayPay checkout. Please try again.",
           termsNotice: 'By purchasing, you agree to our <a href="./privacy.html" target="_blank" rel="noopener">Terms of Service</a> (no refunds).',
@@ -321,8 +298,6 @@
           cardName: "신용카드",
           cardSub: "Visa, Mastercard 등 (Stripe 결제)",
           paypaySubText: "PayPay 온라인 결제",
-          cashName: "현금",
-          cashSub: "안내 데스크에서 결제",
           secure: "안전한 결제 · ¥1,000 · 24시간 이용",
           paypayError: "PayPay 결제를 시작할 수 없습니다. 다시 시도해 주세요.",
           termsNotice: '구매 시 <a href="./privacy.html" target="_blank" rel="noopener">이용약관</a>(환불 불가)에 동의하는 것으로 간주됩니다.',
@@ -334,8 +309,6 @@
           cardName: "信用卡",
           cardSub: "支持 Visa、Mastercard 等（Stripe 支付）",
           paypaySubText: "PayPay 在线支付",
-          cashName: "现金",
-          cashSub: "在前台付款",
           secure: "安全结账 · ¥1,000 · 24小时使用",
           paypayError: "无法启动 PayPay 支付，请重试。",
           termsNotice: '购买即表示您同意我们的<a href="./privacy.html" target="_blank" rel="noopener">服务条款</a>（不支持退款）。',
@@ -380,8 +353,6 @@
         document.getElementById("cardName").textContent = t.cardName;
         document.getElementById("cardSub").textContent = t.cardSub;
         document.getElementById("paypaySubText").textContent = t.paypaySubText;
-        document.getElementById("cashName").textContent = t.cashName;
-        document.getElementById("cashSub").textContent = t.cashSub;
         document.getElementById("secureLabel").textContent = t.secure;
         document.getElementById("payTerms").innerHTML = t.termsNotice;
         document.getElementById("navBackLabel").textContent = t.back;
@@ -395,10 +366,6 @@
 
       document.getElementById("btnCard").addEventListener("click", () => {
         window.location.href = "./pay.html";
-      });
-
-      document.getElementById("btnCash").addEventListener("click", () => {
-        window.location.href = "./cash.html";
       });
 
       const btnPaypay = document.getElementById("btnPaypay");
