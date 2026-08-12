@@ -89,6 +89,24 @@ it are HMAC-signed over `{timestamp}\n{body}` inside a 300-second window.
 `TOKEN_SECRET` never leaves Cloudflare, so a compromised relay cannot mint tour
 access on its own. Full write-up: [`wordpress/PAYPAY-RELAY.md`](wordpress/PAYPAY-RELAY.md).
 
+### Cash payments
+
+A third option next to Card and PayPay: `cash.html` tells the visitor to pay at
+the front desk, then takes a 6-digit code. The code isn't stored anywhere — both
+`functions/api/verify-cash-code.js` and `functions/api/staff-cash-code.js` derive
+it the same way, as `HMAC(CASH_CODE_SECRET, "cash-code|" + today's date in JST)`,
+so it rotates at JST midnight with nothing to update by hand. `staff-code.html`
+is how the front desk reads today's value — it's gated by `STAFF_ACCESS_KEY`, a
+passphrase shared with them out of band, kept separate from `CASH_CODE_SECRET` so
+rotating one never touches the other. Neither var is set yet; both fall back to
+`TOKEN_SECRET`/`STRIPE_SECRET_KEY` for the code secret, but `STAFF_ACCESS_KEY` has
+no fallback and must be set before `staff-code.html` will work.
+
+There's no rate limiting on `verify-cash-code` — same as the Stripe/PayPay verify
+endpoints — so a 6-digit code is brute-forceable in principle. Low risk today
+(1-in-a-million odds per guess, temple-scale traffic), but worth a KV-backed
+throttle if this ever gets attention from farther afield.
+
 ### Image sizing
 
 The tour endpoint used to return whatever WordPress stored — in practice 2560px
