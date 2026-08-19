@@ -1,0 +1,41 @@
+name = "rakanji-watchdog"
+main = "src/index.js"
+compatibility_date = "2024-09-23"
+
+# No route — this Worker is never fetched by a visitor. It wakes up on the
+# cron below, checks the site from outside, and mails only when something
+# changes state. Free plan allows 5 Cron Triggers per account; this is one.
+workers_dev = false
+
+[triggers]
+crons = ["*/5 * * * *"]
+
+# The same free Email Routing binding the contact Worker uses. Sends to a
+# verified destination address are free on every plan and don't count toward
+# any quota. destination_address locks the binding, so a bug in this Worker
+# cannot mail anyone else.
+#
+# This address MUST be verified first: Cloudflare dashboard -> Email Routing ->
+# Destination addresses -> Add, then click the link Cloudflare emails you. Until
+# that link is clicked every send fails. To point alerts elsewhere, verify that
+# address the same way and change this line and ALERT_TO below together.
+[[send_email]]
+name = "EMAIL"
+destination_address = "linusfujisawa@gmail.com"
+
+# Remembers which checks are already failing, so an outage sends one email
+# rather than one every five minutes. Create it once with:
+#   npx wrangler kv namespace create WATCHDOG_STATE
+# then paste the printed id here.
+[[kv_namespaces]]
+binding = "STATE"
+id = "3faa7784d01840f1aaeab1da45a3721f"
+
+[vars]
+ALERT_FROM = "contact@rakanji.org"
+ALERT_TO = "linusfujisawa@gmail.com"
+
+# Free on the Workers Free plan: 200k events/day, 3-day retention. Makes every
+# console.log here searchable in the dashboard when an alert needs explaining.
+[observability]
+enabled = true

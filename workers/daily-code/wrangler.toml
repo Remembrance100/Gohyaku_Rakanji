@@ -1,0 +1,30 @@
+name = "rakanji-daily-code"
+main = "src/index.js"
+compatibility_date = "2024-09-23"
+
+# No route — nothing fetches this. It wakes on the cron, asks the site for
+# today's code, and mails it.
+workers_dev = false
+
+# 23:00 UTC = 08:00 JST, an hour before the temple opens. Crons are always UTC.
+# The code rotates at JST midnight, so any morning slot already has that day's
+# value. Free plan allows 5 Cron Triggers per account; with the watchdog this
+# is the second.
+[triggers]
+crons = ["0 23 * * *"]
+
+# Both addresses below are already verified Email Routing destinations, so
+# switching CODE_TO between them needs no dashboard work.
+[[send_email]]
+name = "EMAIL"
+allowed_destination_addresses = ["linusfujisawa@gmail.com", "500@rakan.or.jp"]
+
+[vars]
+CODE_FROM = "contact@rakanji.org"
+
+# CURRENTLY POINTED AT THE DEVELOPER FOR TESTING.
+# Change to "500@rakan.or.jp" to put it in front of the actual front desk.
+CODE_TO = "linusfujisawa@gmail.com"
+
+[observability]
+enabled = true
