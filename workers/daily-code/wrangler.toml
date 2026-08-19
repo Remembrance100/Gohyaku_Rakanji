@@ -20,6 +20,22 @@ name = "EMAIL"
 allowed_destination_addresses = ["linusfujisawa@gmail.com", "500@rakan.or.jp"]
 
 [vars]
+# ─────────────────────────────────────────────────────────────────────────
+#  MASTER SWITCH — currently OFF
+#
+#  The Cash option is hidden in pay-select.html (commit f21249c), so visitors
+#  cannot enter the code yet and there is no reason to mail it to anyone.
+#
+#  TO TURN THE DAILY EMAIL ON:
+#     1. change "false" to "true" on the line below
+#     2. npx wrangler deploy
+#
+#  That is the entire procedure. The cron stays registered either way, so
+#  nothing else needs re-creating. While this is "false" the 08:00 JST run
+#  wakes up, logs that it skipped, and sends nothing.
+# ─────────────────────────────────────────────────────────────────────────
+ENABLED = "false"
+
 CODE_FROM = "contact@rakanji.org"
 
 # CURRENTLY POINTED AT THE DEVELOPER FOR TESTING.

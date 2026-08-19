@@ -137,6 +137,15 @@ async function run(env) {
 
 export default {
   async scheduled(controller, env, ctx) {
+    // Master switch, set in wrangler.toml. Off while the Cash option is hidden
+    // in pay-select.html — the code is unusable by visitors, so mailing it to
+    // the front desk every morning would just be noise. The cron stays
+    // registered so turning this back on is a one-line change plus a deploy.
+    if (env.ENABLED !== "true") {
+      console.log('daily-code: skipped, ENABLED is not "true" in wrangler.toml');
+      return;
+    }
+
     ctx.waitUntil(
       run(env).then((summary) => {
         console.log(
@@ -158,6 +167,8 @@ export default {
       return new Response("Not found", { status: 404 });
     }
 
-    return Response.json(await run(env));
+    // Deliberately ignores ENABLED. The switch exists to stop the unattended
+    // 08:00 run, not to block a human deliberately testing the thing.
+    return Response.json({ ...(await run(env)), enabled: env.ENABLED === "true" });
   },
 };
