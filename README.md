@@ -48,14 +48,21 @@ functions/                       # Cloudflare Pages Functions (serverless API)
   _lib/
     access-token.js              # Issues the 24h HMAC-signed access token
     paypay-relay.js              # Signed calls to the PayPay relay
+    cash-code.js                 # Derives the daily cash code (HMAC of the JST date)
   api/
     create-checkout.js           # Starts a Stripe Checkout session
     verify-session.js            # Verifies a Stripe session, issues the token
     create-paypay-payment.js     # Starts a PayPay payment via the relay
     verify-paypay-payment.js     # Verifies a PayPay payment, issues the token
-workers/
-  contact/                       # Standalone Worker — deploys separately
-    src/index.js                 # Contact form → email, Email Routing binding
+    verify-cash-code.js          # Checks a front-desk code, issues the token
+    staff-cash-code.js           # Returns today's code to the front desk
+  img/
+    [[path]].js                  # Same-origin proxy for tour images
+workers/                         # Standalone Workers — each deploys separately
+  contact/                       # Contact form → email, Email Routing binding
+  daily-code/                    # Emails the front desk the day's cash code
+  watchdog/                      # Probes the live site, emails when it breaks
+  _shared/mime.js                # Email message helpers shared by the Workers
 wordpress/                       # Code that runs on the WordPress backend
   memorial-tour-endpoint.php     # The /memorial/v1/tour REST endpoint
   paypay-relay.php               # PayPay relay (fixed, whitelisted egress IP)
@@ -136,4 +143,4 @@ Setup it depends on (Cloudflare dashboard → Email Routing, zone `rakanji.org`)
 `contact@rakanji.org` as a custom address, and `500@rakan.or.jp` added _and
 verified_ as a destination address.
 
-:; gohyakurakanji
+Free Code for the tour entry Stripe: gohyakurakanji
