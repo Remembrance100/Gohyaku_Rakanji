@@ -159,4 +159,4 @@ Setup it depends on (Cloudflare dashboard → Email Routing, zone `rakanji.org`)
 verified_ as a destination address.
 
 Free Code for the tour entry Stripe/code for daily code admin: gohyakurakanji
-c
+link: https://tour.rakanji.org/staff-code
