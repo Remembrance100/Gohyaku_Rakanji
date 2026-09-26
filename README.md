@@ -157,6 +157,3 @@ cd workers/contact && npx wrangler deploy
 Setup it depends on (Cloudflare dashboard → Email Routing, zone `rakanji.org`):
 `contact@rakanji.org` as a custom address, and `500@rakan.or.jp` added _and
 verified_ as a destination address.
-
-Free Code for the tour entry Stripe/code for daily code admin: gohyakurakanji
-link: https://tour.rakanji.org/staff-code

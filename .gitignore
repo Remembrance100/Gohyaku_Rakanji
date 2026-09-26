@@ -5,6 +5,9 @@
 .dev.vars
 .env
 
+# Private operating notes: passphrases, promo codes, internal links. Local only.
+private-notes.md
+
 # Wrangler / Cloudflare local build cache & state
 .wrangler/
 
