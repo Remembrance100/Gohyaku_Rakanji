@@ -20,6 +20,7 @@ A paid, multi-language interactive audio tour guide for [天恩山五百羅漢�
 - **Headless CMS integration**: content (stop titles, descriptions, images, audio) is authored by temple staff in a WordPress + ACF backend and pulled into the frontend through a custom REST API, so the app never hardcodes content
 - **Multi-language i18n**: full UI and tour content in Japanese, English, Korean, and Chinese
 - **Signed, stateless auth**: a custom HMAC-SHA256 token scheme gates 24-hour access after payment, verified without any server-side session store
+- **Free preview**: stops 1–3 open for anyone, before any payment, and going past them leads to the paywall
 - **Two payment providers**: Stripe Checkout for cards, PayPay for Japan's dominant QR wallet, both issuing the same access token
 - **Built for weak reception**: the tour runs on temple grounds where signal is poor, so image payload was cut 154MB → 73MB and the next stop preloads while the visitor is listening
 - **Serverless throughout**: static frontend and API routes both deployed as Cloudflare Pages Functions, no origin server to manage
@@ -96,6 +97,20 @@ it are HMAC-signed over `{timestamp}\n{body}` inside a 300-second window.
 `TOKEN_SECRET` never leaves Cloudflare, so a compromised relay cannot mint tour
 access on its own. Full write-up: [`wordpress/PAYPAY-RELAY.md`](wordpress/PAYPAY-RELAY.md).
 
+### Free preview
+
+Visitors can try the app before paying. Settings → entry screen → `tour.html`
+works without an access token, in a preview mode: stops 1–3 open normally, and
+anything past them — a map pin, the stop picker, the Next arrow on stop 3, End
+Tour — opens a paywall that sends the visitor to `privacy.html` and on to
+payment. Locked pins and picker rows are greyed out so it's clear where the
+preview ends. Anyone holding a valid token (paid, or a cash code) gets the whole
+tour as before.
+
+The limit is `PREVIEW_STOP_LIMIT` in `assets/js/script.js`. It's enforced in the
+browser only, like the access gate it replaced, and the tour JSON is a public
+WordPress endpoint anyway — so it's a nudge toward paying, not a lock.
+
 ### Cash payments
 
 A third option next to Card and PayPay: `cash.html` tells the visitor to pay at
@@ -143,4 +158,5 @@ Setup it depends on (Cloudflare dashboard → Email Routing, zone `rakanji.org`)
 `contact@rakanji.org` as a custom address, and `500@rakan.or.jp` added _and
 verified_ as a destination address.
 
-Free Code for the tour entry Stripe: gohyakurakanji
+Free Code for the tour entry Stripe/code for daily code admin: gohyakurakanji
+c

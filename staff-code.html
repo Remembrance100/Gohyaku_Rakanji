@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#08080c" />
     <meta name="robots" content="noindex, nofollow" />
-    <title>Front Desk · Today's Cash Code</title>
+    <title>受付用｜本日のアクセスコード</title>
     <style>
       *, *::before, *::after { box-sizing: border-box; }
 
@@ -131,28 +131,56 @@
       const dateValue = document.getElementById("dateValue");
       const refreshBtn = document.getElementById("refreshBtn");
 
+      const MESSAGES = {
+        wrongKey: "パスフレーズが違います。",
+        failed: "コードを取得できませんでした。通信状況をご確認のうえ、もう一度お試しください。",
+      };
+
+      // The API sends the date as YYYY-MM-DD (JST). Build it in UTC and format
+      // it in UTC so the day can't shift with the device's own time zone.
+      function formatDate(isoDate) {
+        const [y, m, d] = String(isoDate).split("-").map(Number);
+        if (!y || !m || !d) return String(isoDate || "");
+        return new Date(Date.UTC(y, m - 1, d)).toLocaleDateString("ja-JP", {
+          timeZone: "UTC",
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+          weekday: "short",
+        });
+      }
+
+      // Resolves to { data } on success, or { status } on failure (status 0 =
+      // the request never got an answer), so the caller can tell a wrong
+      // passphrase (401) from everything else.
       async function fetchCode(key) {
-        const res = await fetch("/api/staff-cash-code?key=" + encodeURIComponent(key));
-        if (!res.ok) return null;
-        return res.json();
+        try {
+          const res = await fetch("/api/staff-cash-code?key=" + encodeURIComponent(key));
+          if (!res.ok) return { status: res.status };
+          return { data: await res.json() };
+        } catch {
+          return { status: 0 };
+        }
       }
 
       async function tryUnlock(key) {
         unlockBtn.disabled = true;
         gateError.classList.remove("is-visible");
 
-        const data = await fetchCode(key);
+        const { data, status } = await fetchCode(key);
 
         unlockBtn.disabled = false;
 
         if (!data || !data.code) {
+          if (status === 401) sessionStorage.removeItem(STAFF_KEY_STORAGE);
+          gateError.textContent = status === 401 ? MESSAGES.wrongKey : MESSAGES.failed;
           gateError.classList.add("is-visible");
           return;
         }
 
         sessionStorage.setItem(STAFF_KEY_STORAGE, key);
         codeValue.textContent = data.code;
-        dateValue.textContent = data.date;
+        dateValue.textContent = formatDate(data.date);
         gate.style.display = "none";
         codeDisplay.style.display = "flex";
       }
@@ -170,10 +198,10 @@
       refreshBtn.addEventListener("click", async () => {
         const key = sessionStorage.getItem(STAFF_KEY_STORAGE);
         if (!key) return;
-        const data = await fetchCode(key);
+        const { data } = await fetchCode(key);
         if (data && data.code) {
           codeValue.textContent = data.code;
-          dateValue.textContent = data.date;
+          dateValue.textContent = formatDate(data.date);
         }
       });
 

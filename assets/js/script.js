@@ -70,6 +70,11 @@ const omamoriMsgScrub = document.querySelector("#omamoriMsgScrub");
 const omamoriMsgScrubFill = document.querySelector("#omamoriMsgScrubFill");
 const omamoriMsgScrubKnob = document.querySelector("#omamoriMsgScrubKnob");
 const mapEndBtn = document.querySelector("#mapEndBtn");
+const paywallModal = document.querySelector("#paywallModal");
+const paywallTitle = document.querySelector("#paywallTitle");
+const paywallText = document.querySelector("#paywallText");
+const paywallUnlockBtn = document.querySelector("#paywallUnlockBtn");
+const paywallKeepBtn = document.querySelector("#paywallKeepBtn");
 const omamoriBgModal = document.querySelector("#omamoriBgModal");
 const omamoriBgModalClose = document.querySelector("#omamoriBgModalClose");
 const omamoriBgModalTitle = document.querySelector("#omamoriBgModalTitle");
@@ -151,6 +156,73 @@ function getTourStops(stops = []) {
     return stops;
   }
   return stops.filter((stop) => stop.id !== introStop.id);
+}
+
+// ─── Free preview ────────────────────────────────────────────
+//
+// tour.html lets visitors in without a token. Until they have one they can open
+// stops 1..PREVIEW_STOP_LIMIT and get a feel for the app; anything past that
+// opens the paywall, which sends them on to payment. It's a client-side limit,
+// the same as the access gate it replaces — the tour JSON is public either way.
+const PREVIEW_STOP_LIMIT = 3;
+
+function hasValidAccessToken() {
+  try {
+    const expiry = parseInt(localStorage.getItem("tourAccessExpiry") || "0", 10);
+    return Boolean(localStorage.getItem("tourAccessToken")) && expiry > Date.now();
+  } catch {
+    return false;
+  }
+}
+
+// A number that doesn't parse counts as locked, so a stop can't slip past the
+// limit because of an oddly-formed number.
+function isStopLocked(stop) {
+  if (hasValidAccessToken()) return false;
+  const n = parseInt(stop?.number, 10);
+  return !(n >= 1 && n <= PREVIEW_STOP_LIMIT);
+}
+
+const PAYWALL_STRINGS = {
+  ja: {
+    title: "無料プレビューはここまでです",
+    text: "スポット1〜{n}は無料でお楽しみいただけます。続きのスポットは、24時間アクセスをご購入のうえご利用ください。",
+    unlock: "全スポットを開く",
+    keep: "プレビューに戻る",
+  },
+  en: {
+    title: "That's the end of the free preview",
+    text: "Stops 1–{n} are free to explore. Unlock 24-hour access to continue with the rest of the tour.",
+    unlock: "Unlock the full tour",
+    keep: "Back to preview",
+  },
+  ko: {
+    title: "무료 미리보기는 여기까지입니다",
+    text: "스팟 1~{n}은 무료로 이용하실 수 있습니다. 나머지 스팟은 24시간 이용권을 구매하신 후 이용해 주세요.",
+    unlock: "전체 투어 잠금 해제",
+    keep: "미리보기로 돌아가기",
+  },
+  zh: {
+    title: "免费试听到此结束",
+    text: "景点 1–{n} 可免费体验。购买 24 小时使用权后，即可继续收听其余景点。",
+    unlock: "解锁完整导览",
+    keep: "返回试听",
+  },
+};
+
+function openPaywall() {
+  if (!paywallModal) return;
+  const t = PAYWALL_STRINGS[getLangKey()] || PAYWALL_STRINGS.ja;
+  paywallTitle.textContent = t.title;
+  paywallText.textContent = t.text.replace("{n}", PREVIEW_STOP_LIMIT);
+  paywallUnlockBtn.textContent = t.unlock;
+  paywallKeepBtn.textContent = t.keep;
+  paywallModal.classList.remove("hidden");
+  paywallUnlockBtn.focus();
+}
+
+function closePaywall() {
+  paywallModal?.classList.add("hidden");
 }
 
 const fallbackStops = [
@@ -1694,6 +1766,7 @@ function renderMapPins(stops) {
     btn.textContent = stop.number;
     btn.setAttribute("aria-label", `Stop ${stop.number}: ${stop.title}`);
     btn.dataset.stopId = stop.id;
+    btn.classList.toggle("is-locked", isStopLocked(stop));
     btn.style.left = `${pos[0]}%`;
     btn.style.top = `${pos[1]}%`;
 
@@ -2184,6 +2257,10 @@ function openAdjacentStop(step) {
   }
   const targetStop = tourStopsData[activeIndex + step];
   if (!targetStop) return;
+  if (isStopLocked(targetStop)) {
+    openPaywall();
+    return;
+  }
   setDetailStop(targetStop);
   resetDetailScroll();
 }
@@ -2208,6 +2285,12 @@ function resetDetailScroll() {
 
 function openOmamoriMessage() {
   if (!omamoriMessageScreen) return;
+  // The closing message is the finale of the full tour, so "End Tour" during
+  // the free preview goes to the paywall instead.
+  if (!hasValidAccessToken()) {
+    openPaywall();
+    return;
+  }
   omamoriMessageScreen.classList.add("is-open");
   omamoriMessageScreen.setAttribute("aria-hidden", "false");
   omamoriMessageScreen.scrollTo({ top: 0 });
@@ -2453,6 +2536,10 @@ function reloadMsgPlayerForLang() {
 function openDetailById(stopId) {
   const stop = tourStopsData.find((item) => item.id === stopId);
   if (!stop) return;
+  if (isStopLocked(stop)) {
+    openPaywall();
+    return;
+  }
   setDetailStop(stop);
   appShell.classList.add("is-detail");
   resetDetailScroll();
@@ -2800,6 +2887,8 @@ function buildStopPicker() {
     btn.type = "button";
     btn.className = "stop-picker-item";
     btn.dataset.stopId = stop.id;
+    const locked = isStopLocked(stop);
+    btn.classList.toggle("is-locked", locked);
 
     const numSpan = document.createElement("span");
     numSpan.className = "stop-picker-num";
@@ -2811,6 +2900,13 @@ function buildStopPicker() {
 
     btn.appendChild(numSpan);
     btn.appendChild(titleSpan);
+
+    if (locked) {
+      btn.insertAdjacentHTML(
+        "beforeend",
+        `<svg class="stop-picker-lock" width="14" height="16" viewBox="0 0 14 16" fill="none" aria-hidden="true"><rect x="1.5" y="6.5" width="11" height="8" rx="1.8" stroke="currentColor" stroke-width="1.5"/><path d="M4 6.5V4.6a3 3 0 016 0v1.9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>`,
+      );
+    }
 
     btn.addEventListener("click", () => {
       closeStopPicker();
@@ -2837,6 +2933,13 @@ function closeStopPicker() {
 
 function bindEvents() {
   backButton?.addEventListener("click", closeDetail);
+  paywallUnlockBtn?.addEventListener("click", () => {
+    window.location.href = "./privacy.html";
+  });
+  paywallKeepBtn?.addEventListener("click", closePaywall);
+  paywallModal?.addEventListener("click", (e) => {
+    if (e.target === paywallModal) closePaywall();
+  });
   mapPreviewClose?.addEventListener("click", closeMapPreview);
   termModalClose?.addEventListener("click", closeTermModal);
 

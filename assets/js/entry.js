@@ -881,12 +881,10 @@ function initSettings(onLangChange) {
   }
 
   confirmBtn?.addEventListener("click", () => {
-    savePrefs({ lang: selectedLang, size: selectedSize });
-    if (hasValidAccessToken()) {
-      hideSettings();
-    } else {
-      window.location.href = "./privacy.html";
-    }
+    // Everyone continues to the entry screen and on into the tour. Without a
+    // token the tour is the free preview (stops 1–3), which sends the visitor
+    // to payment when they go past it, so there's no paywall here any more.
+    hideSettings();
   });
 
   // Re-open from gear icon
@@ -897,8 +895,7 @@ function initSettings(onLangChange) {
   });
 
   // Skip settings if returning from payment (user already set prefs before paying).
-  // Requires an actual valid token — `?skip_settings=1` alone must not be able
-  // to bypass the paywall by itself, since Welcome is now gated behind payment.
+  // Only honoured with a valid token, since that's the one case it's meant for.
   const skipSettings = new URLSearchParams(window.location.search).get("skip_settings") === "1";
   if (skipSettings) history.replaceState(null, "", window.location.pathname);
   if (skipSettings && hasValidAccessToken()) {
