@@ -183,38 +183,44 @@ function isStopLocked(stop) {
   return !(n >= 1 && n <= PREVIEW_STOP_LIMIT);
 }
 
+// {n} = PREVIEW_STOP_LIMIT, {remaining} = however many stops are left past it —
+// computed from the live tour data in openPaywall(), not hardcoded, so this
+// stays correct if WordPress ever adds or removes a stop.
 const PAYWALL_STRINGS = {
   ja: {
-    title: "無料プレビューはここまでです",
-    text: "スポット1〜{n}は無料でお楽しみいただけます。続きのスポットは、24時間アクセスをご購入のうえご利用ください。",
-    unlock: "全スポットを開く",
-    keep: "プレビューに戻る",
+    title: "この先には、まだ見ぬ物語があります",
+    text: "スポット1〜{n}をご覧いただきました。残る{remaining}体の羅漢像にも、それぞれの物語と音声ガイドが待っています。¥1,000で24時間、全スポットをお楽しみいただけます。",
+    unlock: "続きを解放する（¥1,000）",
+    keep: "プレビューを続ける",
   },
   en: {
-    title: "That's the end of the free preview",
-    text: "Stops 1–{n} are free to explore. Unlock 24-hour access to continue with the rest of the tour.",
-    unlock: "Unlock the full tour",
-    keep: "Back to preview",
+    title: "Ready to see where the story goes?",
+    text: "You've explored stops 1–{n}. {remaining} more are waiting, each with its own story, carving and audio guide. Unlock the full 24-hour tour for ¥1,000.",
+    unlock: "Unlock the full tour — ¥1,000",
+    keep: "Keep exploring the preview",
   },
   ko: {
-    title: "무료 미리보기는 여기까지입니다",
-    text: "스팟 1~{n}은 무료로 이용하실 수 있습니다. 나머지 스팟은 24시간 이용권을 구매하신 후 이용해 주세요.",
-    unlock: "전체 투어 잠금 해제",
-    keep: "미리보기로 돌아가기",
+    title: "이야기는 아직 끝나지 않았습니다",
+    text: "스팟 1~{n}을 둘러보셨습니다. 아직 {remaining}개의 스팟에 저마다의 이야기와 음성 가이드가 기다리고 있습니다. ¥1,000으로 24시간 전체 투어를 이용하실 수 있습니다.",
+    unlock: "전체 투어 잠금 해제 (¥1,000)",
+    keep: "미리보기 계속 보기",
   },
   zh: {
-    title: "免费试听到此结束",
-    text: "景点 1–{n} 可免费体验。购买 24 小时使用权后，即可继续收听其余景点。",
-    unlock: "解锁完整导览",
-    keep: "返回试听",
+    title: "故事还在继续",
+    text: "您已体验景点 1–{n}。还有 {remaining} 个景点，各自藏着独特的故事与语音导览，等待您的探索。¥1,000 即可解锁 24 小时完整导览。",
+    unlock: "解锁完整导览（¥1,000）",
+    keep: "继续试听",
   },
 };
 
 function openPaywall() {
   if (!paywallModal) return;
   const t = PAYWALL_STRINGS[getLangKey()] || PAYWALL_STRINGS.ja;
+  const remaining = Math.max(tourStopsData.length - PREVIEW_STOP_LIMIT, 0);
   paywallTitle.textContent = t.title;
-  paywallText.textContent = t.text.replace("{n}", PREVIEW_STOP_LIMIT);
+  paywallText.textContent = t.text
+    .replace("{n}", PREVIEW_STOP_LIMIT)
+    .replace("{remaining}", remaining);
   paywallUnlockBtn.textContent = t.unlock;
   paywallKeepBtn.textContent = t.keep;
   paywallModal.classList.remove("hidden");
