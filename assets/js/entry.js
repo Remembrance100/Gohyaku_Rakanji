@@ -16,6 +16,14 @@ const entryGuideTrack = document.querySelector("#entryGuideTrack");
 const entryGuideDots = document.querySelector("#entryGuideDots");
 const entryStartBtn = document.querySelector("#entryStartBtn");
 
+// index.html (the on-site/QR link) and demo.html share this file. The only
+// difference between them is where "Start" goes: index.html sends straight to
+// payment, same as before the free preview existed; demo.html sends into
+// tour.html's preview so it can be shared without paying. Missing or unknown
+// values default to "paid" so a page that forgets the attribute doesn't
+// accidentally hand out a free preview.
+const ENTRY_FLOW = document.body.dataset.flow === "demo" ? "demo" : "paid";
+
 const fallbackStopZero = {
   number: "0",
   title:
@@ -910,6 +918,13 @@ function initSettings(onLangChange) {
 function bindEvents() {
   entryStartBtn?.addEventListener("click", () => {
     entryVideo?.pause();
+    if (ENTRY_FLOW !== "demo") {
+      // Pay-first flow: straight to the terms/payment path, same as before
+      // the free preview existed. privacy.html reads the saved language out
+      // of localStorage itself, same as pay-select.html does.
+      window.location.href = "./privacy.html";
+      return;
+    }
     const prefs = loadPrefs();
     const lang = prefs.lang || "ja";
     const targetUrl = new URL("./tour.html", window.location.href);

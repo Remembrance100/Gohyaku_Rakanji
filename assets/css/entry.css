@@ -93,6 +93,26 @@ body {
   background: #111;
 }
 
+/* Demo-only banner — see demo.html. Scoped by body[data-flow="demo"], so
+   index.html (data-flow="paid") never shows it. */
+.demo-banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 60;
+  text-align: center;
+  font: 700 0.78rem "Manrope", sans-serif;
+  letter-spacing: 0.04em;
+  color: #fff;
+  background: linear-gradient(135deg, #f6515f, #db3f4c);
+  padding: 0.45rem 0.6rem;
+}
+
+body[data-flow="demo"] .entry-shell {
+  padding-top: 2.1rem;
+}
+
 .entry-video {
   display: block;
   width: 100%;

@@ -1,5 +1,8 @@
 <!doctype html>
-<!-- Entry page: language/font settings plus the intro experience before the tour starts. -->
+<!-- Demo entry page: identical to index.html, except Start leads into tour.html's
+     free preview (stops 1-3) instead of straight to payment. See entry.js's
+     ENTRY_FLOW. Meant for sharing so people can get a feel of the app without
+     paying — index.html (the on-site/QR link) is the real, pay-first entry. -->
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -7,7 +10,8 @@
     <meta name="theme-color" content="#08080c" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
-    <title>Tour Entry · Stop 0</title>
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Tour Demo · Stop 0</title>
     <script>
       if ("serviceWorker" in navigator) {
         window.addEventListener("load", () => {
@@ -40,7 +44,9 @@
     />
     <link rel="stylesheet" href="./assets/css/entry.css?v=20260802a" />
   </head>
-  <body data-flow="paid">
+  <body data-flow="demo">
+    <div class="demo-banner" aria-hidden="true">DEMO — 無料プレビュー / Free preview, not the live paid tour</div>
+
     <!-- Settings screen (shown first) -->
     <div
       id="settingsScreen"
