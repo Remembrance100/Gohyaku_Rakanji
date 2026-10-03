@@ -708,7 +708,7 @@ const TRANSLATIONS = {
     "confirm-btn": "Start Tour",
     "contact-btn": "Contact Us",
     "start-btn": "Guide Map",
-    "demo-banner": "DEMO — Free preview, not the live paid tour",
+    "demo-banner": "Contains pay to view content",
   },
   ja: {
     "audio-on": "音声オン",
@@ -731,7 +731,7 @@ const TRANSLATIONS = {
     "confirm-btn": "ガイド開始",
     "contact-btn": "お問い合わせ",
     "start-btn": "ガイドマップ",
-    "demo-banner": "デモ版｜無料プレビューです（実際の有料ツアーではありません）",
+    "demo-banner": "一部有料コンテンツを含みます",
   },
   ko: {
     "audio-on": "음성 켜기",
@@ -754,7 +754,7 @@ const TRANSLATIONS = {
     "confirm-btn": "가이드 시작",
     "contact-btn": "문의하기",
     "start-btn": "가이드 맵",
-    "demo-banner": "데모 버전｜무료 미리보기입니다 (실제 유료 투어가 아닙니다)",
+    "demo-banner": "일부 유료 시청 콘텐츠가 포함되어 있습니다",
   },
   zh: {
     "audio-on": "开启音频",
@@ -777,7 +777,7 @@ const TRANSLATIONS = {
     "confirm-btn": "开始导览",
     "contact-btn": "联系我们",
     "start-btn": "导览地图",
-    "demo-banner": "演示版｜这是免费试听，并非正式付费导览",
+    "demo-banner": "包含部分付费观看内容",
   },
 };
 
