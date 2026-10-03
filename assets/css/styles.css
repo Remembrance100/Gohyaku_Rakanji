@@ -49,6 +49,22 @@ body {
     );
 }
 
+/* Shown only in free-preview mode (see demoBanner in script.js) — a normal
+   flex child of body, so it just pushes the header/app-shell down rather than
+   needing fixed positioning + offset math. [hidden] already means display:none. */
+.demo-banner {
+  width: min(100%, 560px);
+  text-align: center;
+  font:
+    700 0.78rem "Manrope",
+    sans-serif;
+  letter-spacing: 0.04em;
+  color: #fff;
+  background: linear-gradient(135deg, #f6515f, #db3f4c);
+  padding: 0.5rem 0.9rem;
+  border-radius: 10px;
+}
+
 /* ─── Site header & footer ─────────────────────────────────── */
 
 .site-header,
@@ -656,7 +672,15 @@ body {
   display: grid;
   place-items: center;
   padding: 0.6rem;
-  background: rgba(0, 0, 0, 0.75);
+  background: rgba(0, 0, 0, 0.9);
+  /* At the old 0.75 opacity, bright elements behind the modal (the white audio
+     play icon especially) still read clearly through the backdrop while dimmer
+     gray text nearly vanished — inconsistent and messy-looking on a phone. The
+     blur hides shapes/icons outright instead of just darkening them, so what's
+     behind no longer competes with the modal itself. Still correctly blocks
+     clicks either way — this is a paint-only change. */
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   overflow-y: auto;
 }
 

@@ -3,6 +3,7 @@ const DATA_URL =
   "https://stg-apirakanjicom-stgrakanji.kinsta.cloud/?rest_route=/memorial/v1/tour";
 
 const appShell = document.querySelector("#appShell");
+const demoBanner = document.querySelector("#demoBanner");
 const appLoadingOverlay = document.querySelector("#appLoadingOverlay");
 const mapPins = document.querySelector("#mapPins");
 const mapImage = document.querySelector("#mapImage");
@@ -183,32 +184,33 @@ function isStopLocked(stop) {
   return !(n >= 1 && n <= PREVIEW_STOP_LIMIT);
 }
 
-// {n} = PREVIEW_STOP_LIMIT, {remaining} = however many stops are left past it —
-// computed from the live tour data in openPaywall(), not hardcoded, so this
-// stays correct if WordPress ever adds or removes a stop.
+// {n} = PREVIEW_STOP_LIMIT, {remaining} = however many stops are left past it,
+// {total} = the full stop count — all computed from the live tour data in
+// openPaywall(), not hardcoded, so this stays correct if WordPress ever adds
+// or removes a stop.
 const PAYWALL_STRINGS = {
   ja: {
-    title: "この先には、まだ見ぬ物語があります",
-    text: "スポット1〜{n}をご覧いただきました。残る{remaining}体の羅漢像にも、それぞれの物語と音声ガイドが待っています。¥1,000で24時間、全スポットをお楽しみいただけます。",
-    unlock: "続きを解放する（¥1,000）",
-    keep: "プレビューを続ける",
+    title: "この先には、羅漢寺の歴史とさらなる物語が待っています",
+    text: "{n}つのスポットをご覧いただきました。残る{remaining}のスポットでは、羅漢像とその背景にある羅漢寺全体の歴史にまつわる、それぞれの物語をお楽しみいただけます。500円で24時間、全{total}スポットすべてのガイドをご覧いただけます。",
+    unlock: "残りのガイドを見る（500円）",
+    keep: "プレビューに戻る",
   },
   en: {
     title: "Ready to see where the story goes?",
-    text: "You've explored stops 1–{n}. {remaining} more are waiting, each with its own story, carving and audio guide. Unlock the full 24-hour tour for ¥1,000.",
-    unlock: "Unlock the full tour — ¥1,000",
+    text: "You've explored stops 1–{n}. {remaining} more are waiting, each with its own story, carving and audio guide. Unlock the full 24-hour tour for ¥500.",
+    unlock: "Unlock the full tour — ¥500",
     keep: "Keep exploring the preview",
   },
   ko: {
     title: "이야기는 아직 끝나지 않았습니다",
-    text: "스팟 1~{n}을 둘러보셨습니다. 아직 {remaining}개의 스팟에 저마다의 이야기와 음성 가이드가 기다리고 있습니다. ¥1,000으로 24시간 전체 투어를 이용하실 수 있습니다.",
-    unlock: "전체 투어 잠금 해제 (¥1,000)",
+    text: "스팟 1~{n}을 둘러보셨습니다. 아직 {remaining}개의 스팟에 저마다의 이야기와 음성 가이드가 기다리고 있습니다. ¥500으로 24시간 전체 투어를 이용하실 수 있습니다.",
+    unlock: "전체 투어 잠금 해제 (¥500)",
     keep: "미리보기 계속 보기",
   },
   zh: {
     title: "故事还在继续",
-    text: "您已体验景点 1–{n}。还有 {remaining} 个景点，各自藏着独特的故事与语音导览，等待您的探索。¥1,000 即可解锁 24 小时完整导览。",
-    unlock: "解锁完整导览（¥1,000）",
+    text: "您已体验景点 1–{n}。还有 {remaining} 个景点，各自藏着独特的故事与语音导览，等待您的探索。¥500 即可解锁 24 小时完整导览。",
+    unlock: "解锁完整导览（¥500）",
     keep: "继续试听",
   },
 };
@@ -216,11 +218,13 @@ const PAYWALL_STRINGS = {
 function openPaywall() {
   if (!paywallModal) return;
   const t = PAYWALL_STRINGS[getLangKey()] || PAYWALL_STRINGS.ja;
-  const remaining = Math.max(tourStopsData.length - PREVIEW_STOP_LIMIT, 0);
+  const total = tourStopsData.length;
+  const remaining = Math.max(total - PREVIEW_STOP_LIMIT, 0);
   paywallTitle.textContent = t.title;
   paywallText.textContent = t.text
     .replace("{n}", PREVIEW_STOP_LIMIT)
-    .replace("{remaining}", remaining);
+    .replace("{remaining}", remaining)
+    .replace("{total}", total);
   paywallUnlockBtn.textContent = t.unlock;
   paywallKeepBtn.textContent = t.keep;
   paywallModal.classList.remove("hidden");
@@ -641,6 +645,7 @@ const UI_STRINGS = {
     "highlight-label": "ハイライト",
     "audio-guide-heading": "音声ガイド",
     "all-stops-heading": "全スポット",
+    "demo-banner": "デモ版｜無料プレビューです（実際の有料ツアーではありません）",
     "map-end-btn": "ガイド終了",
     "omamori-priest-role": "住職より",
     "omamori-priest-quote": "「本日はご参拝いただき、誠にありがとうございます。この地に眠る御霊が、皆様の歩みをいつまでも見守っておられます。どうかお守りを携え、健やかな日々をお過ごしください。」",
@@ -712,6 +717,7 @@ const UI_STRINGS = {
     "highlight-label": "Highlights",
     "audio-guide-heading": "Audio Guide",
     "all-stops-heading": "All Stops",
+    "demo-banner": "DEMO — Free preview, not the live paid tour",
     "map-end-btn": "End Tour",
     "omamori-priest-role": "From the Head Priest",
     "omamori-priest-quote": "\"Thank you for visiting today. May the souls resting here watch over your journey always. Please carry this omamori with you and live each day in good health.\"",
@@ -783,6 +789,7 @@ const UI_STRINGS = {
     "highlight-label": "하이라이트",
     "audio-guide-heading": "오디오 가이드",
     "all-stops-heading": "전체 스팟",
+    "demo-banner": "데모 버전｜무료 미리보기입니다 (실제 유료 투어가 아닙니다)",
     "map-end-btn": "투어 종료",
     "omamori-priest-role": "주지 스님의 말씀",
     "omamori-priest-quote": "「오늘 참배해 주셔서 진심으로 감사드립니다. 이곳에 잠든 영혼들이 여러분의 발걸음을 언제나 지켜보고 있습니다. 부디 오마모리를 간직하시고 건강한 나날을 보내시기 바랍니다.」",
@@ -854,6 +861,7 @@ const UI_STRINGS = {
     "highlight-label": "亮点",
     "audio-guide-heading": "语音导览",
     "all-stops-heading": "全部景点",
+    "demo-banner": "演示版｜这是免费试听，并非正式付费导览",
     "map-end-btn": "结束导览",
     "omamori-priest-role": "住持寄语",
     "omamori-priest-quote": "「感谢您今日的到访。长眠于此的灵魂将永远守护您的前行。请携带御守，祝您每天健康平安。」",
@@ -3197,6 +3205,11 @@ async function init() {
   applySelectedLanguage();
   applyFontScale();
   initTourSettings();
+
+  // Only an unpaid visitor is in free-preview mode (see isStopLocked/openPaywall
+  // above) — a paid or cash-code visitor on this same page gets the real tour,
+  // so the banner would be wrong for them.
+  demoBanner?.toggleAttribute("hidden", hasValidAccessToken());
 
   try {
     stopsData = await loadStops();
