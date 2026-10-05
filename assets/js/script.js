@@ -191,26 +191,26 @@ function isStopLocked(stop) {
 const PAYWALL_STRINGS = {
   ja: {
     title: "この先には、羅漢寺の歴史とさらなる物語が待っています",
-    text: "{n}つのスポットをご覧いただきました。残る{remaining}のスポットでは、羅漢像とその背景にある羅漢寺全体の歴史にまつわる、それぞれの物語をお楽しみいただけます。500円で24時間、全{total}スポットすべてのガイドをご覧いただけます。",
-    unlock: "残りのガイドを見る（500円）",
+    text: "{n}つのスポットをご覧いただきました。残る{remaining}のスポットでは、羅漢像とその背景にある羅漢寺全体の歴史にまつわる、それぞれの物語をお楽しみいただけます。1,000円で24時間、全{total}スポットすべてのガイドをご覧いただけます。",
+    unlock: "残りのガイドを見る（1,000円）",
     keep: "プレビューに戻る",
   },
   en: {
     title: "Ready to see where the story goes?",
-    text: "You've explored stops 1–{n}. {remaining} more are waiting, each with its own story, carving and audio guide. Unlock the full 24-hour tour for ¥500.",
-    unlock: "Unlock the full tour — ¥500",
+    text: "You've explored stops 1–{n}. {remaining} more are waiting, each with its own story, carving and audio guide. Unlock the full 24-hour tour for ¥1,000.",
+    unlock: "Unlock the full tour — ¥1,000",
     keep: "Keep exploring the preview",
   },
   ko: {
     title: "이야기는 아직 끝나지 않았습니다",
-    text: "스팟 1~{n}을 둘러보셨습니다. 아직 {remaining}개의 스팟에 저마다의 이야기와 음성 가이드가 기다리고 있습니다. ¥500으로 24시간 전체 투어를 이용하실 수 있습니다.",
-    unlock: "전체 투어 잠금 해제 (¥500)",
+    text: "스팟 1~{n}을 둘러보셨습니다. 아직 {remaining}개의 스팟에 저마다의 이야기와 음성 가이드가 기다리고 있습니다. ¥1,000으로 24시간 전체 투어를 이용하실 수 있습니다.",
+    unlock: "전체 투어 잠금 해제 (¥1,000)",
     keep: "미리보기 계속 보기",
   },
   zh: {
     title: "故事还在继续",
-    text: "您已体验景点 1–{n}。还有 {remaining} 个景点，各自藏着独特的故事与语音导览，等待您的探索。¥500 即可解锁 24 小时完整导览。",
-    unlock: "解锁完整导览（¥500）",
+    text: "您已体验景点 1–{n}。还有 {remaining} 个景点，各自藏着独特的故事与语音导览，等待您的探索。¥1,000 即可解锁 24 小时完整导览。",
+    unlock: "解锁完整导览（¥1,000）",
     keep: "继续试听",
   },
 };

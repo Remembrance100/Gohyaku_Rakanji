@@ -35,7 +35,7 @@ export async function onRequestPost(context) {
         {
           price_data: {
             currency: "jpy",
-            unit_amount: 500,
+            unit_amount: 1000,
             product_data: {
               name: product.name,
               description: product.description,

@@ -893,9 +893,16 @@ function initSettings(onLangChange) {
   }
 
   confirmBtn?.addEventListener("click", () => {
-    // Everyone continues to the entry screen and on into the tour. Without a
-    // token the tour is the free preview (stops 1–3), which sends the visitor
-    // to payment when they go past it, so there's no paywall here any more.
+    savePrefs({ lang: selectedLang, size: selectedSize });
+    if (ENTRY_FLOW !== "demo" && !hasValidAccessToken()) {
+      // Pay-first flow, no access yet: straight to the terms/payment path,
+      // same as before the free preview existed — never show the entry
+      // screen to a visitor who hasn't paid on this page.
+      window.location.href = "./privacy.html";
+      return;
+    }
+    // Paid/cash visitor, or demo.html (where showing the preview is the
+    // point regardless of token): continue to the entry screen as normal.
     hideSettings();
   });
 
@@ -922,10 +929,16 @@ function initSettings(onLangChange) {
 function bindEvents() {
   entryStartBtn?.addEventListener("click", () => {
     entryVideo?.pause();
-    if (ENTRY_FLOW !== "demo") {
-      // Pay-first flow: straight to the terms/payment path, same as before
-      // the free preview existed. privacy.html reads the saved language out
-      // of localStorage itself, same as pay-select.html does.
+    // A paid/cash visitor always goes straight into the tour from here,
+    // regardless of which page this is — this button is the normal, expected
+    // way in after watching the intro video. BUG FIXED 2026-10-04: this used
+    // to check only ENTRY_FLOW, so a visitor who had already paid via
+    // index.html (the pay-first page) was sent back to privacy.html instead
+    // of into the tour every single time — reported as a payment loop.
+    if (ENTRY_FLOW !== "demo" && !hasValidAccessToken()) {
+      // Pay-first flow, no access yet: straight to the terms/payment path,
+      // same as before the free preview existed. privacy.html reads the
+      // saved language out of localStorage itself, same as pay-select.html does.
       window.location.href = "./privacy.html";
       return;
     }

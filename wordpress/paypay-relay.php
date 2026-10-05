@@ -40,7 +40,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 const PAYPAY_RELAY_ROUTE     = 'memorial/v1';
-const PAYPAY_AMOUNT_JPY      = 500;
+const PAYPAY_AMOUNT_JPY      = 1000;
 const PAYPAY_ORDER_DESC      = 'Memorial Tour Guide — 24-hour access';
 const PAYPAY_RELAY_MAX_SKEW  = 300; // seconds a relay signature stays valid
 
