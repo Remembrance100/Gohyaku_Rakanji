@@ -105,6 +105,14 @@
         position: relative;
       }
 
+      /* .method-btn's own `display: flex` above would otherwise win over the
+         browser's default [hidden] rule (author CSS beats the UA stylesheet
+         even at equal specificity) — without this, `hidden` on #btnCash
+         wouldn't actually hide it. */
+      .method-btn[hidden] {
+        display: none;
+      }
+
       .method-btn:hover:not(:disabled) {
         border-color: rgba(246, 81, 95, 0.6);
         background: rgba(246, 81, 95, 0.06);
@@ -257,7 +265,11 @@
           </svg>
         </button>
 
-        <button class="method-btn" id="btnCash" type="button">
+        <!-- Cash temporarily switched off 2026-10-07 — pay at the front desk
+             isn't offered right now. To bring it back, delete the `hidden`
+             attribute below; nothing else needs to change (cash.html,
+             verify-cash-code.js and staff-code.html were all left as-is). -->
+        <button class="method-btn" id="btnCash" type="button" hidden>
           <div class="method-icon method-icon--cash">
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
               <text x="3" y="15" font-size="14" font-weight="900" font-family="Arial, sans-serif" fill="white">¥</text>
